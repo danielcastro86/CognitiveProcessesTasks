@@ -1,0 +1,598 @@
+﻿<usermanual>
+___________________________________________________________________________________________________________________	
+
+									*Self-Referent Encoding Task (custom)*
+_____________________________________________________________________ ______________________________________________	
+
+Script Author:Katja Borchert, Ph.D. (katjab@millisecond.com) for Millisecond Software, LLC
+Date: 01-05-2021
+last updated:  01-05-2021 by K. Borchert (katjab@millisecond.com) for Millisecond Software, LLC
+
+Script Copyright © 01-05-2021 Millisecond Software
+
+___________________________________________________________________________________________________________________
+BACKGROUND INFO 	
+___________________________________________________________________________________________________________________	
+
+This script implements a custom template script for a Self-Referent Encoding Task
+The implemented procedure is based on:
+
+Reference
+Disner, S. G., Shumake, J. D., & Beevers, C. G. (2017). Self-referential schemas and attentional bias predict 
+severity and naturalistic course of depression symptoms. Cognition & emotion, 31(4), 632–644. 
+https://doi.org/10.1080/02699931.2016.1146123
+
+//Diffusion Model references (the original data were analyzed using the Diffusion Model):
+Ratcliff, R., & McKoon, G. (2008). The diffusion decision model:
+Theory and data for two-choice decision tasks. Neural
+Computation, 20(4), 873–922.
+
+Voss, A., & Voss, J. (2007). Fast-dm: A free program for efficient
+diffusion model analysis. Behavior Research Methods, 39(4),
+767–775.
+
+also: https://www.psychologie.uni-heidelberg.de/ae/meth/fast-dm/
+
+___________________________________________________________________________________________________________________
+TASK DESCRIPTION	
+___________________________________________________________________________________________________________________	
+
+Participants work through a list of 30 positive and 30 negative words (order is randomized)
+and judge whether the word is self-descriptive.
+
+___________________________________________________________________________________________________________________	
+DATA FILE INFORMATION 
+___________________________________________________________________________________________________________________		
+The default data stored in the data files are:
+
+(1) Raw data file: 'selfreferentencodingtask_raw*.iqdat' (a separate file for each participant)*
+
+
+build:								The specific Inquisit version used (the 'build') that was run
+computer.platform:					the platform the script was run on (win/mac/ios/android)
+date, time, 						date and time script was run 
+subject, group, 					with the current subject/groupnumber
+sessio:								with the current session id
+
+blockcode, blocknum:				the name and number of the current block (built-in Inquisit variable)
+trialcode, trialnum: 				the name and number of the currently recorded trial (built-in Inquisit variable)
+										Note: trialnum is a built-in Inquisit variable; it counts all trials run; even those
+										that do not store data to the data file. 
+										
+stim:								the presented stimuli in order of trial presentation
+
+response:							the participant's response (scancode of response buttons)
+responsetext:						the label of the response key 
+
+SR_judgment:						1 = self-referential judgment (yes); 0 = otherwise (no)
+
+latency: 							the response latency (in ms); measured from: onset of trial
+
+(2) Summary data file: 'selfreferentencodingtask_summary*.iqdat' (a separate file for each participant)*
+
+inquisit.build:						the Inquisit build/version run
+computer.platform:					the platform the script was run on (win/mac/ios/android)
+inquisit.build:						the version/build of Inquisit
+script.startdate:					date script was run
+script.starttime:					time script was started
+script.subjectid:					assigned subject id number
+script.groupid:						assigned group id number
+script.sessionid:					assigned session id number
+script.elapsedtime:					time it took to run script (in ms); measured from onset to offset of script
+script.completed:					0 = script was not completed (prematurely aborted); 
+									1 = script was completed (all conditions run)
+							
+countSR_positive:					number of self-referential judgments (pressed Y) for positive words 
+propSR_positive:					proportion of self-referential judgments (pressed Y) for positive words
+meanRT_SR_positive:					mean response time (in ms) for making self-referential judgments for positive words
+
+countSR_negative:					number of self-referential judgments (pressed Y) for negative words  
+propSR_negative:					proportion of self-referential judgments (pressed Y) for negative words
+meanRT_SR_positive:					mean response time (in ms) for making self-referential judgments for negative words
+							
+* separate data files: to change to one data file for all participants (on Inquisit Lab only), go to section
+"DATA" and follow further instructions
+
+___________________________________________________________________________________________________________________	
+EXPERIMENTAL SET-UP 
+___________________________________________________________________________________________________________________	
+
+(1) Test: runs 60 trials
+- 30 positive words
+- 30 negative words
+(order is determined randomly)
+
+Trial Sequence:
+- word is presented until response
+- iti
+
+___________________________________________________________________________________________________________________
+STIMULI
+___________________________________________________________________________________________________________________
+This script is created as a template that runs with placeholder stimuli.
+To insert final stimuli, go to section 'Editable Stimuli' and follow instructions.
+
+___________________________________________________________________________________________________________________	
+INSTRUCTIONS 
+___________________________________________________________________________________________________________________	
+provided by Millisecond Software - can be edited under section Editable Instructions
+
+___________________________________________________________________________________________________________________	
+EDITABLE CODE 
+___________________________________________________________________________________________________________________	
+check below for (relatively) easily editable parameters, stimuli, instructions etc. 
+Keep in mind that you can use this script as a template and therefore always "mess" with the entire code 
+to further customize your experiment.
+
+The parameters you can change are:		
+</usermanual>
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE PARAMETERS: change editable parameters here
+**************************************************************************************************************
+**************************************************************************************************************
+
+<parameters>
+/getReadyDuration = 5000		//the duration (in ms) of the get-ready-trial (default: 5000)
+/iti = 1000						//the intertrial interval (in ms) (default: 1000)
+
+//Sizing Parameters
+/wordSize = 10%					//the proportional size of the presented words (default: 10%)
+
+//Response keys:
+/yesKey = "S"					//the key used for YES responses (default: Y)
+/noKey = "N"					//the key used for NO responses (default: N)
+</parameters>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE STIMULI
+**************************************************************************************************************
+**************************************************************************************************************
+
+<item positive>
+/1 = "Contente"
+/2 = "Alegre"
+/3 = "Festivo"
+/4 = "Feliz"
+/5 = "Amigo"
+/6 = "Apaixonado"
+/7 = "Amigável"
+/8 = "Curioso"
+/9 = "Tranquilo"
+/10 = "Esperançado"
+
+/11 = "Satisfeito"
+/12 = "Sociável"
+/13 = "Útil"
+/14 = "Bonito"
+/15 = "Concentrado"
+/16 = "Atencioso"
+/17 = "Empenhado"
+/18 = "Calmo"
+/19 = "Sossegado"
+/20 = "Paciente"
+
+/21 = "Humilde"
+/22 = "Descontraido"
+/23 = "Seguro"
+/24 = "Agradecido"
+/25 = "Bom"
+/26 = "Simpático"
+/27 = "Honesto"
+/28 = "Respeitador"
+/29 = "Generoso"
+/30 = "Despreocupado"
+</item>
+
+<item negative>
+/1 = "Infeliz"
+/2 = "Triste"
+/3 = "Infiel"
+/4 = "Deprimido"
+/5 = "Desanimado"
+/6 = "Desesperado"
+/7 = "Agressivo"
+/8 = "Angustiado"
+/9 = "Falso"
+/10 = "Falhado"
+
+/11 = "Frustrado"
+/12 = "Solitário"
+/13 = "Inútil"
+/14 = "Feio"
+/15 = "Cansado"
+/16 = "Aborrecido"
+/17 = "Arrogante"
+/18 = "Tenso"
+/19 = "Irritado"
+/20 = "Descontente"
+
+/21 = "Desinteressado"
+/22 = "Inseguro"
+/23 = "Preocupado"
+/24 = "Indiferente"
+/25 = "Ansioso"
+/26 = "Timido"
+/27 = "Preguiçoso"
+/28 = "Sozinho"
+/29 = "Desconfiado"
+/30 = "Envergonhado"
+</item>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE INSTRUCTIONS: change instructions here
+**************************************************************************************************************
+**************************************************************************************************************
+<instruct>
+/ inputdevice = keyboard
+/ nextlabel = "pressione a [barra de espaços] para continuar"
+/ lastlabel = "pressione a [barra de espaços] para COMEÇAR"
+/ prevlabel = "pressione a tecla [backspace] para retroceder"
+/ screencolor = black
+/ txcolor = white
+</instruct>
+
+<page intro>
+<h1>Instruções</h1><hr>
+Nesta tarefa será lhe apresentada uma lista de palavras.<br><br>
+Decida <u>o mais rapidamente possível</u> se a palavra o/a descreve.<br><br>
+&bull; Pressione <%parameters.yesKey%> se a palavra o/a descrever.<br>
+&bull; Pressione <%parameters.noKey%> se a palavra NÃO o/a descrever. <br><br>
+
+Vamos começar.
+</page>
+
+
+<text yes>
+/ items = ("SIM")
+/ fontstyle = ("Arial", 4%, true, false, false, false, 5, 1)
+/ position = (25%, 90%)
+/ vjustify = center
+/ valign = center
+/ halign = center
+/ txcolor = gray
+/ erase = false
+</text>
+
+<text yes_hl>
+/ items = ("SIM")
+/ fontstyle = ("Arial", 4%, true, false, false, false, 5, 1)
+/ position = (25%, 90%)
+/ vjustify = center
+/ valign = center
+/ halign = center
+/ txcolor = yellow
+/ erase = false
+</text>
+
+<text no>
+/ items = ("NÃO")
+/ fontstyle = ("Arial", 4%, true, false, false, false, 5, 1)
+/ position = (75%, 90%)
+/ vjustify = center
+/ valign = center
+/ halign = center
+/ txcolor = gray
+/ erase = false
+</text>
+
+<text no_hl>
+/ items = ("NÃO")
+/ fontstyle = ("Arial", 4%, true, false, false, false, 5, 1)
+/ position = (75%, 90%)
+/ vjustify = center
+/ valign = center
+/ halign = center
+/ txcolor = yellow
+/ erase = false
+</text>
+
+
+
+<text finish>
+/ items = ("Obrigado!")
+/ fontstyle = ("Arial", 8%, true, false, false, false, 5, 1)
+/ position = (50%, 50%)
+/ size = (80%, 10%)
+/ vjustify = center
+/ valign = center
+/ halign = center
+</text>
+
+<text exit>
+/ items = ("pressione a [barra de espaços] para terminar esta tarefa")
+/ fontstyle = ("Arial", 3%, false, false, false, false, 5, 1)
+/ position = (50%, 95%)
+/ size = (80%, 5%)
+/ vjustify = center
+/ valign = center
+/ halign = center
+/ txbgcolor = gray
+</text>
+
+*******************************
+General Helper Instructions
+******************************
+
+<text getReady>
+/ items = ("<center><h1>Prepare-se!</h1><br>
+~n<%expressions.buttoninstruct1%></center>")
+/ fontstyle = ("Arial", 3.00%, false, false, false, false, 5, 1)
+</text>
+
+****************************************************************************************************
+general instruction expressions: adjust the instruction text depending on device used to run script
+****************************************************************************************************
+<expressions>
+/buttoninstruct1 = if (computer.touch && !computer.haskeyboard) {"coloque os dedos sobre as teclas de reposta";} else 
+{"coloque os dedos sobre as teclas de resposta '<%parameters.yesKey%>' e '<%parameters.noKey%>'";}
+</expressions>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE LISTS: change editable lists here
+**************************************************************************************************************
+**************************************************************************************************************
+
+**************************************************************************************************************
+				!!!REMAINING CODE: Customize after careful consideration only!!!
+**************************************************************************************************************
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	DEFAULTS
+**************************************************************************************************************
+**************************************************************************************************************
+script requires Inquisit 6.3.4.0 or higher
+
+<defaults>
+/canvasaspectratio = (4,3)
+/minimumversion = "6.3.4.0"
+/ fontstyle = ("Arial", 3%, false, false, false, false, 5, 1)
+/txbgcolor = black
+/ txcolor = white
+/ screencolor = black
+</defaults>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	DATA
+**************************************************************************************************************
+**************************************************************************************************************
+
+Note: data file explanations under User Manual Information at the top
+
+To change from one data file per participant to one data file for all participants, set
+/separatefiles = false
+
+***********************
+raw data file
+***********************
+<data>
+/ columns = (build, computer.platform, date, time, subject, group, session, 
+blockcode, blocknum, trialcode, trialnum, 
+values.stim, response, responsetext, values.SR_judgment, latency)
+</data>
+
+***********************
+summary data file
+***********************
+<summarydata>
+/ columns = (inquisit.build, computer.platform, inquisit.build, expressions.task, script.startdate, script.starttime, 
+script.subjectid, script.groupid, script.sessionid, 
+script.elapsedtime, script.completed,block.finish
+expressions.countSR_positive, expressions.propSR_positive, expressions.meanRT_SR_positive,
+expressions.countSR_negative, expressions.propSR_negative, expressions.meanRT_SR_negative)
+
+</summarydata>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	VALUES: automatically updated
+**************************************************************************************************************
+**************************************************************************************************************
+
+<values>
+/SR_judgment = ""
+/stim = ""
+</values>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EXPRESSIONS
+**************************************************************************************************************
+**************************************************************************************************************
+
+<expressions>
+/countSR_positive = list.selfreferentialJudgments_positive.mean * list.selfreferentialJudgments_positive.itemcount
+/propSR_positive = list.selfreferentialJudgments_positive.mean
+/meanRT_SR_positive = list.RT_selfreferentialJudgments_positive.mean
+
+/countSR_negative = list.selfreferentialJudgments_negative.mean * list.selfreferentialJudgments_negative.itemcount
+/propSR_negative = list.selfreferentialJudgments_negative.mean
+/meanRT_SR_negative = list.RT_selfreferentialJudgments_negative.mean
+/task = "MBM"
+</expressions>
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	INSTRUCTIONS
+**************************************************************************************************************
+**************************************************************************************************************
+
+**************************************************************************************************************
+finish trial
+**************************************************************************************************************
+<trial finish>
+/ inputdevice = keyboard
+/ stimulusframes = [1 = finish, exit]
+/ validresponse = (" ")
+/ recorddata = false
+</trial>
+
+*************************************
+General Helper Instruction Trials/Blocks
+*************************************
+
+This trial is used when participants are asked to place their fingers on specific response
+buttons. On the touchscreen, this trial presents the (inactive) response buttons to the participants.
+<trial getReady>
+/ stimulusframes = [1 = clearscreen, getReady, yes, no]
+/ timeout = parameters.getReadyDuration
+/ validresponse = (parameters.yesKey, parameters.noKey)
+/ beginresponsetime = parameters.getReadyDuration
+/ errormessage = false
+/ recorddata = false
+/ posttrialpause = parameters.iti
+</trial>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	STIMULI
+**************************************************************************************************************
+**************************************************************************************************************
+
+<text positive>
+/ items = item.positive
+/ select = noreplace
+/ fontstyle = ("Arial", parameters.wordSize, false, false, false, false, 5, 1)
+/ position = (50%, 50%)
+/ vjustify = center
+/ erase = false
+</text>
+
+<text negative>
+/ items = item.negative
+/ select = noreplace
+/ fontstyle = ("Arial", parameters.wordSize, false, false, false, false, 5, 1)
+/ position = (50%, 50%)
+/ vjustify = center
+/ erase = false
+</text>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	LISTS	
+**************************************************************************************************************
+**************************************************************************************************************
+
+updated during runtime: 
+stores 1 = self-referential judgment; 0 = otherwise 
+<list selfreferentialJudgments_positive>
+</list>
+
+updated during runtime: 
+<list RT_selfreferentialJudgments_positive>
+</list>
+
+updated during runtime: 
+stores 1 = self-referential judgment; 0 = otherwise 
+<list selfreferentialJudgments_negative>
+</list>
+
+updated during runtime: 
+<list RT_selfreferentialJudgments_negative>
+</list>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	TRIALS 	
+**************************************************************************************************************
+**************************************************************************************************************
+
+<trial negative>
+/ stimulusframes = [1 = clearscreen, negative, yes, no]
+/ validresponse = (parameters.yesKey, parameters.noKey)
+/ ontrialend = [
+	if (trial.negative.responsetext == parameters.yesKey){
+		values.SR_judgment = 1;
+	} else if (trial.negative.responsetext == parameters.noKey){
+		values.SR_judgment = 0;
+	};
+	
+	list.selfreferentialJudgments_negative.appenditem(values.SR_judgment);
+	if (values.SR_judgment == 1){
+		list.RT_selfreferentialJudgments_negative.appenditem(trial.negative.latency);
+	};
+	values.stim = text.negative.currentitem;
+]
+/ responsemessage = (parameters.yesKey, text.yes_hl, 50)
+/ responsemessage = (parameters.noKey, text.no_hl, 50)
+/ branch = [
+	return trial.iti;
+]
+</trial>
+
+<trial positive>
+/ stimulusframes = [1 = clearscreen, positive, yes, no]
+/ validresponse = (parameters.yesKey, parameters.noKey)
+/ ontrialend = [
+	if (trial.positive.responsetext == parameters.yesKey){
+		values.SR_judgment = 1;
+	} else if (trial.positive.responsetext == parameters.noKey){
+		values.SR_judgment = 0;
+	};
+	
+	list.selfreferentialJudgments_positive.appenditem(values.SR_judgment);
+	if (values.SR_judgment == 1){
+		list.RT_selfreferentialJudgments_positive.appenditem(trial.positive.latency);
+	};	
+	values.stim = text.positive.currentitem;
+]
+/ responsemessage = (parameters.yesKey, text.yes_hl, 50)
+/ responsemessage = (parameters.noKey, text.no_hl, 50)
+/ branch = [
+	return trial.iti;
+]
+</trial>
+
+<trial iti>
+/ stimulusframes = [1 = clearscreen, yes, no]
+/ trialduration = parameters.iti
+/ recorddata = false
+</trial>
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	BLOCKS
+**************************************************************************************************************
+**************************************************************************************************************
+
+<block test>
+/ trials = [
+	1 = getReady; 
+	2-61 = noreplace(trial.positive, trial.negative);
+]
+</block>
+
+<block finish>
+/ trials = [
+	1 = finish;
+]
+</block>
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EXPERIMENT 
+**************************************************************************************************************
+**************************************************************************************************************
+
+<expt>
+/ preinstructions = (intro)
+/ blocks = [
+	1 = test;
+	2 = finish;
+]
+</expt>
+
+**************************************************************************************************************
+												End of File
+**************************************************************************************************************

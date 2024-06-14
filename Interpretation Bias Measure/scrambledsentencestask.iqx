@@ -1,0 +1,2020 @@
+﻿<usermanual>
+___________________________________________________________________________________________________________________	
+
+									*SCRAMBLED SENTENCES TASK*
+___________________________________________________________________________________________________________________	
+
+Script Author: Katja Borchert, Ph.D. (katjab@millisecond.com) for Millisecond Software, LLC
+Date: 04-07-2016
+last updated:  03-13-2020 by K. Borchert (katjab@millisecond.com) for Millisecond Software, LLC
+
+Script Copyright © 03-13-2020 Millisecond Software
+
+Millisecond Software thanks Timo Brockmeyer for collaborating on this script!
+
+___________________________________________________________________________________________________________________
+BACKGROUND INFO 	
+___________________________________________________________________________________________________________________	
+This script implements a simple computerized Scrambled Sentences Task, a test to measure 
+interpretation bias.
+
+The implemented procedure is based on the following publications:
+
+Hedlund, S., & Rude, S. S. (1995). Evidence of latent depressive schemas
+in formerly depressed individuals. Journal of Abnormal Psychology,
+104, 517–525.
+
+Wenzlaff, R. M., & Bates, D. E. (1998). Unmasking a cognitive vulnerability
+to depression: How lapses in mental control reveal depressive
+thinking. Journal of Personality and Social Psychology, 75, 1559–1571
+
+Everaert, J., Duyck, W., & Koster, E. H. W. (2014). Attention, interpretation, and memory
+biases in subclinical depression: A proof-of-principle test of the combined
+cognitive biases hypothesis. Emotion, 14(2), 331–340
+
+Sanchez, A. et al (2015). Life is . . . great! Emotional attention during instructed and
+uninstructed ambiguity resolution in relation to depressive symptoms.
+Biological Psychology, 109 (2015), 67–72.
+
+___________________________________________________________________________________________________________________
+TASK DESCRIPTION
+___________________________________________________________________________________________________________________	
+Participants are given scrambled sentences (e.g. "born winner am loser a I") with 6 words and are asked 
+to unscramble them using 5 of the 6 given words by entering corresponding numbers (e.g. 1 = 'born', 6 = 'I').
+Half the scrambled sentences are "Emotional" ('winner' vs. 'loser') half the scrambled sentence are neutral 
+in regard to emotion. A cognitive load test is run for half the participants (based on groupid).
+ 
+___________________________________________________________________________________________________________________	
+DURATION 
+___________________________________________________________________________________________________________________	
+the default set-up of the script takes appr. 12 minutes to complete
+
+___________________________________________________________________________________________________________________	
+DATA FILE INFORMATION 
+___________________________________________________________________________________________________________________	
+The default data stored in the data files are:
+
+(1) Raw data file: 'scrambledsentencestask_raw*.iqdat' (a separate file for each participant)
+
+build:								The specific Inquisit version used (the 'build') that was run
+computer.platform:					the platform the script was run on (win/mac/ios/android)
+date, time, 						date and time script was run 
+subject, group, 					with the current subject/groupnumber
+script.sessionid:					with the current session id
+
+blockcode, blocknum:				the name and number of the current block (built-in Inquisit variable)
+trialcode, trialnum: 				the name and number of the currently recorded trial (built-in Inquisit variable)
+										Note: trialnum is a built-in Inquisit variable; it counts all trials run; even those
+										that do not store data to the data file such as feedback trials. Thus, trialnum 
+										may not reflect the number of main trials run per block. 
+										
+									
+values.sentenceCondition:			0 = demo; 
+									1 = Emotional; 
+									2 = Control
+									
+values.CL_Condition:				cognitive load condition: 
+									1 = runs cognitive load task; 
+									2 = does not run cognitive load task
+										
+values.index						itemnumber of current sentence			
+									
+values.scrambledSentence:			the currently presented scrambled sentence
+values.positiveSolution:			stores the positive (pseudopositive for control) solution for the currently scrambled sentence
+values.negativeSolution:			stores the negative solution (pseudonegative for control) for the currently scrambled sentence 
+values.numericSentence:				stores the cumulative numeric response
+values.sentenceResponse:			the entered unscrambled sentence (as translated from the numericSentence)
+values.responseCategory:			the emotional category of the response: "positive", "negative", "neutral" (for correct responses), "other" (for incorrect responses)
+values.numericResponse:				helper variable: stores the current numeric response based on scancode of response button
+
+correct:							accuracy of response (1 = correct; 0 = otherwise)
+values.cumulativeRT:				stores the cumulative latencies (in ms) of selecting the numbers of the current cumulative numeric response
+
+
+(2) Summary data file: 	'scrambledsentencestask_summary*.iqdat' (a separate file for each participant)
+
+computer.platform:					the platform the script was run on (win/mac/ios/android)
+script.startdate:					date script was run
+script.starttime:					time script was started
+script.subjectid:					assigned subject id number
+script.groupid:						assigned group id number
+script.sessionid:					assigned session id number
+script.elapsedtime:					time it took to run script (in ms); measured from onset to offset of script
+script.completed:					0 = script was not completed (prematurely aborted); 
+									1 = script was completed (all conditions run)
+
+
+expressions.propCorrectSolutions:		proportion correct solutions (correct = either the 'positive'/control1 or the 'negative'/control2 solution)
+expressions.meanRT_Solutions:			mean latency (in ms) of entering the 5 digits for a correct solution 
+
+expressions.propCorrectSolutions_E:		proportion correct solutions in condition 1 (Emotional)
+expressions.meanRT_E:					mean latency (in ms) of entering the 5 digits for a correct solution in condition 1 (Emotional)
+expressions.propNegSolutions:			proportion negative solutions (based on correct solutions entered) in condition 1 (Emotional)
+expressions.propPosSolutions:			proportion positive solutions (based on correct solutions entered) in condition 1 (Emotional)
+expressions.meanRT_Neg:					mean latency (in ms) of entering the 5 digits for negative solutions in condition 1 (Emotional)
+expressions.meanRT_Pos:					mean latency (in ms) of entering the 5 digits for positive solutions in condition 1 (Emotional)
+
+expressions.propCorrectSolutions_C:		proportion correct solutions in condition 2 (Control)
+expressions.meanRT_C:					mean latency (in ms) of entering the 5 digits for a correct solution in condition 2 (Control)
+
+values.CL_Condition:					cognitive load condition: 
+											1 = runs cognitive load task; 
+											2 = does not run cognitive load task
+										
+values.CLcorrect:						1 = cognitive load task correct; 
+											0 = cognitive load task incorrect; 
+											N/A = if no cognitive load condition was run
+______________________________________________________________________________________________________________	
+EXPERIMENTAL SET-UP 
+___________________________________________________________________________________________________________________
+This script runs
+1) 5 practice sentences (neutral)
+2) 1 Testblock of 40 statements: 20 Emotional Statements, 20 Neutral Statements (order is randomly determined 
+with constraint that max.3 of the same trial type can run consecutively)
+
+Each trial starts with a fixation cross presented center left for 2000ms (default) before it appears and 
+the scrambled sentence (each word in its own box) is presented for max. 10000ms (default).
+Participants need to unscramble the sentences and click on the words in the order they should appear.
+Digits appear above each word to indicate the selected word order.
+Responses cannot be corrected.
+
+Cognitive Load (CL): This script runs a cognitive load task for participants with odd numbered groupids
+- presents a 6-digit number of 7000ms (can be edited) at start of test
+- digit recall at end of test
+
+___________________________________________________________________________________________________________________	
+STIMULI
+___________________________________________________________________________________________________________________	
+5 practice sentences
+20 emotional statements (taken from Wentzlaff & Bates, 1998*). * slightly altered to avoid ambiguous sentence 
+structures as much as possible
+	constraints on the order of the scrambled words:
+	* half the scrambled sentences present the positive word before the negative
+	* target words never start or end a scrambled sentence
+	* target words do not appear directly next to each other in the scrambled sentences
+20 neutral statements (provided by Millisecond Software as demo sentences only) 
+(same constraints as for the Emotional sentences)
+
+edit all stimuli under section Editable Stimuli
+
+___________________________________________________________________________________________________________________	
+INSTRUCTIONS 
+___________________________________________________________________________________________________________________	
+Instructions are not original to any study- they are based on Wentzlaff & Bates (1998) and
+can be edited under section Editable Instructions
+	
+___________________________________________________________________________________________________________________	
+EDITABLE CODE 
+___________________________________________________________________________________________________________________	
+check below for (relatively) easily editable parameters, stimuli, instructions etc. 
+Keep in mind that you can use this script as a template and therefore always "mess" with the entire code 
+to further customize your experiment.
+
+The parameters you can change are:
+
+/wordSize:						the size of the word stimuli in canvas height percentages (default: 1.8%)
+/digitSize::					the size of the cognitive load digits in canvas height percentages (default: 5%)
+
+/fixationDuration:				duration (in ms) fixation cross is presented by itself (default: 2000ms)
+/maxAssemblyTime:				the max. duration (in ms) allowed to assembly each sentence (default: 10000ms)
+
+/iti:							intertrial interval (in ms) = blank screen between trials before next 
+								fixation cross is presented (default: 7000ms)
+								
+/CL_digitDuration:				Cognitive Load digit presentation duration (in ms) (default: 7000ms)
+
+</usermanual>
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE PARAMETERS: change editable parameters here
+**************************************************************************************************************
+**************************************************************************************************************
+
+<parameters>
+/ wordSize = 1.5%
+/ digitSize = 5%
+/ fixationDuration = 2000
+/ maxAssemblyTime = 10000
+/ iti = 1000
+/ CL_digitDuration = 7000
+</parameters>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE STIMULI: change editable stimuli here
+**************************************************************************************************************
+**************************************************************************************************************
+
+************************************************************
+Emotional Condition
+************************************************************
+
+contains the itemnumbers for the emotional items
+<list itemnumbersE>
+/ items = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20)
+/ replace = false
+</list>
+
+
+(from Wenzlaff & Bates, 1998) - slightly altered to avoid ambiguous sentence structures as much as possible
+as well as work within the given constraints described
+<item scrambledSentencesE>
+/ 1 = "PARECE BRILHANTE FUTURO O DESANIMADOR MUITO"
+/ 2 = "É INTERESSANTE VIDA A ABORRECIDA BASTANTE"
+/ 3 = "DE POUCO GENERICAMENTE, MIM MUITO GOSTAM"
+/ 4 = "OUTROS IGUAL SOU INFERIOR EU AOS"
+/ 5 = "VIDA VERDADEIRAMENTE RECOMPENSADORA É NÃO A"
+/ 6 = "UMA ÚTIL EU INÚTIL SOU PESSOA"
+/ 7 = "UM SOU FALHANÇO GRANDE SUCESSO EU" 
+/ 8 = "AMADO EU TAMBÉM MEREÇO NÃO SER" 
+/ 9 = "AS MUITO PESSOAS COMIGO POUCO PREOCUPAM-SE"
+/ 10 = "OS EU PERDI MEUS AJUDEI AMIGOS"
+/ 11 = "É IMPOSSÍVEL A FELICIDADE POSSÍVEL OBTER"
+/ 12 = "ESTÁ INALTERADA APARÊNCIA MINHA PÉSSIMA A"
+/ 13 = "MIM BEM GENERICAMENTE, DE MAL PENSAM"
+/ 14 = "É POUCO UNIVERSIDADE RECOMPENSADORA BASTANTE A"
+/ 15 = "PARECEM MAL AS PESSOAS BEM COMPREENDEREM-ME"
+/ 16 = "A ESTÁ A PIORAR VIDA MELHORAR A"
+/ 17 = "PESSOA SOU INADEQUADA EU ADEQUADA UMA"
+/ 18 = "AS DEFRAUDAR EU POSSO CUMPRIR EXPECTATIVAS"
+/ 19 = "EU POUCO OFERECER TENHO MUITO PARA"
+/ 20 = "MINHAS DESPERDICEI EU APROVEITEI AS OPORTUNIDADES"
+</item>
+
+****************************************
+positive responses
+****************************************
+
+<item scrambledSentencesE_pos>
+/ 1 = "TO FUTURO PARECE MUITO BRILHANTE"
+/ 2 = "A VIDA É BASTANTE INTERESSANTE"
+/ 3 = "GENERICAMENTE, GOSTAM MUITO DE MIM"
+/ 4 = "EU SOU IGUAL AOS OUTROS"
+/ 5 = "A VIDA É VERDADEIRAMENTE RECOMPENSADORA"
+/ 6 = "EU SOU UMA PESSOA ÚTIL"
+/ 7 = "EU SOU UM GRANDE SUCESSO"
+/ 8 = "EU TAMBÉM MEREÇO SER AMADO"
+/ 9 = "AS PESSOAS PREOCUPAM-SE MUITO COMIGO"
+/ 10 = "EU AJUDEI OS MEUS AMIGOS"
+/ 11 = "É POSSIVEL OBTER A FELICIDADE"
+/ 12 = "A MINHA APARÊNCIA ESTÁ INALTERADA"
+/ 13 = "GENERICAMENTE, PENSAM BEM DE MIM"
+/ 14 = "A UNIVERSIDADE É BASTANTE RECOMPENSADORA"
+/ 15 = "AS PESSOAS PARECEM COMPREENDER-ME BEM"
+/ 16 = "A VIDA ESTÁ A MELHORAR"
+/ 17 = "EU SOU UMA PESSOA ADEQUADA"
+/ 18 = "EU POSSO CUMPRIR AS EXPECTATIVAS"
+/ 19 = "EU TENHO MUITO PARA OFERECER"
+/ 20 = "EU APROVEITEI AS MINHAS OPORTUNIDADES"
+</item>
+
+****************************************
+negative responses
+****************************************
+
+<item scrambledSentencesE_neg>
+/ 1 = "O FUTURO PARECE MUITO DESANIMADOR"
+/ 2 = "A VIDA É BASTANTE ABORRECIDA"
+/ 3 = "GENERICAMENTE, GOSTAM POUCO DE MIM"
+/ 4 = "EU SOU INFERIOR AOS OUTROS"
+/ 5 = "A VIDA NÃO É RECOMPENSADORA"
+/ 6 = "EU SOU UMA PESSOA INÚTIL"
+/ 7 = "EU SOU UM GRANDE FALHANÇO"
+/ 8 = "EU NÃO MEREÇO SER AMADO"
+/ 9 = "AS PESSOAS PREOCUPAM-SE POUCO COMIGO"
+/ 10 = "EU PERDI OS MEUS AMIGOS"
+/ 11 = "É IMPOSSÍVEL OBTER A FELICIDADE"
+/ 12 = "A MINHA APARÊNCIA ESTÁ PÉSSIMA"
+/ 13 = "GENERICAMENTE, PENSAM MAL DE MIM"
+/ 14 = "A UNIVERSIDADE É POUCO RECOMPENSADORA"
+/ 15 = "AS PESSOAS PARECEM COMPREENDER-ME MAL"
+/ 16 = "A VIDA ESTÁ A PIORAR"
+/ 17 = "EU SOU UMA PESSOA INADEQUADA"
+/ 18 = "EU POSSO DEFRAUDAR AS EXPECTATIVAS"
+/ 19 = "EU TENHO POUCO PARA OFERECER"
+/ 20 = "EU DESPERDICEI AS MINHAS OPORTUNIDADES"
+
+</item>
+
+
+******************************
+individual words
+******************************
+
+<item scrambledSentencesE_word1>
+/ 1 = "PARECE"
+/ 2 = "É"
+/ 3 = "DE"
+/ 4 = "OUTROS"
+/ 5 = "VIDA"
+/ 6 = "UMA"
+/ 7 = "UM"
+/ 8 = "AMADO"
+/ 9 = "AS"
+/ 10 = "OS"
+/ 11 = "É"
+/ 12 = "ESTÁ"
+/ 13 = "MIM"
+/ 14 = "É"
+/ 15 = "PARECEM"
+/ 16 = "A"
+/ 17 = "PESSOA"
+/ 18 = "AS'"
+/ 19 = "EU"
+/ 20 = "MINHAS"
+</item>
+
+<item scrambledSentencesE_word2>
+/ 1 = "BRILHANTE"
+/ 2 = "INTERESSANTE"
+/ 3 = "POUCO"
+/ 4 = "IGUAL"
+/ 5 = "VERDADEIRAMENTE"
+/ 6 = "ÚTIL"
+/ 7 = "SOU"
+/ 8 = "EU"
+/ 9 = "MUITO"
+/ 10 = "EU"
+/ 11 = "IMPOSSÍVEL"
+/ 12 = "INALTERADA"
+/ 13 = "BEM"
+/ 14 = "POUCO"
+/ 15 = "MAL"
+/ 16 = "ESTÁ"
+/ 17 = "SOU"
+/ 18 = "DEFRAUDAR"
+/ 19 = "POUCO"
+/ 20 = "DESPERDICEI"
+</item>
+
+<item scrambledSentencesE_word3>
+/ 1 = "FUTURO"
+/ 2 = "VIDA"
+/ 3 = "GENERICAMENTE,"
+/ 4 = "SOU"
+/ 5 = "RECOMPENSADORA"
+/ 6 = "EU"
+/ 7 = "FALHANÇO"
+/ 8 = "TAMBÉM"
+/ 9 = "PESSOAS"
+/ 10 = "PERDI"
+/ 11 = "A"
+/ 12 = "APARÊNCIA"
+/ 13 = "GENERICAMENTE,"
+/ 14 = "UNIVERSIDADE"
+/ 15 = "AS"
+/ 16 = "PIORAR"
+/ 17 = "INADEQUADA"
+/ 18 = "EU"
+/ 19 = "OFERECER"
+/ 20 = "AS"
+</item>
+
+<item scrambledSentencesE_word4>
+/ 1 = "O"
+/ 2 = "A"
+/ 3 = "MIM"
+/ 4 = "INFERIOR"
+/ 5 = "É"
+/ 6 = "INÚTIL"
+/ 7 = "GRANDE"
+/ 8 = "MEREÇO"
+/ 9 = "COMIGO"
+/ 10 = "MEUS"
+/ 11 = "FELICIDADE"
+/ 12 = "MINHA"
+/ 13 = "DE"
+/ 14 = "RECOMPENSADORA"
+/ 15 = "PESSOAS"
+/ 16 = "VIDA"
+/ 17 = "EU"
+/ 18 = "POSSO"
+/ 19 = "TENHO"
+/ 20 = "APROVEITEI"
+</item>
+
+<item scrambledSentencesE_word5>
+/ 1 = "DESANIMADOR"
+/ 2 = "ABORRECIDA"
+/ 3 = "MUITO"
+/ 4 = "EU"
+/ 5 = "NÃO"
+/ 6 = "SOU"
+/ 7 = "SUCESSO"
+/ 8 = "NÃO"
+/ 9 = "POUCO"
+/ 10 = "AJUDEI"
+/ 11 = "POSSÍVEL"
+/ 12 = "PÉSSIMA"
+/ 13 = "MAL"
+/ 14 = "BASTANTE"
+/ 15 = "BEM"
+/ 16 = "MELHORAR"
+/ 17 = "ADEQUADA"
+/ 18 = "CUMPRIR"
+/ 19 = "MUITO"
+/ 20 = "AS"
+</item>
+
+<item scrambledSentencesE_word6>
+/ 1 = "MUITO"
+/ 2 = "BASTANTE"
+/ 3 = "GOSTAM"
+/ 4 = "AOS"
+/ 5 = "A"
+/ 6 = "PESSOA"
+/ 7 = "EU"
+/ 8 = "SER"
+/ 9 = "PREOCUPAM-SE"
+/ 10 = "AMIGOS"
+/ 11 = "OBTER"
+/ 12 = "A"
+/ 13 = "PENSAM"
+/ 14 = "A"
+/ 15 = "COMPREENDER-ME"
+/ 16 = "A"
+/ 17 = "UMA"
+/ 18 = "EXPECTATIVAS"
+/ 19 = "PARA"
+/ 20 = "OPORTUNIDADES"
+</item>
+
+************************************************************
+Control Condition
+************************************************************
+
+contains the itemnumbers for the control items
+<list itemnumbersC>
+/ items = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20)
+/ replace = false
+</list>
+
+<item scrambledSentencesC>
+/ 1 = "JOGOS TABULEIRO DIVERTIDOS DE ABORRECIDOS SÃO"
+/ 2 = "A AUDIÇÃO AFETADA ESTÁ VISÃO MINHA"
+/ 3 = "AMBIENTE TER PASSE AJUDA BICICLETA O"
+/ 4 = "TENHO LIVROS POR REVISTAS EU PREFERÊNCIA"
+/ 5 = "MUITO DIVERTIDO ESCALAR IR DANÇAR É"
+/ 6 = "MUITO CRIANÇAS AS GATAS SÃO GIRAS"
+/ 7 = "PEQUENO-ALMOÇO CEREAIS COMO OVOS EU AO"
+/ 8 = "É RELÓGIO CARO COLAR O MEU"
+/ 9 = "CHINÊS DIFÍCIL UMA SIMPLES É LÍNGUA"
+/ 10 = "EU MUITO CEDO ACORDAR TARDE ADORO"
+/ 11 = "POLITICOS CONSERVADORES OS DEMASIADO LIBERAIS PROMETEM"
+/ 12 = "BANHO CHUVEIRO TOMO EU IMERSÃO DE"
+/ 13 = "OUTROS FANTÁSTICO PAÍSES CARO É VISITAR"
+/ 14 = "ANIMAIS COBRAS MUITO COELHINHOS DIVERTIDOS SÃO"
+/ 15 = "UM SAUDÁVEL LANCHE DONUTS MAU SÃO"
+/ 16 = "QUERO ASIA VISITAR EU EUROPA A"
+/ 17 = "MAIORITARIAMENTE CARTAS EU EMAILS ESCREVER PREFIRO"
+/ 18 = "PESSOAS INTROVERTIDOS CONHEÇO EXTROVERTIDOS EU MUITAS"
+/ 19 = "MEU CAFÉ O CHÁ ESTÁ AZEDO"
+/ 20 = "UM BONITO MUITO FEIO TENHO CARRO"
+</item>
+
+****************************************
+'positive' responses
+****************************************
+
+<item scrambledSentencesC_pos>
+/ 1 = "JOGOS DE TABULEIRO SÃO DIVERTIDOS"
+/ 2 = "A MINHA AUDIÇÃO ESTÁ AFETADA"
+/ 3 = "TER PASSE AJUDA O AMBIENTE"
+/ 4 = "EU TENHO PREFERÊNCIA POR LIVROS"
+/ 5 = "É MUITO DIVERTIDO IR ESCALAR"
+/ 6 = "AS CRIANÇAS SÃO MUITO GIRAS"
+/ 7 = "EU COMO CEREAIS AO PEQUENO-ALMOÇO"
+/ 8 = "O MEU RELÓGIO É CARO"
+/ 9 = "CHINÊS É UMA LÍNGUA DIFÍCIL"
+/ 10 = "EU ADORO ACORDAR CEDO"
+/ 11 = "OS POLITICOS LIBERAIS PROMETEM DEMASIADO"
+/ 12 = "EU TOMO BANHO DE IMERSÃO"
+/ 13 = "VISITAR OUTROS PAÍSES É CARO"
+/ 14 = "COELHINHOS SÃO ANIMAIS MUITO DIVERTIDOS"
+/ 15 = "DONUTS SÃO UM LANCHE MAU"
+/ 16 = "EU QUERO VISITAR A EUROPA"
+/ 17 = "EU PREFIRO MAIORITARIAMENTE ESCREVER EMAILS"
+/ 18 = "EU CONHEÇO MUITAS PESSOAS EXTROVERTIDAS"
+/ 19 = "O MEU CHÁ ESTÁ AZEDO"
+/ 20 = "TENHO UM CARRO MUITO BONITO"
+</item>
+
+****************************************
+'negative' responses
+****************************************
+
+<item scrambledSentencesC_neg>
+/ 1 = "JOGOS DE TABULEIRO SÃO ABORRECIDOS"
+/ 2 = "A MINHA VISÃO ESTÁ AFETADA"
+/ 3 = "TER BICICLETA AJUDA O AMBIENTE"
+/ 4 = "EU TENHO PREFERÊNCIA POR REVISTAS"
+/ 5 = "É MUITO DIVERTIDO IR DANÇAR"
+/ 6 = "AS GATAS SÃO MUITO GIRAS"
+/ 7 = "EU COMO OVOS AO PEQUENO-ALMOÇO"
+/ 8 = "O MEU COLAR É CARO"
+/ 9 = "CHINÊS É UMA LÍNGUA SIMPLES"
+/ 10 = "EU ADORO ACORDAR MUITO TARDE"
+/ 11 = "OS POLITICOS CONSERVADORES PROMETEM DEMASIADO"
+/ 12 = "EU TOMO BANHO DE CHUVEIRO"
+/ 13 = "VISITAR OUTROS PAÍSES É FANTÁSTICO"
+/ 14 = "COBRAS SÃO ANIMAIS MUITO DIVERTIDOS"
+/ 15 = "DONUTS SÃO UM LANCHE SAUDÁVEL"
+/ 16 = "EU QUERO VISITAR A ÁSIA"
+/ 17 = "EU PREFIRO MAIORITARIAMENTE ESCREVER CARTAS"
+/ 18 = "EU CONHEÇO MUITAS PESSOAS INTROVERTIDAS"
+/ 19 = "O MEU CAFÉ ESTÁ AZEDO"
+/ 20 = "TENHO UM CARRO MUITO FEIO"
+</item>
+
+****************************************
+individual words
+****************************************
+
+<item scrambledSentencesC_word1>
+/ 1 = "JOGOS"
+/ 2 = "A"
+/ 3 = "AMBIENTE"
+/ 4 = "TENHO"
+/ 5 = "MUITO"
+/ 6 = "MUITO"
+/ 7 = "PEQUENO-ALMOÇO"
+/ 8 = "É"
+/ 9 = "CHINÊS"
+/ 10 = "EU"
+/ 11 = "POLITICOS"
+/ 12 = "BANHO"
+/ 13 = "OUTROS"
+/ 14 = "ANIMAIS"
+/ 15 = "UM"
+/ 16 = "QUERO"
+/ 17 = "POR"
+/ 18 = "PESSOAS"
+/ 19 = "MEU"
+/ 20 = "UM"
+</item>
+
+<item scrambledSentencesC_word2>
+/ 1 = "TABULEIRO"
+/ 2 = "AUDIÇÃO"
+/ 3 = "TER"
+/ 4 = "LIVROS"
+/ 5 = "DIVERTIDO"
+/ 6 = "CRIANÇAS"
+/ 7 = "CEREAIS"
+/ 8 = "RELÓGIO"
+/ 9 = "DIFÍCIL"
+/ 10 = "MUITO"
+/ 11 = "CONSERVADORES"
+/ 12 = "CHUVEIRO"
+/ 13 = "FANTÁSTICO"
+/ 14 = "COBRAS"
+/ 15 = "SAUDÁVEL"
+/ 16 = "ÁSIA"
+/ 17 = "CARTAS"
+/ 18 = "INTROVERTIDOS"
+/ 19 = "CAFÉ"
+/ 20 = "BONITO"
+</item>
+
+<item scrambledSentencesC_word3>
+/ 1 = "DIVERTIDOS"
+/ 2 = "AFETADA"
+/ 3 = "PASSE"
+/ 4 = "POR"
+/ 5 = "ESCALAR"
+/ 6 = "AS"
+/ 7 = "COMO"
+/ 8 = "CARO"
+/ 9 = "UMA"
+/ 10 = "CEDO"
+/ 11 = "OS"
+/ 12 = "TOMO"
+/ 13 = "PAÍSES"
+/ 14 = "MUITO"
+/ 15 = "LANCHE"
+/ 16 = "VISITAR"
+/ 17 = "TENHO"
+/ 18 = "CONHEÇO"
+/ 19 = "O"
+/ 20 = "MUITO"
+</item>
+
+<item scrambledSentencesC_word4>
+/ 1 = "DE"
+/ 2 = "ESTÁ"
+/ 3 = "AJUDA"
+/ 4 = "REVISTAS"
+/ 5 = "IR"
+/ 6 = "GATAS"
+/ 7 = "OVOS"
+/ 8 = "COLAR"
+/ 9 = "SIMPLES"
+/ 10 = "ACORDAR"
+/ 11 = "DEMASIADO"
+/ 12 = "EU"
+/ 13 = "CARO"
+/ 14 = "COELHINHOS"
+/ 15 = "DONUTS"
+/ 16 = "EU"
+/ 17 = "EMAILS"
+/ 18 = "EXTROVERTIDAS"
+/ 19 = "CHÁ"
+/ 20 = "FEIO"
+</item>
+
+<item scrambledSentencesC_word5>
+/ 1 = "ABORRECIDOS"
+/ 2 = "VISÃO"
+/ 3 = "BICICLETAS"
+/ 4 = "EU"
+/ 5 = "DANÇAR"
+/ 6 = "SÃO"
+/ 7 = "EU"
+/ 8 = "O"
+/ 9 = "É"
+/ 10 = "TARDE"
+/ 11 = "LIBERAIS"
+/ 12 = "IMERSÃO"
+/ 13 = "É"
+/ 14 = "DIVERTIDOS"
+/ 15 = "MAU"
+/ 16 = "EUROPA"
+/ 17 = "ESCREVER"
+/ 18 = "EU"
+/ 19 = "ESTÁ"
+/ 20 = "TENHO"
+</item>
+
+<item scrambledSentencesC_word6>
+/ 1 = "SÃO"
+/ 2 = "MINHA"
+/ 3 = "O"
+/ 4 = "PREFERÊNCIA"
+/ 5 = "É"
+/ 6 = "GIRAS"
+/ 7 = "AO"
+/ 8 = "MEU"
+/ 9 = "LÍNGUA"
+/ 10 = "ADORO"
+/ 11 = "PROMETEM"
+/ 12 = "DE"
+/ 13 = "VISITAR"
+/ 14 = "SÃO"
+/ 15 = "SÃO"
+/ 16 = "A"
+/ 17 = "PREFERÊNCIA"
+/ 18 = "MUITAS"
+/ 19 = "AZEDO"
+/ 20 = "CARRO"
+</item>
+
+************************************************************
+Demo
+************************************************************
+
+contains the itemnumbers for the demo items
+<list itemnumbersD>
+/ items = (1, 2, 3, 4, 5)
+/ replace = false
+</list>
+
+<item scrambledSentencesD>
+/ 1 = "CÃO PEQUENO LADRA O GRANDE ALTO"
+/ 2 = "PEQUENO EU CÃO UM GATO TENHO"
+/ 3 = "TENHO AMARELAS COMPRADO VERDES BANANAS EU"
+/ 4 = "FUNCIONA BEM COMPUTADOR O SCANNER NÃO"
+/ 5 = "QUE A NEVE ESTOU CHOVA CONTAR"
+</item>
+
+****************************************
+'positive' responses
+****************************************
+<item scrambledSentencesD_pos>
+/ 1 = "O CÃO PEQUENO LADRA ALTO"
+/ 2 = "EU TENHO UM GATO PEQUENO"
+/ 3 = "EU TENHO COMPRADO BANANAS AMARELAS"
+/ 4 = "O SCANNER NÃO FUNCIONA BEM"
+/ 5 = "ESTOU A CONTAR QUE CHOVA"
+</item>
+
+****************************************
+'negative' responses
+****************************************
+<item scrambledSentencesD_neg>
+/ 1 = "O CÃO GRANDE LADRA ALTO"
+/ 2 = "EU TENHO UM CÃO PEQUENO"
+/ 3 = "EU TENHO COMPRADO BANANAS VERDES"
+/ 4 = "O COMPUTADOR BÃO TRABALHA"
+/ 5 = "ESTOU A CONTAR QUE NEVE"
+
+</item>
+
+****************************************
+individual words
+****************************************
+
+<item scrambledSentencesD_word1>
+/ 1 = "CÃO"
+/ 2 = "PEQUENO"
+/ 3 = "TENHO"
+/ 4 = "FUNCIONA"
+/ 5 = "QUE"
+</item>
+
+<item scrambledSentencesD_word2>
+/ 1 = "PEQUENO"
+/ 2 = "EU"
+/ 3 = "AMARELAS"
+/ 4 = "BEM"
+/ 5 = "A"
+</item>
+
+<item scrambledSentencesD_word3>
+/ 1 = "LADRA"
+/ 2 = "CÃO"
+/ 3 = "COMPRADO"
+/ 4 = "COMPUTADOR"
+/ 5 = "NEVE"
+</item>
+
+<item scrambledSentencesD_word4>
+/ 1 = "O"
+/ 2 = "UM"
+/ 3 = "VERDES"
+/ 4 = "O"
+/ 5 = "ESTOU"
+</item>
+
+<item scrambledSentencesD_word5>
+/ 1 = "GRANDE"
+/ 2 = "GATO"
+/ 3 = "BANANAS"
+/ 4 = "SCANNER"
+/ 5 = "CHOVA"
+</item>
+
+<item scrambledSentencesD_word6>
+/ 1 = "ALTO"
+/ 2 = "TENHO"
+/ 3 = "EU"
+/ 4 = "NÃO"
+/ 5 = "CONTAR"
+</item>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE INSTRUCTIONS: change instructions here
+**************************************************************************************************************
+**************************************************************************************************************
+
+
+<item instructions1>
+/ 1 = "Vão-lhe ser apresentados um conjunto de 6 palavras desordenadas. A sua tarefa é ordenar 5 palavras de modo a formar uma frase com significado (sem ser uma questão). 
+
+Cada conjunto de palavras pode formar mais do que uma frase, mas deve construir só uma frase.
+
+Exemplo:"
+</item>
+
+<item instructions2>
+/ 1 = "Uma cruz irá indicar que a frase será em breve apresentada."
+/ 2 = "Estas são as palavras desordenadas. 
+Construa uma frase." 
+/ 3 = "<%expressions.buttoninstruct1%> palavras na sequência que pretende que elas apareçam na sua frase.
+Em cima das palavras vão aparecer números que indicam a ordem que selecionou.
+~nTerá <%parameters.maxAssemblyTime/1000%>s para colocar as palavras na ordem que pretende.
+~nRealize a tarefa o mais rapidamente possível mas preste atenção. NÃO PODE corrigir a sua resposta."
+</item>
+
+<item CL_instructions>
+/ 1 = "Adicionalmente:
+No inicio de cada tarefa, um número aleatório de 6 digitos será apresentado (Exemplo: 560691) no centro do ecrã durante <%parameters.CL_digitDuration/1000%>s.
+
+Decore o número.
+
+Vai-lhe ser pedido que se relembre dele no final da tarefa."
+</item>
+
+<item instructionsPractice>
+/ 1 = "Vamos realizar alguns exercícios de treino"
+/ 2 = "Acabaram os exercícios de treino.
+Lembre-se:
+Tem apenas <%parameters.maxAssemblyTime/1000%>s para colocar as palavras na sequência que pretende para a sua frase.  
+~nRealize a tarefa o mais rapidamente possível mas preste atenção. NÃO PODE corrigir a sua resposta.
+~n~nContinue assim que estiver preparado/a para iniciar o exercício."
+</item>
+
+<item instructionPics>
+/ 1 = "Intro1.jpg"
+/ 2 = "Intro2.jpg"
+/ 3 = "Intro3.jpg"
+</item>
+
+<button continuebutton>
+/ caption = "continuar"
+/ fontstyle = ("Courier New",2%, false, false, false, false, 5, 1)
+/ size = (40%, 3%)
+/ position = (50%, 95%)
+</button>
+
+<text demoAlert>
+/ items = ("Já teriam passados os <%parameters.maxAssemblyTime/1000%>s")
+/ position = (50%, 95%)
+/ fontstyle = ("Courier New", 3%, true, false, false, false, 5, 1)
+/ txcolor = red
+/ erase = false
+</text>
+
+<text CLinstructions>
+/ items = ("Por favor decore o seguinte número com 6 digitos.
+Vai-lhe ser pedido que se relembre dele no final da tarefa.")
+/ size = (80%, 80%)
+/ position = (50%, 10%)
+/ vjustify = center
+/ fontstyle = ("Arial", 3%, false, false, false, false, 5, 1)
+</text>
+
+<text CLrecallInstructions>
+/ items = ("Introduza o número de 6 digitos")
+/ size = (80%, 80%)
+/ position = (50%, 40%)
+/ vjustify = center
+/ fontstyle = ("Arial", 3%, false, false, false, false, 5, 1)
+</text>
+
+<text finish>
+/ items = ("Obrigado!")
+/ fontstyle = ("Arial", 8%, true, false, false, false, 5, 1)
+/ position = (50%, 50%)
+/ size = (80%, 10%)
+/ vjustify = center
+/ valign = center
+/ halign = center
+</text>
+
+<button exitbutton>
+/ caption = "SAIR"
+/ fontstyle = ("Arial", 3%, false, false, false, false, 5, 1)
+/ position = (50%, 80%)
+/ size = (20%, 5%)
+/ valign = center
+/ halign = center
+</button>
+
+****************************************************************************************************
+general instruction expressions: adjust the instruction text depending on device used to run script
+****************************************************************************************************
+<expressions>
+/ buttoninstruct1 = if (computer.touch && !computer.haskeyboard) {"Tap";} else {"Clique na";}
+
+/task = "IBM"
+</expressions>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE LISTS: change editable lists here
+**************************************************************************************************************
+**************************************************************************************************************
+
+
+**************************************************************************************************************
+				!!!REMAINING CODE: Customize after careful consideration only!!!
+**************************************************************************************************************
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	DEFAULTS
+**************************************************************************************************************
+**************************************************************************************************************
+script requires Inquisit 6.1.0.0 or higher
+
+<defaults>
+/ canvasaspectratio = (4,3)
+/ minimumversion = "6.1.0.0"
+/ fontstyle = ("Arial", 3%, false, false, false, false, 5, 1)
+/ txbgcolor = white
+/ txcolor = (0, 0, 0)
+/ inputdevice = mouse
+</defaults>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	DATA
+**************************************************************************************************************
+**************************************************************************************************************
+
+Note: data file explanations under User Manual Information at the top
+
+***********************
+raw data file
+***********************
+<data>
+/ columns = (build, computer.platform, date, time, subject, group, script.sessionid, blockcode, blocknum, 
+trialcode, trialnum,
+values.sentenceCondition, values.CL_Condition, values.index, values.scrambledSentence, values.positiveSolution, values.negativeSolution, 
+values.numericSentence, values.sentenceResponse, values.responseCategory, values.numericResponse, correct, values.cumulativeRT)
+</data>
+
+***********************
+summary data file
+***********************
+<summarydata>
+/ columns = (computer.platform, script.startdate, expressions.task, script.starttime, script.subjectid, script.groupid, script.sessionid, script.elapsedtime, 
+script.completed, 
+expressions.propCorrectSolutions, expressions.meanRT_Solutions,
+expressions.propCorrectSolutions_E, expressions.meanRT_E,
+expressions.propNegSolutions, expressions.propPosSolutions,
+expressions.meanRT_Neg, expressions.meanRT_Pos,
+expressions.propCorrectSolutions_C, expressions.meanRT_C,
+values.CL_Condition, values.CLcorrect)
+</summarydata>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	VALUES: automatically updated
+**************************************************************************************************************
+**************************************************************************************************************
+                                    
+/sentenceCondition:		1 = Emotional; 2 = Control; 0 = practice
+/CL_Condition = "":		cognitive load condition: 1 = runs cognitive load task; 2 = does not run cognitive load task
+/scrambledSentence:		the currently presented scrambled sentence
+/word1-
+/word6:					store the assigned words
+/number1-
+/number6:				assign each selected box the appropriate sentence position
+/positiveSolution:		stores the positive (pseudopositive for control) solution for the currently scrambled sentence
+/negativeSolution:		stores the negative solution (pseudonegative for control) for the currently scrambled sentence 
+/countWords:			counts the number of words/numbers entered
+/numericSentence:		stores the cumulative numeric response
+/sentenceResponse:		the unscrambled sentence (as translated from the numericSentence)
+/numericResponse:			helper variable: stores the current numeric response based on scancode of response button
+/cumulativeRT:			stores the cumulative latency (in ms) of the current cumulative numeric response
+/sumRT_pos:				stores the sum of the cumulative latencies (in ms) of all positive cumulative numeric responses in condition 1 (Emotional)
+/sumRT_neg:				stores the sum of the cumulative latencies (in ms) of all negative cumulative numeric responses in condition 1 (Emotional)
+/sumRT_control:			stores the sum of the cumulative latencies (in ms) of all correct cumulative numeric control responses
+/countPosSolutions:		counts the number of positive solutions entered in condition 1 (Emotional)
+/countNegSolutions:		counts the number of negative solutions entered in condition 1 (Emotional)
+/countCorrectSolutions_Control: counts the number of correct solutions entered in condition 2 (Control)
+/countTrials:			counts all trials
+/countTrials_E:			counts all Emotional trials
+/countTrials_C:			counts all Control trials
+/responseCategory:		"positive", "negative", "neutral"
+/currentAssemblyTime:	stores the currently available time to assemble the sentence
+/CLdigits:				stores the current cognitive load 6 digit number
+/CLcorrect:				1 = cognitive load task correct; 0 = cognitive load task incorrect
+
+<values>
+/ sentenceCondition = ""
+/ CL_Condition = ""
+/ index = 0
+/ scrambledSentence = ""
+/ word1 = ""
+/ word2 = ""
+/ word3 = ""
+/ word4 = ""
+/ word5 = ""
+/ word6 = ""
+/ number1 = 0
+/ number2 = 0
+/ number3 = 0
+/ number4 = 0
+/ number5 = 0
+/ number6 = 0
+/ positiveSolution = ""
+/ negativeSolution = ""
+/ countWords = 0
+/ numericSentence = ""
+/ sentenceResponse = ""
+/ numericResponse = ""
+/ cumulativeRT = ""
+/ sumRT_pos = ""
+/ sumRT_neg = ""
+/ sumRT_control = ""
+/ countPosSolutions = 0
+/ countNegSolutions = 0
+/ countCorrectSolutions_Control = 0
+/ countTrials = 0
+/ countTrials_E = 0
+/ countTrials_C = 0
+/ word1selected = false
+/ word2selected = false
+/ word3selected = false
+/ word4selected = false
+/ word5selected = false
+/ word6selected = false
+/ responseCategory = ""
+/ currentAssemblyTime = 0
+/ CLdigits = 0
+/ CLcorrect = 0
+</values>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EXPRESSIONS
+**************************************************************************************************************
+**************************************************************************************************************
+
+/propCorrectSolutions:			proportion correct solutions (correct = either the positive or the negative solution)
+/meanRT_Solutions:				mean latency (in ms) of entering the 5 digits for a correct solution 
+
+/propCorrectSolutions_E:		proportion correct solutions in condition 1 (Emotional)
+/meanRT_E:						mean latency (in ms) of entering the 5 digits for a correct solution in condition 1 (Emotional)
+/propNegSolutions:				proportion negative solutions (based on correct solutions entered) in condition 1 (Emotional)
+/propPosSolutions:				proportion positive solutions (based on correct solutions entered) in condition 1 (Emotional)
+/meanRT_Neg:					mean latency (in ms) of entering the 5 digits for negative solutions in condition 1 (Emotional)
+/meanRT_Pos:					mean latency (in ms) of entering the 5 digits for positive solutions in condition 1 (Emotional)
+
+/propCorrectSolutions_C:		proportion correct solutions in condition 2 (Control)
+/meanRT_C:						mean latency (in ms) of entering the 5 digits for a correct solution in condition 2 (Control)
+
+/assembleWordResponse:			translates the numeric response into the entered unscrambled sentence
+
+<expressions>
+/ propCorrectSolutions = (values.countNegSolutions + values.countPosSolutions + values.countCorrectSolutions_Control)/values.countTrials
+/ meanRT_Solutions = (values.sumRT_neg + values.sumRT_pos + values.sumRT_control)/(values.countNegSolutions + values.countPosSolutions + values.countCorrectSolutions_Control)
+
+/ propCorrectSolutions_E = (values.countNegSolutions + values.countPosSolutions)/values.countTrials_E
+/ meanRT_E = (values.sumRT_neg + values.sumRT_pos)/(values.countNegSolutions + values.countPosSolutions)
+/ propNegSolutions = values.countNegSolutions/(values.countNegSolutions + values.countPosSolutions)
+/ propPosSolutions = values.countPosSolutions/(values.countNegSolutions + values.countPosSolutions)
+/ meanRT_Neg = values.sumRT_neg/values.countNegSolutions
+/ meanRT_Pos = values.sumRT_pos/values.countPosSolutions
+
+/ propCorrectSolutions_C = values.countCorrectSolutions_Control/values.countTrials_C
+/ meanRT_C = values.sumRT_Control/values.countCorrectSolutions_Control
+
+/ assembleWordResponse = {
+	if (values.numericResponse == 1){
+		values.sentenceResponse = concat(values.sentenceResponse, values.word1);
+		values.sentenceResponse = concat(values.sentenceResponse, " ");
+	} else if (values.numericResponse == 2){
+		values.sentenceResponse = concat(values.sentenceResponse, values.word2);
+		values.sentenceResponse = concat(values.sentenceResponse, " ");		
+	} else if (values.numericResponse == 3){
+		values.sentenceResponse = concat(values.sentenceResponse, values.word3);
+		values.sentenceResponse = concat(values.sentenceResponse, " ");		
+	} else if (values.numericResponse == 4){
+		values.sentenceResponse = concat(values.sentenceResponse, values.word4);
+		values.sentenceResponse = concat(values.sentenceResponse, " ");		
+	} else if (values.numericResponse == 5){
+		values.sentenceResponse = concat(values.sentenceResponse, values.word5);
+		values.sentenceResponse = concat(values.sentenceResponse, " ");		
+	} else if (values.numericResponse == 6){
+		values.sentenceResponse = concat(values.sentenceResponse, values.word6);
+		values.sentenceResponse = concat(values.sentenceResponse, " ");		
+	} ;
+}
+</expressions>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	INSTRUCTIONS
+**************************************************************************************************************
+**************************************************************************************************************
+
+<text instructions1>
+/ items = instructions1
+/ select = 1
+/ position = (50%, 20%)
+/ size = (90%, 20%)
+/ hjustify = left
+/ erase = false
+/ fontstyle = ("Verdana", 3%, false, false, false, false, 5, 1)
+</text>
+
+<picture instructionPic>
+/ items = instructionPics
+/ select = sequence
+/ position = (50%, 50%)
+/ size = (70%, 70%)
+</picture>
+
+<text instructions2>
+/ items = instructions2
+/ select = sequence
+/ position = (50%, 80%)
+/ size = (80%, 40%)
+/ fontstyle = ("Verdana", 3%, false, false, false, false, 5, 1)
+/ txcolor = red
+</text>
+
+<text CL_instructions>
+/ items = CL_instructions
+/ select = sequence
+/ position = (50%, 50%)
+/ size = (80%, 80%)
+/ vjustify = center
+/ fontstyle = ("Arial", 5%, false, false, false, false, 5, 1)
+/ txcolor = black
+</text>
+
+<text instructionsPractice>
+/ items = instructionsPractice
+/ select = sequence
+/ position = (50%, 50%)
+/ size = (80%, 50%)
+/ vjustify = center
+/ fontstyle = ("Arial", 4%, false, false, false, false, 5, 1)
+/ txcolor = black
+</text>
+
+<trial instructionStart>
+/ stimulusframes = [1 = instructions1, instructionPic, instructions2, continueButton]
+/ validresponse = (continueButton)
+/ recorddata = false
+</trial>
+
+<trial instructionCL>
+/ skip = [
+	values.CL_Condition != 1;
+]
+/ stimulusframes = [1 = clearscreen, CL_instructions, continueButton]
+/ validresponse = (continueButton)
+/ recorddata = false
+</trial>
+
+<trial instructionPractice>
+/ stimulusframes = [1 = clearscreen, instructionsPractice, continueButton]
+/ validresponse = (continueButton)
+/ recorddata = false
+</trial>
+
+<trial finish_mouse>
+/ inputdevice = mouse
+/ stimulusframes = [1 = finish, exitButton]
+/ validresponse = (exitButton)
+/ recorddata = false
+</trial>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	STIMULI
+**************************************************************************************************************
+**************************************************************************************************************
+
+<shape frame1>
+/ shape = rectangle
+/ color = black
+/ size = (12.5%, 8.5%)
+/ vposition = 46%
+/ hposition = 10%
+/ halign = left
+/ valign = top
+/ erase = false
+</shape>
+
+<text word1>
+/ items = ("<%values.word1%>")
+/ size = (12%, 8%)
+/ vposition = shape.frame1.vposition + 0.25%
+/ hposition = shape.frame1.hposition + 0.25%
+/ halign = left
+/ valign = top
+/ vjustify = center
+/ hjustify = center
+/ fontstyle = ("Arial",parameters.wordSize, false, false, false, false, 5, 1)
+/ erase = false
+</text>
+
+<shape frame2>
+/ shape = rectangle
+/ color = black
+/ width = shape.frame1.width
+/ height = shape.frame1.height
+/ vposition = shape.frame1.vposition
+/ hposition = shape.frame1.hposition + shape.frame1.width + 1.5%
+/ halign = left
+/ valign = top
+/ erase = false
+</shape>
+
+<text word2>
+/ items = ("<%values.word2%>")
+/ width = text.word1.width
+/ height = text.word1.height
+/ vposition = shape.frame1.vposition  + 0.25%
+/ hposition = shape.frame1.hposition + shape.frame1.width + 1.5% + 0.25%
+/ halign = left
+/ valign = top
+/ vjustify = center
+/ hjustify = center
+/ fontstyle = ("Arial",parameters.wordSize, false, false, false, false, 5, 1)
+/ erase = false
+</text>
+
+<shape frame3>
+/ shape = rectangle
+/ color = black
+/ width = shape.frame1.width
+/ height = shape.frame1.height
+/ vposition = shape.frame1.vposition
+/ hposition = shape.frame2.hposition + shape.frame2.width + 1.5%
+/ halign = left
+/ valign = top
+/ erase = false
+</shape>
+
+<text word3>
+/ items = ("<%values.word3%>")
+/ width = text.word1.width
+/ height = text.word1.height
+/ vposition = shape.frame1.vposition  + 0.25%
+/ hposition = shape.frame2.hposition + shape.frame2.width + 1.5% + 0.25%
+/ halign = left
+/ valign = top
+/ vjustify = center
+/ hjustify = center
+/ fontstyle = ("Arial",parameters.wordSize, false, false, false, false, 5, 1)
+/ erase = false
+</text>
+
+<shape frame4>
+/ shape = rectangle
+/ color = black
+/ width = shape.frame1.width
+/ height = shape.frame1.height
+/ vposition = shape.frame1.vposition
+/ hposition = shape.frame3.hposition + shape.frame3.width + 1.5%
+/ halign = left
+/ valign = top
+/ erase = false
+</shape>
+
+<text word4>
+/ items = ("<%values.word4%>")
+/ width = text.word1.width
+/ height = text.word1.height
+/ vposition = shape.frame1.vposition  + 0.25%
+/ hposition = shape.frame3.hposition + shape.frame3.width + 1.5% + 0.25%
+/ halign = left
+/ valign = top
+/ vjustify = center
+/ hjustify = center
+/ fontstyle = ("Arial",parameters.wordSize, false, false, false, false, 5, 1)
+/ erase = false
+</text>
+
+<shape frame5>
+/ shape = rectangle
+/ color = black
+/ width = shape.frame1.width
+/ height = shape.frame1.height
+/ vposition = shape.frame1.vposition
+/ hposition = shape.frame4.hposition + shape.frame4.width + 1.5%
+/ halign = left
+/ valign = top
+/ erase = false
+</shape>
+
+<text word5>
+/ items = ("<%values.word5%>")
+/ width = text.word1.width
+/ height = text.word1.height
+/ vposition = shape.frame1.vposition  + 0.25%
+/ hposition = shape.frame4.hposition + shape.frame4.width + 1.5% + 0.25%
+/ halign = left
+/ valign = top
+/ vjustify = center
+/ hjustify = center
+/ fontstyle = ("Arial",parameters.wordSize, false, false, false, false, 5, 1)
+/ erase = false
+</text>
+
+<shape frame6>
+/ shape = rectangle
+/ color = black
+/ width = shape.frame1.width
+/ height = shape.frame1.height
+/ vposition = shape.frame1.vposition
+/ hposition = shape.frame5.hposition + shape.frame5.width + 1.5%
+/ halign = left
+/ valign = top
+/ erase = false
+</shape>
+
+<text word6>
+/ items = ("<%values.word6%>")
+/ width = text.word1.width
+/ height = text.word1.height
+/ vposition = shape.frame1.vposition  + 0.25%
+/ hposition = shape.frame5.hposition + shape.frame5.width + 1.5% + 0.25%
+/ halign = left
+/ valign = top
+/ vjustify = center
+/ hjustify = center
+/ fontstyle = ("Arial",parameters.wordSize, false, false, false, false, 5, 1)
+/ erase = false
+</text>
+
+<text number1>
+/ items = ("<%values.number1%>")
+/ size = (11.5%, 7.5%)
+/ vposition = shape.frame1.vposition - 10%
+/ hposition = shape.frame1.hposition + 0.25%
+/ halign = left
+/ valign = top
+/ vjustify = center
+/ hjustify = center
+/ erase = false
+</text>
+
+<text number2>
+/ items = ("<%values.number2%>")
+/ width = text.number1.width
+/ height = text.number1.height
+/ vposition = text.number1.vposition
+/ hposition = shape.frame1.hposition + shape.frame1.width + 1.5% + 0.25%
+/ halign = left
+/ valign = top
+/ vjustify = center
+/ hjustify = center
+/ erase = false
+</text>
+
+<text number3>
+/ items = ("<%values.number3%>")
+/ width = text.number1.width
+/ height = text.number1.height
+/ vposition = text.number1.vposition
+/ hposition = shape.frame2.hposition + shape.frame2.width + 1.5% + 0.25%
+/ halign = left
+/ valign = top
+/ vjustify = center
+/ hjustify = center
+/ erase = false
+</text>
+
+<text number4>
+/ items = ("<%values.number4%>")
+/ width = text.number1.width
+/ height = text.number1.height
+/ vposition = text.number1.vposition
+/ hposition = shape.frame3.hposition + shape.frame3.width + 1.5% + 0.25%
+/ halign = left
+/ valign = top
+/ vjustify = center
+/ hjustify = center
+/ erase = false
+</text>
+
+<text number5>
+/ items = ("<%values.number5%>")
+/ select = text.number1.currentitemnumber
+/ width = text.number1.width
+/ height = text.number1.height
+/ vposition = text.number1.vposition
+/ hposition = shape.frame4.hposition + shape.frame4.width + 1.5% + 0.25%
+/ halign = left
+/ valign = top
+/ vjustify = center
+/ hjustify = center
+/ erase = false
+</text>
+
+<text number6>
+/ items = ("<%values.number6%>")
+/ width = text.number1.width
+/ height = text.number1.height
+/ vposition = text.number1.vposition
+/ hposition = shape.frame5.hposition + shape.frame5.width + 1.5% + 0.25%
+/ halign = left
+/ valign = top
+/ vjustify = center
+/ hjustify = center
+/ erase = false
+</text>
+
+<text response>
+/ items = ("<%values.numericSentence%>")
+/ position = (50%, 75%)
+/ size = (50%, 5%)
+/ vjustify = center
+/ hjustify = center
+/ erase = false
+/ fontstyle = ("Arial", 4%, true, false, false, false, 5, 1)
+</text>
+
+<text fixation>
+/ items = ("+")
+/ position = (5%, 50%)
+/ fontstyle = ("Arial", 4%, true, false, false, false, 5, 1)
+</text>
+
+*************************************************
+Cognitive Load
+*************************************************
+
+<text CLdigits>
+/ items = ("<%values.CLdigits%>")
+/ size = (50%, 20%)
+/ position = (50%, 50%)
+/ vjustify = center
+/ fontstyle = ("Arial", parameters.digitSize, true, false, false, false, 5, 1)
+</text>
+
+<text errorfeedback>
+/ items = ("Incorrect. 
+The correct number was: <%values.CLdigits%>")
+/ size = (50%, 20%)
+/ position = (50%, 50%)
+/ vjustify = center
+/ fontstyle = ("Courier New", 3%, true, false, false, false, 5, 1)
+/ txcolor = red
+</text>
+
+<text correctfeedback>
+/ items = ("Correct")
+/ size = (50%, 20%)
+/ position = (50%, 50%)
+/ vjustify = center
+/ fontstyle = ("Courier New", 3%, true, false, false, false, 5, 1)
+/ txcolor = green
+</text>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	LISTS	
+**************************************************************************************************************
+**************************************************************************************************************
+
+*************************************************
+Data Lists: used for descriptive statistics
+store correct latencies/accuracy data
+fill up during runtime
+*************************************************
+
+Note: list stores 1 = correct response; 0 = incorrect response for each relevant trial
+<list accuracy>
+</list>
+
+Note: list stores the latency of correct responses for each relevant trial
+<list latencies>
+</list>
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	TRIALS 	
+**************************************************************************************************************
+**************************************************************************************************************
+
+*******************************************************
+Emotional Sentences
+*******************************************************
+
+Note: trial.fixationE
+* resets necessary values for each trial sequence
+* randomly selects the next Emotional scrambled sentence via list.itemnumbersE
+* presents the fixation cross for a predetermined time frame
+* calls the next trial in the sequence
+<trial fixationE>
+/ stimulusframes = [1 = clearscreen, fixation]
+/ ontrialbegin = [
+	values.sentenceCondition = 1;
+	values.countWords = 0;
+	values.numericSentence = "";
+	values.sentenceResponse = "";
+	values.cumulativeRT = "";
+	values.index = list.itemnumbersE.nextvalue;
+	values.word1 = item.scrambledSentencesE_word1.item(values.index);
+	values.word2 = item.scrambledSentencesE_word2.item(values.index);
+	values.word3 = item.scrambledSentencesE_word3.item(values.index);
+	values.word4 = item.scrambledSentencesE_word4.item(values.index);
+	values.word5 = item.scrambledSentencesE_word5.item(values.index);
+	values.word6 = item.scrambledSentencesE_word6.item(values.index);
+	values.positiveSolution = item.scrambledSentencesE_pos.item(values.index);
+	values.negativeSolution = item.scrambledSentencesE_neg.item(values.index);
+	values.word1selected = false;
+	values.word2selected = false;
+	values.word3selected = false;
+	values.word4selected = false;
+	values.word5selected = false;
+	values.word6selected = false;
+	text.number1.textcolor = white;
+	text.number2.textcolor = white;
+	text.number3.textcolor = white;
+	text.number4.textcolor = white;
+	text.number5.textcolor = white;
+	text.number6.textcolor = white;
+	values.currentAssemblyTime = parameters.maxAssemblyTime;
+]
+/ trialduration = parameters.fixationDuration
+/ branch = [
+	return trial.scrambledSentenceE;
+]
+/ recorddata = false
+</trial>
+
+
+
+Note: trial.scrambledSentenceE
+* waits for mouse response: participants need to unscramble the sentence and click the word boxes in the order of their sentence
+(numbers appear above the boxes)
+* assembles numeric response (values.numericSentence) and sentence response (values.sentenceResponse)
+* tracks the response latencies
+* calls itself if fewer than 5 words/numbers have been entered IF within time limit or calls trial.scrambledSentenceSolutionE_end
+
+<trial scrambledSentenceE>
+/ inputdevice = mouse
+/ stimulusframes = [1 = frame1, word1, frame2, word2, frame3, word3, frame4, word4, frame5, word5, frame6, word6, 
+number1, number2, number3, number4, number5, number6]
+/ validresponse = (word1, word2, word3, word4, word5, word6)
+/ iscorrectresponse = [
+	return (
+		(trial.scrambledSentenceE.response == "word1" && values.word1selected == false) ||
+		(trial.scrambledSentenceE.response == "word2" && values.word2selected == false) ||	
+		(trial.scrambledSentenceE.response == "word3" && values.word3selected == false) ||	
+		(trial.scrambledSentenceE.response == "word4" && values.word4selected == false) ||
+		(trial.scrambledSentenceE.response == "word5" && values.word5selected == false) ||
+		(trial.scrambledSentenceE.response == "word6" && values.word6selected == false));
+]
+/ response = correct
+/ ontrialend = [
+	values.countWords += 1;
+	values.numericResponse = substring(trial.scrambledSentenceE.response, 4, 1);
+	values.numericSentence = concat(values.numericSentence, values.numericResponse);
+	expressions.assembleWordResponse;
+	values.cumulativeRT += trial.scrambledSentenceE.latency;
+	if (values.numericResponse == 1) {
+		values.word1selected = true;
+		text.number1.textcolor = black;
+		values.number1 = values.countWords;
+	} else if (values.numericResponse == 2) {
+		values.word2selected = true;
+		text.number2.textcolor = black;
+		values.number2 = values.countWords;
+	} else if (values.numericResponse == 3) {
+		values.word3selected = true;
+		text.number3.textcolor = black;
+		values.number3 = values.countWords;
+	} else if (values.numericResponse == 4) {
+		values.word4selected = true;
+		values.number4 = values.countWords;
+		text.number4.textcolor = black;
+	} else if (values.numericResponse == 5) {
+		values.word5selected = true;
+		text.number5.textcolor = black;
+		values.number5 = values.countWords;
+	} else if (values.numericResponse == 6) {
+		values.word6selected = true;
+		text.number6.textcolor = black;
+		values.number6 = values.countWords;
+	};
+	values.currentAssemblyTime -= trial.scrambledSentenceE.elapsedtime;
+]
+/ branch = [
+	if (values.countWords < 5) {
+		return trial.scrambledSentenceE;
+	} else {
+		return trial.scrambledSentenceE_end;
+	};
+]
+/ recorddata = false
+/ timeout = values.currentAssemblyTime
+</trial>
+
+Note: trial.scrambledSentenceSolutionE_end
+* presents the last entered number for a brief time
+* updates summary variables for the current trial sequence and stores it to the data file
+<trial scrambledSentenceE_end>
+/ stimulustimes = [0 = frame1, word1, frame2, word2, frame3, word3, frame4, word4, frame5, word5, frame6, word6, number1, number2, number3, number4, number5, number6; 50 = clearscreen]
+/ timeout = 50
+/ iscorrectresponse = [
+	values.sentenceResponse = trimright(values.sentenceResponse, " ");
+	return (values.sentenceResponse == values.positiveSolution || values.sentenceResponse == values.negativeSolution);
+]
+/ ontrialend = [
+	values.countTrials += 1;
+	values.countTrials_E += 1;
+	values.scrambledSentence = item.scrambledSentencesE.item(values.index);
+	if (values.sentenceResponse == item.scrambledSentencesE_pos.item(values.index)) {
+		values.countPosSolutions += 1;
+		values.sumRT_pos += values.cumulativeRT;
+		values.responseCategory = "positive";
+	} else if (values.sentenceResponse == item.scrambledSentencesE_neg.item(values.index)) {
+		values.countNegSolutions += 1;
+		values.sumRT_neg += values.cumulativeRT;
+		values.responseCategory = "negative";
+	} else {
+		values.responseCategory = "other";
+	};
+]
+/ recorddata = true
+/ posttrialpause = parameters.iti
+</trial>
+
+*******************************************************
+Control Sentences
+*******************************************************
+
+Note: trial.fixationC
+* resets necessary values for each trial sequence
+* randomly selects the next Emotional scrambled sentence via list.itemnumbersE
+* presents the fixation cross for a predetermined time frame
+* calls the next trial in the sequence
+<trial fixationC>
+/ stimulusframes = [1 = clearscreen, fixation]
+/ ontrialbegin = [
+	values.sentenceCondition = 2;
+	values.countWords = 0;
+	values.numericSentence = "";
+	values.sentenceResponse = "";
+	values.cumulativeRT = "";
+	values.index = list.itemnumbersC.nextvalue;
+	values.word1 = item.scrambledSentencesC_word1.item(values.index);
+	values.word2 = item.scrambledSentencesC_word2.item(values.index);
+	values.word3 = item.scrambledSentencesC_word3.item(values.index);
+	values.word4 = item.scrambledSentencesC_word4.item(values.index);
+	values.word5 = item.scrambledSentencesC_word5.item(values.index);
+	values.word6 = item.scrambledSentencesC_word6.item(values.index);
+	values.positiveSolution = item.scrambledSentencesC_pos.item(values.index);
+	values.negativeSolution = item.scrambledSentencesC_neg.item(values.index);
+	values.word1selected = false;
+	values.word2selected = false;
+	values.word3selected = false;
+	values.word4selected = false;
+	values.word5selected = false;
+	values.word6selected = false;
+	text.number1.textcolor = white;
+	text.number2.textcolor = white;
+	text.number3.textcolor = white;
+	text.number4.textcolor = white;
+	text.number5.textcolor = white;
+	text.number6.textcolor = white;
+	values.currentAssemblyTime = parameters.maxAssemblyTime;
+]
+/ trialduration = parameters.fixationDuration
+/ branch = [
+	return trial.scrambledSentenceC;
+]
+/ recorddata = false
+</trial>
+
+
+
+Note: trial.scrambledSentenceC
+* waits for mouse response: participants need to unscramble the sentence and click the word boxes in the order of their sentence
+(numbers appear above the boxes)
+* assembles numeric response (values.numericSentence) and sentence response (values.sentenceResponse)
+* tracks the response latencies
+* calls itself if fewer than 5 words/numbers have been entered IF within time limit or calls trial.scrambledSentenceC_end
+
+<trial scrambledSentenceC>
+/ inputdevice = mouse
+/ stimulusframes = [1 = frame1, word1, frame2, word2, frame3, word3, frame4, word4, frame5, word5, frame6, word6, 
+number1, number2, number3, number4, number5, number6]
+/ validresponse = (word1, word2, word3, word4, word5, word6)
+/ iscorrectresponse = [
+	return (
+		(trial.scrambledSentenceC.response == "word1" && values.word1selected == false) ||
+		(trial.scrambledSentenceC.response == "word2" && values.word2selected == false) ||	
+		(trial.scrambledSentenceC.response == "word3" && values.word3selected == false) ||	
+		(trial.scrambledSentenceC.response == "word4" && values.word4selected == false) ||
+		(trial.scrambledSentenceC.response == "word5" && values.word5selected == false) ||
+		(trial.scrambledSentenceC.response == "word6" && values.word6selected == false));
+]
+/ response = correct
+/ ontrialend = [
+	values.countWords += 1;
+	values.numericResponse = substring(trial.scrambledSentenceC.response, 4, 1);
+	values.numericSentence = concat(values.numericSentence, values.numericResponse);
+	expressions.assembleWordResponse;
+	values.cumulativeRT += trial.scrambledSentenceC.latency;
+	if (values.numericResponse == 1) {
+		values.word1selected = true;
+		text.number1.textcolor = black;
+		values.number1 = values.countWords;
+	} else if (values.numericResponse == 2) {
+		values.word2selected = true;
+		text.number2.textcolor = black;
+		values.number2 = values.countWords;
+	} else if (values.numericResponse == 3) {
+		values.word3selected = true;
+		text.number3.textcolor = black;
+		values.number3 = values.countWords;
+	} else if (values.numericResponse == 4) {
+		values.word4selected = true;
+		values.number4 = values.countWords;
+		text.number4.textcolor = black;
+	} else if (values.numericResponse == 5) {
+		values.word5selected = true;
+		text.number5.textcolor = black;
+		values.number5 = values.countWords;
+	} else if (values.numericResponse == 6) {
+		values.word6selected = true;
+		text.number6.textcolor = black;
+		values.number6 = values.countWords;
+	};
+	values.currentAssemblyTime -= trial.scrambledSentenceC.elapsedtime;
+]
+/ branch = [
+	if (values.countWords < 5) {
+		return trial.scrambledSentenceC;
+	} else {
+		return trial.scrambledSentenceC_end;
+	};
+]
+/ recorddata = false
+/ timeout = values.currentAssemblyTime
+</trial>
+
+Note: trial.scrambledSentenceC_end
+* presents the last entered number for a brief time
+* updates summary variables for the current trial sequence and stores it to the data file
+<trial scrambledSentenceC_end>
+/ stimulustimes = [0 = frame1, word1, frame2, word2, frame3, word3, frame4, word4, frame5, word5, frame6, word6, 
+number1, number2, number3, number4, number5, number6; 50 = clearscreen]
+/ timeout = 50
+/ iscorrectresponse = [
+	values.sentenceResponse = trimright(values.sentenceResponse, " ");
+	return (values.sentenceResponse == values.positiveSolution || values.sentenceResponse == values.negativeSolution);
+]
+/ ontrialend = [
+	values.countTrials += 1;
+	values.countTrials_C += 1;
+	values.countCorrectSolutions_Control += trial.scrambledSentenceC_end.correct;
+	values.sumRT_control += trial.scrambledSentenceC_end.correct * values.cumulativeRT;
+	values.scrambledSentence = item.scrambledSentencesC.item(values.index);
+	if (trial.scrambledSentenceC_end.correct) {
+		values.responseCategory = "neutral";
+	} else {
+		values.responseCategory = "other";
+	};
+]
+/ recorddata = true
+/ posttrialpause = parameters.iti
+</trial>
+
+*******************************************************
+Demo Sentences
+*******************************************************
+
+
+Note: trial.fixationD
+* resets necessary values for each trial sequence
+* randomly selects the next Emotional scrambled sentence via list.itemnumbersE
+* presents the fixation cross for a predetermined time frame
+* calls the next trial in the sequence
+<trial fixationD>
+/ stimulusframes = [1 = clearscreen, fixation]
+/ ontrialbegin = [
+	values.sentenceCondition = 0;
+	values.countWords = 0;
+	values.numericSentence = "";
+	values.sentenceResponse = "";
+	values.cumulativeRT = "";
+	values.index = list.itemnumbersD.nextvalue;
+	values.word1 = item.scrambledSentencesD_word1.item(values.index);
+	values.word2 = item.scrambledSentencesD_word2.item(values.index);
+	values.word3 = item.scrambledSentencesD_word3.item(values.index);
+	values.word4 = item.scrambledSentencesD_word4.item(values.index);
+	values.word5 = item.scrambledSentencesD_word5.item(values.index);
+	values.word6 = item.scrambledSentencesD_word6.item(values.index);
+	values.positiveSolution = item.scrambledSentencesD_pos.item(values.index);
+	values.negativeSolution = item.scrambledSentencesD_neg.item(values.index);
+	values.word1selected = false;
+	values.word2selected = false;
+	values.word3selected = false;
+	values.word4selected = false;
+	values.word5selected = false;
+	values.word6selected = false;
+	text.number1.textcolor = white;
+	text.number2.textcolor = white;
+	text.number3.textcolor = white;
+	text.number4.textcolor = white;
+	text.number5.textcolor = white;
+	text.number6.textcolor = white;
+	values.currentAssemblyTime = parameters.maxAssemblyTime;
+]
+/ trialduration = parameters.fixationDuration
+/ branch = [
+	return trial.scrambledSentenceD;
+]
+/ recorddata = false
+</trial>
+
+
+
+Note: trial.scrambledSentenceD
+* waits for mouse response: participants need to unscramble the sentence and click the word boxes in the order of their sentence
+(numbers appear above the boxes)
+* assembles numeric response (values.numericSentence) and sentence response (values.sentenceResponse)
+* tracks the response latencies
+* calls itself if fewer than 5 words/numbers have been entered or calls trial.scrambledSentenceD_end
+* after the time limit is up this demo trial alerts partipants but does not terminate the trial
+
+<trial scrambledSentenceD>
+/ inputdevice = mouse
+/ ontrialbegin = [
+	trial.scrambledSentenceD.insertstimulustime(text.demoAlert, values.currentAssemblyTime);
+]
+/ stimulusframes = [1 = frame1, word1, frame2, word2, frame3, word3, frame4, word4, frame5, word5, frame6, word6, 
+number1, number2, number3, number4, number5, number6]
+/ validresponse = (word1, word2, word3, word4, word5, word6)
+/ responseinterrupt = immediate
+/ beginresponsetime = 0
+/ iscorrectresponse = [
+	return (
+		(trial.scrambledSentenceD.response == "word1" && values.word1selected == false) ||
+		(trial.scrambledSentenceD.response == "word2" && values.word2selected == false) ||	
+		(trial.scrambledSentenceD.response == "word3" && values.word3selected == false) ||	
+		(trial.scrambledSentenceD.response == "word4" && values.word4selected == false) ||
+		(trial.scrambledSentenceD.response == "word5" && values.word5selected == false) ||
+		(trial.scrambledSentenceD.response == "word6" && values.word6selected == false));
+]
+/ response = correct
+/ ontrialend = [
+	trial.scrambledSentenceD.resetstimulusframes();
+	values.countWords += 1;
+	values.numericResponse = substring(trial.scrambledSentenceD.response, 4, 1);
+	values.numericSentence = concat(values.numericSentence, values.numericResponse);
+	expressions.assembleWordResponse;
+	values.cumulativeRT += trial.scrambledSentenceD.latency;
+	if (values.numericResponse == 1) {
+		values.word1selected = true;
+		text.number1.textcolor = black;
+		values.number1 = values.countWords;
+	} else if (values.numericResponse == 2) {
+		values.word2selected = true;
+		text.number2.textcolor = black;
+		values.number2 = values.countWords;
+	} else if (values.numericResponse == 3) {
+		values.word3selected = true;
+		text.number3.textcolor = black;
+		values.number3 = values.countWords;
+	} else if (values.numericResponse == 4) {
+		values.word4selected = true;
+		values.number4 = values.countWords;
+		text.number4.textcolor = black;
+	} else if (values.numericResponse == 5) {
+		values.word5selected = true;
+		text.number5.textcolor = black;
+		values.number5 = values.countWords;
+	} else if (values.numericResponse == 6) {
+		values.word6selected = true;
+		text.number6.textcolor = black;
+		values.number6 = values.countWords;
+	};
+	
+	values.currentAssemblyTime -= trial.scrambledSentenceD.latency;
+	if (values.currentAssemblyTime < 0) {
+		values.currentAssemblyTime = 0;
+	};
+]
+/ branch = [
+	if (values.countWords < 5) {
+		return trial.scrambledSentenceD;
+	} else {
+		return trial.scrambledSentenceD_end;
+	};
+]
+/ recorddata = false
+</trial>
+
+
+Note: trial.scrambledSentenceD_end
+* presents the last entered number for a brief time
+* updates summary variables for the current trial sequence and stores it to the data file
+<trial scrambledSentenceD_end>
+/ stimulustimes = [0 = frame1, word1, frame2, word2, frame3, word3, frame4, word4, frame5, word5, frame6, word6, 
+number1, number2, number3, number4, number5, number6; 50 = clearscreen]
+/ timeout = 50
+/ iscorrectresponse = [
+	values.sentenceResponse = trimright(values.sentenceResponse, " ");
+	return (values.sentenceResponse == values.positiveSolution || values.sentenceResponse == values.negativeSolution);
+]
+/ ontrialend = [
+	values.scrambledSentence = item.scrambledSentencesD.item(values.index);
+	if (trial.scrambledSentenceD_end.correct) {
+		values.responseCategory = "neutral";
+	} else {
+		values.responseCategory = "other";
+	};
+]
+/ recorddata = true
+/ posttrialpause = parameters.iti
+</trial>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	TRIALS: cognitive load (distractor task)
+**************************************************************************************************************
+**************************************************************************************************************
+
+<trial CL_presentDigits>
+/ ontrialbegin = [
+	values.CLdigits = floor(rand(100000, 999999));
+]
+/ stimulusframes = [1 = CLinstructions, CLdigits]
+/ trialduration = parameters.CL_digitDuration
+</trial>
+
+<openended CL_digitsRecall>
+/ stimulusframes = [1 = CLrecallInstructions]
+/ buttonlabel = "submeter"
+/ charlimit = 6
+/ mask = integer
+/ iscorrectresponse = [
+	return (openended.CL_digitsRecall.response == values.CLdigits);
+]
+/ ontrialend = [
+	values.CLcorrect = openended.CL_digitsRecall.response;
+]
+/ errormessage = true(errorfeedback, 2000)
+/ correctmessage = true(correctfeedback, 2000)
+</openended>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	BLOCKS
+**************************************************************************************************************
+**************************************************************************************************************
+
+<block instructions>
+/ trials = [
+	1-3 = instructionStart; 
+	4 = instructionCL;
+]
+</block>
+
+<block scrambledSentencesPractice_CL>
+/ trials = [
+	1 = instructionPractice; 
+	2 = CL_presentDigits; 
+	3-7 = fixationD; 
+	8 = CL_digitsRecall; 
+	9 = instructionPractice;
+]
+</block>
+
+<block scrambledSentencesPractice>
+/ trials = [
+	1 = instructionPractice; 
+	2-6 = fixationD; 
+	7 = instructionPractice;
+]
+</block>
+
+Note: this list controls the random selection of control and emotional sentences.
+It randomly selects the next trial with the (soft=unless there is no other way) constraint max. 3 of the same trials types run in a row
+<list trialOrder>
+/ items = (trial.fixationC, trial.fixationE)
+/ poolsize = 40
+/ replace = false
+/ maxrunsize = 3
+</list>
+
+Block code for the cognitive load (CL) condition
+- presents the cognitive load digit
+- presents 40 scrambled sentences (20 emotional ones, 20 control ones)
+- cognitive load recall test
+<block scrambledSentences_CL>
+/ trials = [
+	1= CL_presentDigits; 
+	2-41 = list.trialOrder; 
+	42 = CL_digitsRecall;
+]
+</block>
+
+Block code for condition without cognitive load
+- presents 40 scrambled sentences (20 emotional ones, 20 control ones)
+<block scrambledSentences>
+/ trials = [1-40 = list.trialOrder]
+</block>
+
+<block finish>
+/ trials = [
+	1 = finish_mouse;
+]
+</block>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EXPERIMENT 
+**************************************************************************************************************
+**************************************************************************************************************
+
+Odd groupnumbers run the cognitive load (CL) condition
+<expt> 
+/ onblockbegin = [
+	values.CL_Condition = 1;
+]
+/ blocks = [
+	1 = instructions;
+	2 = scrambledSentencesPractice_CL;
+	3 = scrambledSentences_CL;
+	4 = finish;
+]
+</expt>
+
+<monkey>
+/ latencydistribution = normal(100, 50)
+</monkey>
+
+
+**************************************************************************************************************
+												End of File
+**************************************************************************************************************

@@ -1,0 +1,1995 @@
+﻿2<usermanual>
+___________________________________________________________________________________________________________________	
+
+								*Cognitive Bias Modification Task (custom)*								
+___________________________________________________________________________________________________________________	
+
+Script Author: Katja Borchert, Ph.D. (katjab@millisecond.com) for Millisecond Software, LLC
+Date: 01-05-2021
+last updated:  01-05-2021 by K. Borchert (katjab@millisecond.com) for Millisecond Software, LLC
+
+Script Copyright © 01-05-2021 Millisecond Software
+
+___________________________________________________________________________________________________________________
+BACKGROUND INFO 	
+___________________________________________________________________________________________________________________	
+
+This script implements a custom template script for a Cognitive Bias Modification Task
+The implemented procedure is based on:
+
+Reference
+Joormann, J., Waugh, C. E., & Gotlib, I. H. (2015). Cognitive Bias Modification for Interpretation 
+in Major Depression: Effects on Memory and Stress Reactivity. Clinical psychological science : 
+a journal of the Association for Psychological Science, 3(1), 126–139. 
+https://doi.org/10.1177/2167702614560748
+___________________________________________________________________________________________________________________
+TASK DESCRIPTION	
+___________________________________________________________________________________________________________________	
+
+Participants are given real-life scenarios that end with a word fragment. The solution for each
+word fragment is one word. As soon as participants know the solution, they hit the spacebar and enter
+the word into a provided textbox. Each trial ends with a comprehension question about the scenario.
+
+___________________________________________________________________________________________________________________	
+DATA FILE INFORMATION 
+___________________________________________________________________________________________________________________		
+The default data stored in the data files are:
+
+(1) Raw data file: 'cognitivebiasmodificationtask_raw*.iqdat' (a separate file for each participant)*
+
+
+build:								The specific Inquisit version used (the 'build') that was run
+computer.platform:					the platform the script was run on (win/mac/ios/android)
+date, time, 						date and time script was run 
+subject, group, 					with the current subject/groupnumber
+sessio:								with the current session id
+
+blockcode, blocknum:				the name and number of the current block (built-in Inquisit variable)
+trialcode, trialnum: 				the name and number of the currently recorded trial (built-in Inquisit variable)
+										Note: trialnum is a built-in Inquisit variable; it counts all trials run; even those
+										that do not store data to the data file. 
+																				
+										
+//basic scenario Information: 
+
+scenarioType:						"practice", "probe", "training", "filler" 
+itemnumber:							the currently selected scenario itemnumber 
+
+//custom DVs:
+RT_scenario:						response time (in ms) of reading scenario and hitting spacebar 
+
+RT_wordFragment:					response time (in ms) of hitting enter after entering word fragment
+RSP_wordFragment:					entered response for the word fragment 
+wordFragment_correctResponse:		the predetermined correct response for the word fragment (if any)
+
+ACC_wordFragment:					1 = the entered word fragment is the same as 'wordFragment_correctResponse'
+									0 = the entered word fragment differs from 'wordFragment_correctResponse'
+
+RT_comprehensionQ:					response time (in ms) of answering comprehension question 
+RSP_comprehensionQ:					label of entered response key
+
+comprehensionQ_correctResponse:		the predetermined correct response for the comprehension question
+									1 = YES
+									0 = NO
+
+
+ACC_comprehensionQ:					the correctness of the comprehension question response
+									1 = correctly answered
+									0 = error
+
+//built-in DV:
+response:							the participant's response (scancode of response buttons)
+correct:							accuracy of response: 1 = correct response; 0 = otherwise
+latency: 							the response latency (in ms)
+
+//detailed scenario Information:
+title:								the presented scenario title 
+comprehensionQ:						the presented comprehension question
+scenario:							the presented scenario										
+
+
+(2) Summary data file: 'cognitivebiasmodificationtask_summary*.iqdat' (a separate file for each participant)*
+
+inquisit.build:						the Inquisit build/version run
+computer.platform:					the platform the script was run on (win/mac/ios/android)
+inquisit.build:						the version/build of Inquisit
+script.startdate:					date script was run
+script.starttime:					time script was started
+script.subjectid:					assigned subject id number
+script.groupid:						assigned group id number
+script.sessionid:					assigned session id number
+script.elapsedtime:					time it took to run script (in ms); measured from onset to offset of script
+script.completed:					0 = script was not completed (prematurely aborted); 
+									1 = script was completed (all conditions run)
+									
+									
+propCorrect_comprehension: 				proportion correct comprehension questions across all test blocks and scenarios
+meanCorrRT_comprehension:				mean response time (in ms) of correct responses to comprehension questions across all test blocks and scenarios
+
+propCorrect_comprehension_probe: 		proportion correct comprehension questions across all probe scenarios
+meanCorrRT_comprehension_probe:			mean response time (in ms) of correct responses to comprehension questions across all probe scenarios
+
+propCorrect_comprehension_training: 	proportion correct comprehension questions across all training scenarios
+meanCorrRT_comprehension_training:		mean response time (in ms) of correct responses to comprehension questions across all training scenarios
+
+propCorrect_comprehension_filler: 		proportion correct comprehension questions across all filler scenarios
+meanCorrRT_comprehension_filler:		mean response time (in ms) of correct responses to comprehension questions across all filler scenarios								
+							
+							
+* separate data files: to change to one data file for all participants (on Inquisit Lab only), go to section
+"DATA" and follow further instructions
+
+___________________________________________________________________________________________________________________	
+EXPERIMENTAL SET-UP 
+___________________________________________________________________________________________________________________	
+
+(1) Practice: 3 scenarios (order is randomized)
+
+(2) Test: 10 test blocks
+- each test blocks presents 2 probe scenarios, 10 training scenarios, 3 filler scenarios
+- the scenarios from each category (probe/training/filler) are currently randomly (without replacement) 
+selected from their respective pools for each block
+
+Trial Sequence:
+1. Title + Scenario (including word fragment) (continue with spacebar press)
+2. Textbox to enter word fragment solution
+3. Comprehension question (respond with Yes/No key press)
+4. ITI - blank screen- for 1000ms (see Editable Parameters)
+
+___________________________________________________________________________________________________________________
+STIMULI
+___________________________________________________________________________________________________________________
+
+This script is created as a template that runs with placeholder stimuli.
+To insert final stimuli, go to section 'Editable Stimuli' and follow instructions.
+___________________________________________________________________________________________________________________	
+INSTRUCTIONS 
+___________________________________________________________________________________________________________________	
+provided by Millisecond Software - can be edited under section Editable Instructions
+
+Note: to change the instructions for the buttonlabel under the textboxes,
+go to 
+- openended.practice_wordFragment
+- openended.probe_wordFragment
+- openended.training_wordFragment
+- openended.filler_wordFragment
+and change the labels there
+
+___________________________________________________________________________________________________________________	
+EDITABLE CODE 
+___________________________________________________________________________________________________________________	
+check below for (relatively) easily editable parameters, stimuli, instructions etc. 
+Keep in mind that you can use this script as a template and therefore always "mess" with the entire code 
+to further customize your experiment.
+
+The parameters you can change are:
+</usermanual>
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE PARAMETERS: change editable parameters here
+**************************************************************************************************************
+**************************************************************************************************************
+
+<parameters>
+//Duration Parameters
+/iti = 1000						//intertrial interval in ms (default: 1000ms)
+
+//Response keys:
+/yesKey = "S"					//the key used for YES responses (default: Y)
+/noKey = "N"					//the key used for NO responses (default: N)
+</parameters>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE STIMULI
+**************************************************************************************************************
+**************************************************************************************************************
+
+Note: instructions are given for PRACTICE stimuli only but the same instructions apply
+to all category of stimuli (probe, training, filler)
+
+************************************
+Practice: 3 scenarios
+************************************
+
+//add the practice titles
+<item practice_titles>
+/1 = "Primeiro encontro"
+/2 = "Convite para aniversário"
+/3 = "Café"
+</item>
+
+//add practice scenarios (scenarios should contain the word fragment)
+<item practice_scenarios>
+/1 = "O seu amigo apresentou-lhe alguém no domingo passado. Pensa que se divertiram bastante juntos, e ele faz mesmo do seu tipo. Hoje ele disse-lhe que também se divertiu muito, mas que só quer ser seu a_i_o"
+/2 = "O aniversário do seu melhor amigo é no próximo domingo. Soube por outros amigos que ele enviou convites para o aniversário por email, mas ainda não recebeu o seu. Refletindo mais tarde, percebe que não se têm visto com a mesma frequência que há uns t_mp_s"
+/3 = "Trabalha num café e recebeu sempre elogios do gerente e dos clientes durante o seu período experimental.
+Hoje é o último dia do período experimental. Enquanto está a servir um café a um cliente, entorna-o em cima da m_s_"
+</item>
+
+//add the correct solution to the practice wordFragment (if any)
+<item practice_wordFragmentSolution>
+/1 = "amigo"
+/2 = "tempos"
+/3 = "mesa"
+</item>
+
+//add the practice comprehension questions
+<item practice_comprehensionquestion>
+/1 = "Conheceu alguém novo no último sábado"
+/2 = "O aniversário do seu melhor amigo é no domingo??"
+/3 = "Está a trabalhar num café?"
+</item>
+
+//enter 1 (for yes) or 0 (for no) for each practice comprehension question
+<item practice_comprehensionquestionACC>
+/1 = "0"
+/2 = "1"
+/3 = "1"
+</item>
+
+//no need to change anything
+<list practiceselection>
+/items = (
+1, 2, 3)
+/ replace = false //selection is done randomly without replacement
+/ resetinterval = 0 //selection is reset only after the last number has been selected
+</list>
+
+
+************************************
+Probes: 2 * 10 blocks = 20 probes
+************************************
+
+<item probe_titles>
+/1 = "Jardim"
+/2 = "Tocar piano"
+/3 = "Novo emprego"
+/4 = "Mudança de casa"
+/5 = "Poder e sucesso"
+/6 = "Aniversário do pai"
+/7 = "Maratona"
+/8 = "Exame para emprego novo"
+/9 = "Primeiro encontro"
+/10 = "Visita ao avô"
+
+</item>
+
+//scenarios should end with word fragments
+<item probe_scenarios>
+/1 = "O seu jardim cresceu demasiado e passa uma tarde a tratar dele. Corta a relva e retira as ervas daninhas de cerca de três quartos do jardim. Pensa que os seus esforços foram  s_fi_ien_es"
+/2 = "Está nervoso/a enquanto toca piano para os amigos pela primeira vez. Tem um pequeno deslize. Isto faz-lhe pensar que a sua competência musical ainda está em de_env_lv_me_to"
+/3 = "Iniciou um novo trabalho e espera conseguir formar amizades coms os seu colegas. No final do primeiro dia pergunta aos colegas se querem ir tomar um café e duas pessoas dizem que vão consigo. Pensa que isto significa que provavelmente foi a_ei_e"
+/4 = "Mudou de casa e está entusiasmado/a por conhecer novas pessoas e fazer amigos. É convidado/a para uma festa onde vão estar imensas pessoas que não conhece. Pensa que as pessoas que falarem consigo vão achar que é s_ciáv_l"
+/5 = "Sempre lhe disseram que dinheiro equivale a poder e sucesso. E sabe quanto ganha. Julga que é uma pessoa bem suc_d_da"
+/6 = "Decide pintar o retrato do seu pai para o aniversário dele. Quando o mostra à sua mãe ela diz-lhe que o retrato está ok. Pensa que o retrato deve estar r_zoáv_l"
+/7 = "Completou a sua primeira maratona recentemente. Quando conta aos seus amigos, eles ficam muito impressionados e elogiam-no/a imenso. Responde aos seus amigos dizendo que foi in_rív_l"
+/8 = "Tem de fazer um exame antes de a nova empresa a/o contratar. Fez imensas revisões mas não tem a certeza de como vai correr. Quando os resultados são anunciados é-lhe dito que passou e pensa que o que conseguiu foi i_port_nte"
+/9 = "Vai se encontrar com alguém para o primeiro encontro. Ele/ela comenta o quão bonito/a você é. Assume que aquilo foi dito h_n_sta_en_e"
+/10 = "Tinha pensado em visitar o seu avô mas à ultima hora descobre que tem de ir trabalhar. A sua mãe liga para o trabalho e diz-lhe que o seu avô caiu e partiu um braço. Pensa para si mesmo/a que ele caiu por não ter c_id_do"
+
+</item>
+
+//if any
+<item probe_wordFragmentSolution>
+/1 = "suficientes"
+/2 = "desenvolvimento"
+/3 = "aceite"
+/4 = "sociável"
+/5 = "sucedida"
+/6 = "razoável"
+/7 = "incrível"
+/8 = "importante"
+/9 = "honestamente"
+/10 = "cuidado"
+
+</item>
+
+<item probe_comprehensionquestion>
+/1 = "Trabalhou o suficiente no jardim?"
+/2 = "Tocou mal piano?"
+/3 = "Não conseguiu fazer amigos?"
+/4 = "Acha que as outras pessoas vão gostar de conversar consigo?"
+/5 = "Está a atingir os seus objetivos financeiros?"
+/6 = "Está satisfeito/a com a pintura que fez?"
+/7 = "Sente que ter completado a maratona foi um feito?"
+/8 = "Acha que ter passado o exame foi uma sorte?"
+/9 = "Acha que o comentário sobre si foi verdadeiro?"
+/10 = "O seu avô magoou-se porque você não estava lá?"
+
+</item>
+
+//need to enter 1 (for yes) or 0 (for no)
+<item probe_comprehensionquestionACC>
+/1 = "1"
+/2 = "0"
+/3 = "0"
+/4 = "1"
+/5 = "1"
+/6 = "1"
+/7 = "1"
+/8 = "0"
+/9 = "1"
+/10 = "0"
+
+</item>
+
+
+<list probeSelection>
+/items = (
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+/ replace = false //selection is done randomly without replacement across all 10 blocks
+/ resetinterval = 0 //selection is reset only after the last number has been selected
+</list>
+
+
+***********************************
+negative probes
+***********************************
+<item nprobe_titles>
+/1 = "Acidente de carro"
+/2 = "Divórcio"
+/3 = "Estante na cozinha"
+/4 = "Padel"
+/5 = "Receita nova"
+/6 = "Candidatura a novo emprego"
+/7 = "Dificuldades em casa e no emprego"
+/8 = "Discussão com o patrão"
+/9 = "Férias com os amigos"
+/10 = "Projeto no trabalho"
+
+
+</item>
+
+
+<item nprobe_scenarios>
+/1 = "O seu amigo oferece-se para lhe dar boleia para que não tenha que conduzir. Enquanto estão parados no semáforo, um carro bate na traseira do carro do seu amigo. Pensa que o acidente foi causado por s_"
+/2 = "Contam-lhe que dois dos seus melhores amigos vão se divorciar. Apresentou-os um ao outro há muitos anos enquanto andavam na escola. A noticia do divórcio deles faz com que se sinta de c_l_a"
+/3 = "Está a montar uma estante na sua cozinha. Quando termina fica com a impressão que a estante não está muito direita. Pensa que as suas competências de bricolage são m_s_ráv_is"
+/4 = "Concorda em ir jogar Padel com alguns amigos seus.Tenta o melhor que consegue e diverte-se mas acaba a perder o jogo. No que toca ao desporto sempre foi in_om_ten_e"
+/5 = "Tenta cozinhar uma receita nova. Quando mais tarde a experimenta não gosta da receita. Vê tudo o que cozinha como f_a_o "
+/6 = "Candidata-se a um novo emprego e é contratado/a. Após alguns meses no emprego novo, percebe que não gosta do trabalho e que precisa de mudar novamente. A sua vida está cheia de e_ros"
+/7 = "Tem tido umas semanas dificeis no trabalho e em casa. Tem se sentido um pouco chateado/a e em baixo. Pensa para si, que se sente em baixo agora o futuro só pode ser p_or"
+/8 = "Estáa ter uma discussão sobre o estado das coisas com o seu patrão. Sente que vai ser julgado pelos seus comentários. Enquanto conversa com o seu patrão pensa que ele acha tudo o que diz é e_tup_do"
+/9 = "Em breve vai de férias com os seus amigos. Quer estar em boa forma fisica para a praia e por isso decide fazer uma alimentação saudável. Quando se vê ao espelho pensa se os seus esforços valeram a pena visto que fisicamente está muito m_l"
+/10 = "Tem estado a trabalhar arduamente num projeto novo no trabalho mas o progresso tem sido atrasado por causa de outras pessoas. Um dia o seu patrão pergunta-lhe como tem progredido o seu projeto. Conclui que, genericamente ele acha que o seu trabalho tem sido f_a_o"
+
+
+</item>
+
+<item nprobe_wordFragmentSolution>
+/1 = "si"
+/2 = "culpa"
+/3 = "miseráveis"
+/4 = "incompetente"
+/5 = "fraco"
+/6 = "erros"
+/7 = "pior"
+/8 = "estupido"
+/9 = "mal"
+/10 = "fraco"
+
+</item>
+
+<item nprobe_comprehensionquestion>
+
+/1 = "O acidente aconteceu por sua causa?"
+/2 = "Sentiu-se culpado/a pelo divórcio dos seus amigos?"
+/3 = "As suas competências de bricolage são más?"
+/4 = "É genericamente bom no desporto?"
+/5 = "Foi a nova receita um erro?"
+/6 = "Nunca vai encontrar um emprego que goste?"
+/7 = "Acha que o seu futuro vai ser infeliz?"
+/8 = "Sente-se inteligente?"
+/9 = "Acha que está mal fisicamente?"
+/10 = "Acha que está a ter progressos no seu projeto?"
+
+
+</item>
+
+<item nprobe_comprehensionquestionACC>
+/1 = "1"
+/2 = "1"
+/3 = "1"
+/4 = "0"
+/5 = "1"
+/6 = "0"
+/7 = "1"
+/8 = "0"
+/9 = "1"
+/10 = "0"
+
+</item>
+
+
+<list nprobeSelection>
+/items = (
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+/ replace = false //selection is done randomly without replacement across all 10 blocks
+/ resetinterval = 0 //selection is reset only after the last number has been selected
+</list>
+
+
+
+************************************
+Training: 8 * 10 = 80 scenarios
+************************************
+
+<item training_titles>
+/1 = "Viagem de trabalho"
+/2 = "Futebol"
+/3 = "Cozinhar caril"
+/4 = "Ler o jornal"
+/5 = "Quem quer ser milionário?"
+/6 = "Ouvir rádio"
+/7 = "Pinguins"
+/8 = "Gases de estufa"
+/9 = "Guarda-Chuva"
+/10 = "Lista telefónica"
+
+/11 = "Restaurante"
+/12 = "Almoço no refeitório"
+/13 = "Novo Portátil"
+/14 = "Câmbio"
+/15 = "Não perder tempo"
+/16 = "Semente"
+/17 = "Relógios Rolex"
+/18 = "Agricultura orgânica"
+/19 = "Mochila nova"
+/20 = "Livro de ficção científica"
+
+/21 = "Pesquisas sobre pássaros"
+/22 = "Camisola antiga de lã"
+/23 = "Palavras cruzadas"
+/24 = "Compras no supermercado"
+/25 = "Carta da Junta de Freguesia"
+/26 = "Jardim exterior"
+/27 = "Novos electrodomésticos"
+/28 = "Telejornal"
+/29 = "Relógios"
+/30 = "Bússola"
+
+/31 = "Pesquisas na Internet"
+/32 = "Metro de Londres"
+/33 = "Guitarra"
+/34 = "Passeio"
+/35 = "Ler um livro"
+/36 = "Documentário"
+/37 = "Paragem do autocarro"
+/38 = "Telemóvel novo"
+/39 = "Grande Muralha da China"
+/40 = "Sistema Solar"
+
+/41 = "Manhã"
+/42 = "Netflix"
+/43 = "Kafka"
+/44 = "Plutão"
+/45 = "Neil Armstrong"
+/46 = "The Beatles"
+/47 = "Jogos Olímpicos"
+/48 = "Taylor Swift"
+/49 = "Isla Nublar"
+/50 = "Stefani Joanne Angelina Germanotta"
+
+/51 = "Argo"
+/52 = "Titanic"
+/53 = "Torre Eiffel"
+/54 = "Clérigos"
+/55 = "Freguesia de Lordelo"
+/56 = "Fábrica de Fiação e Tecidos do Rio Vizela"
+/57 = "Clube Desportivo das Aves"
+/58 = "Giro de Itália"
+/59 = "Fórmula 1"
+/60 = "Cloverfield"
+
+/61 = "Etelvina"
+/62 = "Cassete antiga"
+/63 = "Disneyland"
+/64 = "Star Wars"
+/65 = "Ser Benfiquista"
+/66 = "Videos no YouTube"
+/67 = "Taj Mahal"
+/68 = "Arco do Triunfo"
+/69 = "Fabrico de Lápis"
+/70 = "Supermercado"
+
+/71 = "Férias"
+/72 = "Videojogos"
+/73 = "Ciência"
+/74 = "Podcast"
+/75 = "Vergonha"
+/76 = "Ficção Científica"
+/77 = "Tango"
+/78 = "Sozinho"
+/79 = "Banda Nova"
+/80 = "Série de Comédia"
+</item>
+
+//scenarios should end with word fragments
+<item training_scenarios>
+/1 = "Está a planear a sua viagem do trabalho para casa. Verifica os horários dos comboios e calcula a viagem na internet. Uma opção é ir de autocarro, mas o meio de transporte mais rápido e mais fácil é o c_mbo_o"
+/2 = "Está a assistir a um jogo de futebol na TV. Ambas as equipas são da mesma cidade e o número de adeptos para cada equipa no estádio é igual. O árbitro apita porque é i_terv_lo"
+/3 = "Está a preparar-se para cozinhar caril. Foi à loja comprar os todos os ingredientes e colocá-los na mesa. De seguida, retira os utensílios e um avental, mas antes de começar a cozinhar, verifica a r_c_ita"
+/4 = "Está a ler sobre fotografia num jornal. O artigo diz que a imagem digital usa um sensor de imagem eletrónico para registar a imagem como um conjunto de dados eletrónicos, em vez de alterações químicas no f_lme"
+/5 = "Está a assistir a um episódio do Quem quer ser Milionário?. O concorrente está a ter um bom desempenho e já vai em 50 mil euros. O concorrente já acertou a 10 p_rg_nt_s "
+/6 = "Está a aumentar o volume do rádio para ouvir música. Não está familiarizado com a melodia, mas tenta decifrar os instrumentos e consegue ouvir bateria, buzina, saxofone, trombone, megafone e o tr_mp_te"
+/7 = "Assistiu a um programa sobre pinguins. Aprendeu que durante a época de reprodução os pinguins formam pares monogâmicos e que, com exceção do pinguim-imperador, onde o macho faz tudo, os pinguins compartilham os deveres de inc_b_ção"
+/8 = "Encontrou uma revista no comboio a caminho do trabalho. Leu sobre os gases do efeito estufa, que são gases na atmosfera que absorvem e emitem radiação na faixa do infravermelho e esse processo causa o efeito de est_fa"
+/9 = "Sentiu uma gota de chuva na sua bochecha, abriu a sua bolsa e rapidamente pegou no seu guarda-chuva. Abre o guarda-chuva e usa-o para voltar para casa e evitar que se m_lhe"
+/10 = "Abriu a lista telefónica e encontrou a secção que começa com: ‘T’. De seguida, encontra a secção dos serviços de táxi. Encontra o serviço de táxi mais próximo e anota o n_me_o"
+
+/11 = "Entra no restaurante. A funcionária leva-o até à sua mesa. Senta-se à mesa e pede um sumo de laranja à funcionária. Depois de alguns minutos, a funcionária volta com a sua b_b_da"
+/12 = "Está a descer para o refeitório para almoçar. Vê o seu chefe a caminhar na sua direção com os seus colegas e dizem “olá” uns aos outros. Agora está a olhar para o menu e espera na fila para recolher a comida que pe-iu"
+/13 = "Gostaria de comprar um novo portátil. Está a ver sítios online de computadores baratos e a ler descrições sobre design, detalhes técnicos e detalhes do produto. Finalmente, verifica se há algum preço r_zo_vel"
+/14 = "Passa por uma loja de câmbio. As taxas de câmbio são exibidas na janela da loja. Um dólar americano equivale a 0,63 libras. Um euro é equivalente a 0,86 l-br-s"
+/15 = ". Leu sobre Yorkshire, um condado histórico no norte de Inglaterra e o maior do Reino Unido. O emblema de Yorkshire é uma rosa br-n-a"
+/16 = "Está a plantar uma semente. É uma pequena planta embrionária envolta em uma cobertura chamada tegumento, geralmente com algum alimento armazenado que é um depósito de nutrientes para a muda que crescerá a partir do em-rião "
+/17 = "Lê sobre o segredo dos relógios Rolex e diz-se que o segredo da Rolex é o marketing desportivo. Eles anunciaram que uma nadadora chamada Mercedes Gleitz cruzou o Canal da Mancha em 1927, enquanto usava um Rolex à prova de á-ua"
+/18 = "Assistiu a um programa de televisão sobre agricultura orgânica. Foi sugerido que a agricultura convencional pode ser mais eficiente em termos de energia para certos alimentos. No entanto, outros disseram que a agricultura orgânica é realmente melhor para o am-ie-te"
+/19 = "Depois de muitos meses de uso, é hora de comprar uma mochila nova. Decidiu que prefere a mesma marca da sua primeira mochila. Comprou o mesmo modelo, mas um de cor d-f-r-nte"
+/20 = ". Leu um livro de ficção científica. Descreve uma nave espacial numa galáxia distante e é sobre as aventuras de um jovem que está a tentar encontrar o caminho de volta para o seu planeta, onde todos estão à procura d-le"
+
+/21 = "Fez algumas pesquisas sobre pássaros. Descobriu que os pássaros migratórios vivem nas florestas tropicais durante o inverno e retornam às regiões mais frias durante a primavera e no verão. Por exemplo, muitos pássaros, durante o inverno dos Estados Unidos, fazem ninhos na 
+Am-z-nia"
+/22 = "Está a lavar à mão uma camisola antiga de lã. Já ouviu falar que a lã pode facilmente perder a sua forma e se tornar menos definida se for lavada sem cuidado. É por isso que usa um detergente esp-cíf-co"
+/23 = "Tentou resolver umas palavras cruzadas durante a viagem de autocarro. Faltava uma palavra quando estava para sair do autocarro e decidiu perguntar à pessoa sentada ao seu lado. Ela deu-lhe a re-p-sta "
+/24 = "Vai comprar comida esta tarde, verifica os produtos que precisa de comprar e anota-os. Quando chega ao supermercado e começa a escolher os vegetais, apercebe-se que o seu vizinho está do lado op-s-o"
+/25 = "Recebeu uma carta da junta de freguesia sobre as atualizações nos procedimentos de reciclagem e recolha de lixo. Antes a reciclagem era feita duas vezes por mês. É notificado de que agora isso será feito s_man-lm_nte "
+/26 = "Concluiu recentemente a construção do seu jardim exterior. Dá conta que tem muitos de tijolos partidos. Decide levar o lixo para o aterro este fim de s-ma-a"
+/27 = "Decide renovar os seus eletrodomésticos e vai até a uma loja e encomenda uma nova máquina de lavar roupa. Liga para a empresa a perguntar quando deve levantar a encomenda. Disseram-lhe que chegará na s-gun-a "
+/28 = "Está a assistir ao telejornal das 6 horas. O apresentador está a dar conta das mudanças recentes na política económica do governo. O Primeiro-Ministro está a ser en-rev-stado "
+/29 = "Verifica as horas no relógio da estação de comboios que marca 12:45h. Verifica a hora no seu relógio que marca 12:50h. O seu relógio deve estar 5 minutos ad_ant-do"
+/30 = "Está a usar uma bússola. A bússola possui 4 pontos cardeais, Norte Sul, Este e Oeste e é um instrumento de navegação. Existem dois tipos diferentes de bússolas, giroscópios e m-gné-icas "
+
+/31 = "Entra na internet e liga no Bing. O Bing é um mecanismo de pesquisa na Internet da Microsoft. Em outubro de 2011, o Bing anunciou que está a trabalhar para que as pesquisas de resultados sejam mais rápidas e r_l_vant_s"
+/32 = "Observa o mapa do metro de Londres. Percebe que há quatro ligações na Liverpool Street e três ligações no circo de Oxford. Existem muitas linhas de metro e todas têm cores d_f_re_tes"
+/33 = "Ouve uma guitarra a tocar. É um instrumento de cordas, geralmente tocado com os dedos ou com uma palheta e geralmente tem seis c_rd_s"
+/34 = "Vai dar um passeio. Entra na loja da esquina local, num café e numa loja de caridade. Anda pela rua e, ao chegar ao cruzamento, vira à e_que_da"
+/35 = "Começa a ler um livro sobre a vida selvagem que inclui todas as plantas, animais e outros organismos não domesticados. A vida selvagem pode ser encontrada em todos os ecossistemas, incluindo na fauna, florestas tropicas e de-er-os "
+/36 = "Está a assistir a um documentário acerca da evolução. O narrador menciona que a evolução é uma mudança através de gerações sucessivas das características hereditárias da p-pul-ção" 
+/37 = "Está à espera do autocarro para ir para casa no centro de Porto. O autocarro está a aproximar-se da paragem. Entra no autocarro e procura um lugar para se sentar. Abre a sua mochila, pega no seu telemóvel e começa a ouvir m-s-ca"
+/38 = "Está à procura de um telemóvel novo na internet. Vê várias lojas e vários modelos. Decide comprar um telemóvel com 5G porque dizem ser o f-t-ro"
+/39 = "Leu acerca da Grande Muralha da China. Foi construída no século 5 A.C. Todas as paredes medem cerca de 9000Km e incluem um muro e barreiras naturais de defesa, como colinas e ri_s"
+/40 = "Está a ler acerca do sistema solar. Consiste no sol e nos objetos astronómicos gravitacionalmente ligados em órbita ao seu redor. Dos muitos objetos que orbitam o sol, a maior parte da massa está contida nos p-an-tas "
+
+/41 = "Precisa de se levantar às 08:30h amanhã de manhã para apanhar o autocarro e chegar a tempo à consulta médica. Demora uma hora a preparar-se de manhã, por isso decide por o despertador para as 07:30h da m-nhã"
+/42 = "Vai à aplicação do Netflix. Os programas recentes são apresentados logo no início da página. Tem várias séries e f_lm_s"
+/43 = "Está a ler sobre Franz Kafka, um escritor Alemão de  romances e histórias curtas. Kafka é dos escritores mais influentes do século 20. A Metamorfose é um dos seus trabalhos mais r_c_nh_cid_s"
+/44 = "Está a ler sobre o Plutão. Plutão é um planeta anão a orbitar o Sol, com cerca de um sexto da massa da Lua. Como outros objetos na Cintura de Asteróides, Plutão é constituído principalmente de pedra e g_lo"
+/45 = "Está a ver um documentário sobre Neil Armstrong. Neil Armstrong, além de astronauta e engenheiro aeronáutico, foi piloto da Marinha dos Estados Unidos e serviu na Guerra da Coreia. É, no entanto, conhecido por ter sido o primeiro homem a andar na l_a"
+/46 = "Está a ouvir o Sargeant Pepper’s Lonely Hearts Club Band, o oitavo album dos Beatles. O albúm foi lançado a 26 de Maio de 1967 e esteve no top de vendas durante 27 s_ma_as"
+/47 = "Os Jogos Olímpicos são considerados a maior competição desportiva do mundo, onde mais de 200 países participam. Os Jogos Olímpicos alternam bienalmente entre os Jogos Olímpicos de inverno e de verão. Assim, cada um dos Jogos Olímpicos é realizado a cada 4 a_os"
+/48 = "Está a ouvir o álbum Red da Taylor Swift. Taylor Swift é uma cantautora Americana que já vendeu mais de 50 milhões de álbuns e tem mais de 150 milhões de downloads em todo o m_ndo"
+/49 = "Esteve a ver o filme Jurassic Park de Steven Spielberg. O filme passa-se numa ilha deserta chamada de Isla Nublar onde os cientistas criaram um parque de diversões com clones de din_ss_ur_s"
+/50 = "Stefani Joanne Angelina Germanotta, é uma cantautora Americana, nascida a 28 de março de 1986 e profissionalmente conhecida como Lady Gaga. A Lady Gaga é conhecida pelo seu estilo experimentalista, pouco convencional e pro_ca_ivo"
+
+/51 = "Acabou de assistir ao filme Argo. O ator principal do filme é o Ben Affleck que também dirigiu o filme. O filme é baseado no livro Master of Disguise. O filme recebeu vários elogios da crítica, bem como 7 nomeações para os ós_a_es"
+/52 = "Está a assistir a um documentário sobre os maiores navios da história. No documentário mencionam o Titanic. O Titanic foi um navio de passageiros britânico da White Star Line e construído da Harland and Wolff, em Belfast.O Titanic foi pensado para ser o navio mais luxuoso e seguro da sua 
+épo_a"
+/53 = "A Torre Eiffel é uma torre de ferro do século XIX localizada no Champ de Mars, em Paris, a qual se tornou um ícone mundial da França. A torre é o edifício mais alto da c_d_de"
+/54 = "A igreja e Torre dos Clérigos foram construídos do século XVIII. Caracterizados primordialmente pelo estilo Barroco, são um notável conjunto arquitétonico situado na cidade do P_r_o"
+/55 = "Lordelo é uma freguesia portuguesa do município de Guimarães, com 4,97 quilómetros quadrados e 4 287 habitantes. Foi elevada à categoria de vila em 1995 no mês de agos_o"
+/56 = "A Fábrica de Fiação e Tecidos do Rio Vizela foi pioneira na industrialização do Vale do Ave. A fábrica, com 135 mil metros quadrados, foi construída em 1845 e chegou a ter, em 1950, cerca de três mil tr_b_lh_dores"
+/57 = "O Clube Desportivo das Aves é uma equipa portuguesa multidesportiva, fundada a 12 de Novembro de 1930 e sediada na Vila das Aves. A sua maior conquista ocorreu na época 2017-2018 quando venceu a Taça de P_rt_g_l"
+/58 = "Está a assistir ao Giro de Itália. Em 2021 a prova foi ganha pelo ciclista Egan Bernal. Em sexto classificado ficou o ciclista João Almeida que é um ciclista  p_rt_guês"
+/59 = "Está a ver uma corrida de Fórmula 1. Lembra-se que em 1993 um piloto português, Pedro Lamy,  participou no campeonato de Fórmula 1 pela equipa da Lotus. No entanto, na Fórmula 1, Nicha Cabral em 1959 foi o primeiro piloto português a p_rt_cip_r"
+/60 = "Está a assistir ao filme de 2008 de Cloverfield que foi produzido por J.J. Abrams. O filme que está a ver é o primeiro da franquia que foi seguido pelo filme 10 Cloverfield Lane em 2016 e o Cloverfield Paradox em 2018. Uma sequela está neste momento em d_s_nvolvim_nto "
+
+/61 = "Está a ouvir a música Etelvina do álbum À Queima Roupa de Sergio Godinho. O álbum é de 1974 e foi um dos principais albums de Sergio Godinho e que o levou a actuar em várias manifestações populares no pós-25 de a_ril"
+/62 = "Descobriu uma cassete antiga de um cantor chamado José Pinhal. Enquanto ouves a musica “Tu não prendas o cabelo” procuras informação sobre o cantor. Descobre que na década de 90 foi um cantor bastante f_m_so"
+/63 = "Está a planear uma viagem à Disneyland. Descobre que o primeiro parque da Disneyland foi inaugurado em 1955 e foi o único que Walt Disney projetou e supervisionou a c_nstr_ção"
+/64 = "Está a revistar os filmes da saga Star Wars. A saga foi criada por George Lucas sendo que o primeiro filme estreou em 1977 e conta já com 9 f_lmes"
+/65 = "Está a ouvir o hino oficial do Sport Lisboa e Benfica chamado Ser Benfiquista. O hino foi escrito por Paulino Gomes Júnior por volta de 1953. O hino é reproduzido no inicio de todos os jogos do Benfica no Estádio da L_z"
+/66 = "Está a ver videos no YouTube de Pablo Aimar. Vê que Pablo Aimar era dono de uma técnica apurada e de uma grande visão de jogo. Após uma carreira em grandes clubes de futebol, incluindo no Sport Lisboa e Benfica, agora é tr_in_dor"
+/67 = "Está a planear uma visita à India para visitar o Taj Mahal. O Taj Mahal foi construído entre 1632 e 1653 por cerca de 20 mil h_me_s"
+/68 = "Está a ler um livro sobre a História da França. O Arco do Triunfo é um monumento localizado na cidade de Paris. O monumento tem 50 metros de altura, 45 metros de largura e 22 metros de profundidade. Foi construído para celebrar as vitórias militares de N_pol_ão "
+/69 = "Está a ler sobre a origem do fabrico do lápis em Portugal. Descobre que a única marca portuguesa de lápis é a Viarco. Além da única marca portuguesa de fabrico de lápis em Portugal é também a única em toda a Peninsula Ibér_ca"
+/70 = "Vai ao supermercado comprar para comprar pasta dos dentes, repara na Pasta Dentífrica Couto. Recorda-se que esta pasta de dentes existe desde os anos 70 e que é quase um símbolo do Portugal do p_ss_do"
+
+/71 = "Está a marcar as suas férias de verão. Este ano decidiu ir para Punta Cana, que fica na República Dominicana. Desde 1970 que este destino é muito procurado devido às suas p_ai_s"
+/72 = "Está a ver um documentário sobre videojogos. Descobre que a primeira consola doméstica da história foi a Odyssey da empresa Magnavox. No entanto, o primeiro grande sucesso comercial surge com o jogo Pong na consola Atari. Este é também a primeira consola doméstica de que se r_cor_a"
+/73 = "Está a ler no site da Quanta Magazine um artigo teórico sobre física. Descobre que terceira lei de Newton está a ser contestada por uma nova t_or_a"
+/74 = "Está a ouvir um podcast sobre ciência. O podcast é apresentado por Carlos Fiolhais que é um fisico português bastante c_nhe_ido"
+/75 = "Está a ler um artigo no site Psyche sobre vergonha nas crianças. O artigo diz que a vergonha nas crianças pode ser bastante adaptativa e que não deve ser considerada como um p_obl_ma"
+/76 = "Acabou de ler a trilogia Themis Files de Sylvain Neuvel. A trilogia tem um formato atípico com a história a ser contada através de entradas de diários e documentos e não através de uma narração tr_di_ion_l"
+/77 = "Está a ouvir o album La Revancha del Tango de 2001 dos Gotan Project. O estilo de musica insere-se no Tango mas com a adição de elementos el_trón_cos"
+/78 = "Esta a ouvir a interpretação de Caetano Veloso da musica Sozinho.  A musica foi escrita por Peninha, que é um dos principais compositores brasileiros. A musica original chamava-se Sozinha e retrata o sentimento da filha de Peninha na relação com o n_mor_do"
+/79 = "Descobriu uma banda nova enquanto estava a jogar um videojogo. A banda chama-se Centarvrvs e a musica que ouviu é El Punto Final. Quando tenta descobrir a banda apercebe-se que existe pouca i_for_ação"
+/80 = "Reparou que na sua plataforma de streaming favorita adicionaram todas as temporadas da série Seinfeld. A série é sobre nada e é considerada como uma das melhores séries de sempre de comédia. Decide rever todas as t_mpora_as"
+</item>
+
+<item training_wordFragmentSolutions>
+/1 = "comboio"
+/2 = "intervalo"
+/3 = "receita"
+/4 = "filme"
+/5 = "perguntas"
+/6 = "trompete"
+/7 = "incubação"
+/8 = "estufa"
+/9 = "molhe"
+/10 = "numero"
+
+/11 = "bebida"
+/12 = "pediu"
+/13 = "razoavel"
+/14 = "libras"
+/15 = "branca"
+/16 = "embrião"
+/17 = "agua"
+/18 = "ambiente"
+/19 = "diferente"
+/20 = "dele"
+
+/21 = "amazonia"
+/22 = "especifico"
+/23 = "resposta"
+/24 = "oposto"
+/25 = "semanalmente"
+/26 = "semana"
+/27 = "segunda"
+/28 = "entrevistado"
+/29 = "adiantado"
+/30 = "magneticas"
+
+/31 = "relevantes"
+/32 = "diferentes"
+/33 = "cordas"
+/34 = "esquerda"
+/35 = "desertos"
+/36 = "documentario"
+/37 = "musica"
+/38 = "futuro"
+/39 = "rios"
+/40 = "planetas"
+
+/41 = "manhã"
+/42 = "filmes"
+/43 = "reconhecidos"
+/44 = "gelo"
+/45 = "lua"
+/46 = "semanas"
+/47 = "anos"
+/48 = "mundo"
+/49 = "dinossauros"
+/50 = "provocativo"
+
+/51 = "óscares"
+/52 = "época"
+/53 = "cidade"
+/54 = "Porto"
+/55 = "agosto"
+/56 = "trabalhadores"
+/57 = "Portugal"
+/58 = "português"
+/59 = "participar"
+/60 = "desenvolvimento"
+
+/61 = "abril"
+/62 = "famoso"
+/63 = "construção"
+/64 = "filmes"
+/65 = "Luz"
+/66 = "treinador"
+/67 = "homens"
+/68 = "Napoleão"
+/69 = "Ibérica"
+/70 = "passado"
+
+/71 = "praias"
+/72 = "recorda"
+/73 = "teoria"
+/74 = "conhecido"
+/75 = "problema"
+/76 = "tradicional"
+/77 = "eletrónicos"
+/78 = "namorado"
+/79 = "informação"
+/80 = "temporadas"
+</item>
+
+<item training_comprehensionquestion>
+/1 = "Planificou a sua viagem?"
+/2 = "Está a assistir a um jogo de baseball?"
+/3 = "Está a cozinhar caril?"
+/4 = "Está a ler sobre fotografia?"
+/5 = "O concorrente acertou em 13 perguntas?"
+/6 = "Baixou o volume?"
+/7 = "Assistiu a um programa sobre focas?"
+/8 = "Encontrou um panfleto?"
+/9 = "Está a chover?"
+/10 = "Estava à procura do horário dos autocarros?"
+
+/11 = "Pediu uma coca-cola? "
+/12 = "Reconheceu o seu chefe no refeitório?"
+/13 = "Vai comprar um novo computador fixo?"
+/14 = "O euro vale menos que o dólar?"
+/15 = "Leu acerca de Yorkshire?"
+/16 = "Está a plantar uma semente?"
+/17 = "O segredo da marca Rolex é o marketing desportivo?"
+/18 = "A agricultura convencional é realmente melhor para o meio ambiente?"
+/19 = "Vai comprar uma mochila nova?"
+/20 = "Leu um livro de ficção científica?"
+
+/21 = "Tem pesquisado sobre répteis?"
+/22 = "Lavou a camisola na máquina?"
+/23 = "Tentou resolver as palavras cruzadas?"
+/24 = "Está a comprar comida?"
+/25 = "Recebeu novas informações sobre os seus impostos?"
+/26 = "Mandou construir uma piscina no seu jardim exterior?"
+/27 = "Comprou uma nova máquina de lavar louça?"
+/28 = "É final de tarde?"
+/29 = "Está na estação de comboio?"
+/30 = "Está a usar um telemóvel?"
+
+/31 = "Usou o Google?"
+/32 = "Olhou para o mapa do met ro?"
+/33 = "Estava a ouvir um piano a tocar?"
+/34 = "Virou à direita?"
+/35 = "Está a ler sobre o clima?"
+/36 = "O documentário é acerca da evolução?"
+/37 = "Está à espera do comboio?"
+/38 = "Está à procura de um rádio?"
+/39 = "A Grande Muralha da China consiste em apenas um muro?"
+/40 = "Tem lido acerca do sistema solar?"
+
+/41 = "Vai apanhar o autocarro amanhã?"
+/42 = "Foi à aplicação da Disney?"
+/43 = "Está a ver um documentário sobre Franz Kafka?"
+/44 = "Está a ler sobre Neptuno?"
+/45 = "Neil Armstrong esteve na Guerra da Coreia?"
+/46 = "Está a ouvir o 5º album dos Beatles?"
+/47 = "Existem Jogos Olímpicos de verão e de inverno?"
+/48 = "A Taylor Swift tem tido bastante sucesso?"
+/49 = "O filme Jurassic Park foi dirigido por Steven Spielberg?"
+/50 = "A Stefani Joanne Angelina Germanotta é profissionalmente reconhecida como Lady Gaga?"
+
+/51 = "O filme Argo não foi bem recebido pela critica?"
+/52 = "Está a ler sobre os maiores navios da história?"
+/53 = "A Torre Eiffel é o edificio mais alto de Paris?"
+/54 = "O estilo barroco está presente na Torre dos Clérigos?"
+/55 = "A freguesia de Lordelo já foi elevada a vila?"
+/56 = "A Fábrica do Rio Vizela foi pioneira na industrialização do Vale do Ave?"
+/57 = "O Clube Desportivo das Aves é uma equipa portuguesa?"
+/58 = "Esteve algum ciclista português no Giro de Italia em 2021?"
+/59 = "Houve mais do que um piloto português a participar na Fórmula 1?"
+/60 = "A franquia Cloverfield é constituida atualmente por 5 filmes?"
+
+/61 = "Está a ouvir o album À Queima Roupa de Sergio Godinho?"
+/62 = "Está a ouvir o Marante?"
+/63 = "Está a planear uma viagem à Disneyland?"
+/64 = "A franquia Star Wars foi criada por George Lucas?"
+/65 = "Está a ouvir o hino oficial do Benfica?"
+/66 = "Está a ver videos de futebol no YouTube?"
+/67 = "Vai visitar o Taj Mahal?"
+/68 = "Está a ver um documentário sobre a História da França?"
+/69 = "Existem várias empresas de fabrico de lápis na Peninsula Ibérica?"
+/70 = "Foi ao supermercado comprar comida?"
+
+/71 = "Vai de férias para Palma de Mallorca?"
+/72 = "A primeira consola doméstica foi a Atari?"
+/73 = "Está a ler um artigo na Nature?"
+/74 = "Está a ouvir um podcast sobre culinária?"
+/75 = "Está a ler um artigo sobre romances polifónicos?"
+/76 = "A trilogia que leu é contada através de uma narração tradicional?"
+/77 = "Está a ouvir o Tio B?"
+/78 = "A musica Sozinho original é de Caetano Veloso?"
+/79 = "Está a ouvir Yeah Yeah Yeahs?"
+/80 = "Está a ver a série Fundação?"
+</item>
+
+//need to enter 1 (for yes) or 0 (for no)
+<item training_comprehensionquestionACC>
+/1 = "1"
+/2 = "0"
+/3 = "1"
+/4 = "1"
+/5 = "0"
+/6 = "0"
+/7 = "0"
+/8 = "0"
+/9 = "1"
+/10 = "0"
+
+/11 = "0"
+/12 = "1"
+/13 = "0"
+/14 = "0"
+/15 = "1"
+/16 = "1"
+/17 = "1"
+/18 = "0"
+/19 = "1"
+/20 = "1"
+
+/21 = "0"
+/22 = "0"
+/23 = "1"
+/24 = "1"
+/25 = "0"
+/26 = "0"
+/27 = "0"
+/28 = "1"
+/29 = "1"
+/30 = "0"
+
+/31 = "0"
+/32 = "1"
+/33 = "0"
+/34 = "0"
+/35 = "0"
+/36 = "1"
+/37 = "0"
+/38 = "0"
+/39 = "0"
+/40 = "1"
+
+/41 = "1"
+/42 = "0"
+/43 = "0"
+/44 = "0"
+/45 = "1"
+/46 = "0"
+/47 = "1"
+/48 = "1"
+/49 = "1"
+/50 = "1"
+
+/51 = "0"
+/52 = "0"
+/53 = "1"
+/54 = "1"
+/55 = "1"
+/56 = "1"
+/57 = "1"
+/58 = "1"
+/59 = "1"
+/60 = "0"
+
+/61 = "1"
+/62 = "0"
+/63 = "1"
+/64 = "1"
+/65 = "1"
+/66 = "1"
+/67 = "1"
+/68 = "0"
+/69 = "0"
+/70 = "0"
+
+/71 = "0"
+/72 = "0"
+/73 = "0"
+/74 = "0"
+/75 = "0"
+/76 = "0"
+/77 = "0"
+/78 = "0"
+/79 = "0"
+/80 = "0"
+</item>
+
+<list trainingSelection>
+/items = (
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 
+11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 
+31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 
+41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 
+51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 
+61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 
+71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 
+)
+/ replace = false //selection is done randomly without replacement across all 10 blocks
+/ resetinterval = 0 //selection is reset only after the last number has been selected
+</list>
+
+
+************************************
+Filler: 3 x 10 = 30
+************************************
+
+<item filler_titles>
+/1 = "Preparar o pequeno-almoço"
+/2 = "Apanhar o comboio"
+/3 = "História dos computadores"
+/4 = "Borboletas Monarcas"
+/5 = "História do ADN"
+/6 = "Grandes feitos da engenharia"
+/7 = "Jardinagem"
+/8 = "Lavar a roupa"
+/9 = "Ilusões visuais"
+/10 = "No supermercado"
+
+/11 = "Compras online"
+/12 = "Bolo de maçã"
+/13 = "Beagles"
+/14 = "Emissões de UV"
+/15 = "Chá verde"
+/16 = "Supermercado"
+/17 = "Livraria"
+/18 = "Câmara fotografica"
+/19 = "Cerca de madeira"
+/20 = "Castelo de areia"
+
+/21 = "Boletim meteorológico"
+/22 = "Muffins"
+/23 = "Bolsa no restaurante"
+/24 = "Revista de Arte"
+/25 = "Confecção das baguetes"
+/26 = "Botões"
+/27 = "Montar uma cômoda"
+/28 = "Escrever uma carta"
+/29 = "Engomar"
+/30 = "Assistir às notícias"
+</item>
+
+//scenarios should end with word fragments
+<item filler_scenarios>
+/1 = "Liga a chaleira e espera até que a água ferva. Tira uma carteira de chá e põe na caneca, põe a água a ferver em cima da carteira de chá. Depois adiciona o a_úc_r"
+/2 = "Entra no póximo elevador até à estação. Espera quatro minutos até ao próximo comboio chegar. Entra no comboio e senta-se. Tira o seu livro e começa a est_d_ar"
+/3 = "Os primeiros computadores eletrónicos digitais foram desenvolvidos em meados do século XX para realizar cálculos complexos com eficiência. Originalmente, eram do tamanho de uma grande sala, consumindo tanta energia como vária centenas de computadores pessoais m_dern_s"
+/4 = "As borboletas Monarcas são conhecidas pela sua longa migração. Na América do Norte, elas migram para o sul em agosto e para o norte na primavera. As Monarcas são as únicas borboletas conhecidas por migrar anualmente tanto para o norte como para o sul de forma semelhante aos p_ss_ros"
+/5 = "Está  aler um livro da história do ADN. O livro descreve como Watson e Crick deduziram a estrutura de dupla hélice com a ajuda da sua colaboradora Rosalind Franklin em Cambridge na un_vers_d_de"
+/6 = "Está a assistir a um video na internet sobre os grandes feitos da engenharia. O video descreve a construção da ponte Golden Gate. O comprimento da ponte tem mais de dois mim e quinhentos m_tr_s"
+/7 = "Está a assistir a um programa de jardinagem. O apresentador explica como cultivar frutas e vegetais. Também explica que os morangos crescem melhor no v_r_o"
+/8 = "Está a seprar a sua roupa suja em duas partes, a branca e a colorida. coloca as brancas na máquina de lavar e seleciona o programa rápido e frio. Quando terminar, lava as outras ro_p_s"
+/9 = "Uma ilusão visual é uma distorção dos sentidos, que revela como o cérebro normalmente organiza e interpreta a estimulação sensorial. A informação recolhida pelos olhos não corresponde exatamente ao estimulo or_g_nal"
+/10 = "Vai para a fila da caixa de pagamento com o seu carrinho de compras. Conforme a pessoa à sua frente avança, você começa a colocar as suas compras no tapete rolante. O empregado começa a faturar as suas c_mp_as"
+
+/11 = "Encomendou vários DVDs e livros pela AMAZON, mas esqueceu-se que os encomendou há dias atrás. Apercebeu-se que o carteiro lhe deixou um aviso de receção. Foi ao ponto de entregra para recolher a sua en_om_nda."
+/12 = "Pré-aqueceu o forno a 200º graus para fazer um bolo de maçã. Descasca e corta as maçãs em pedaços grandes e adiciona o sumo de laranja às maçãs e mistura. De seguida, faz a c_bert_ra"
+/13 = "Vê o seu vizinho na rua e conversam o sobre o seu novo cão Beagle. Ele diz que os Beagles são muito pequenos, enérgicos, bons com as crianças, e a maioria vive entre os 12 e os 17 anos em m_d_a"
+/14 = "Está a ler um artigo sobre UVs numa revista cientifica. Os cientistas explicam que a baixa emissão de UVs do sol pode contribuir para invernos mais frios que o normal, enquanto a alta produção de UVs tem o efeito o_o_to"
+/15 = "O chá verde tem origem na China e foi associado a muitas culturas em toda a Ásia. Atualmente, os seus possíveis beneficios para a saúde foram reconhecidos no mundo ocidental. Acredita-se que os polifenóis presentes no chá tenham efeitos antioxidantes nas c_lu_as"
+/16 = "Está a fazer compras no supermercado online. Ligou o computador, encontrou o site e começou a adicionar os produtos ao seu carrinho de compras. Escolhe a data e a hora de entrega e termina o pa_ame_to"
+/17 = "Encontrou um livro na livraria. A história começa quando um produtor de cinema britânico se muda para Los Angeles. De seguida, realiza o filme Compton Cricket Club, sobre um grupo de jovens de uma comunidade sem abr_go"
+/18 = "O seu colega traz a sua nova câmara, Cannon EOS 600D, para o escritório. Disse que estava à venda online e que, por ussi, comprou-a a um preço mais barato do que aquele que esperava. Tiram todos fotos no escr_tór-o"
+/19 = "Mede a largura das pranchas de madeira para construir uma cerca. A cerca contornará o jardim todo e, quando finalizada, será tratada e pintada em castanho, igual às outras cercas no b_ir_o"
+/20 = "Está a construir um castelo de areia na praia. Tem baldes e pás de vários tamanhos e formatos e começa a cavar um pequeno buraco. De seguida, enche os baldes com areia misturada com água e constrói um castelo com um t_n_l"
+
+/21 = "Ouviu o boletim meteorológico no rádio. O meteorologista relatou que o tempo estará quase seco e nublado a Este, mas os períodos de chuva continuarão na área Oeste, tornando-se mais intensos e p_rsist_nt_s"
+/22 = "Misturou a farinha e o fermento para fazer muffins. De seguida, adicionou a manteiga, os ovos, o açucar e acrescentou um pouco de leite. Antes de colocar a mistura nas formas, adicionou a baunilha e os mi_t_l_s"
+/23 = "Abriu uma bolsa que encontrou na casa de banho do restaurante. Dentro havia um pequeno espelho, um livro, alguns cigarros e cartões de visita. Ligou para o número de telefone e informou a p_ss_a"
+/24 = "Está a ler uma revista de arte. Um artista adotou muitos meios de comunicação diferentes desde os anos 50, incluíndo a pintura, as gravuras e instalações e design industrial. Esta exposição tem foco nos seus trabalhos po_iti_os"
+/25 = "Está a comer uma baguete fresca. é feita com massa de farinha de trigo e com fermento,levemente levedada e finalmente cozida no forno. O trigo é o grão normalmente utilizado para a preparação das b_gu_t_s"
+/26 = "Está a coser um botão solto numa camisa. Passou a linha através do orificio da agulha e, de seguida, começa a fazer os pontos em laçadas únicas de linhas trazidas para dentro e para fora do tecido de um modo es_ec_f_co"
+/27 = "Está a montar uma cômoda. As instruções dizem que precisará de uma chave de fendas da Phillips, de um martelo e estima-se que a montagem demore sessenta m_nut_s"
+/28 = "Acabou de escrever uma carta, dobra-a e coloca-a num envelope Escreve a morada na frente do envelope em letras maiúsculas e cola um selo no canto superior d_re_to"
+/29 = "Apanha a roupa lavada do estendal e a coloca-a num cesto. Depois carrega o cesto para dentro de casa e liga o ferro. Espera que o ferro aqueça antes de começar a passar a c-mi-a "
+/30 = "Está a assistir às notícias da BBC. As notícias relatam que, à medida que a tecnologia avança, é cada vez mais comum que as pessoas descarreguem arquivos maiores. Isso inclui músicas, vídeos e e-mails de maiores di-em_ões "
+</item>
+
+//if any:
+<item filler_wordFragmentSolutions>
+/1 = "açúcar"
+/2 = "estudar"
+/3 = "modernos"
+/4 = "pássaros"
+/5 = "universidade"
+/6 = "metros"
+/7 = "verão"
+/8 = "roupas"
+/9 = "original"
+/10 = "compras"
+
+/11 = "encomenda"
+/12 = "cobertura"
+/13 = "média"
+/14 = "oposto"
+/15 = "células"
+/16 = "pagamento"
+/17 = "sem-abrigo"
+/18 = "escritório"
+/19 = "bairro"
+/20 = "túnel"
+
+/21 = "persistentes"
+/22 = "mirtilos"
+/23 = "pessoa"
+/24 = "políticos"
+/25 = "baguetes"
+/26 = "específico"
+/27 = "minutos"
+/28 = "direito"
+/29 = "camisa"
+/30 = "dimensões"
+</item>
+
+<item filler_comprehensionquestion>
+/1 = "Fez uma chávena de chá?"
+/2 = "Conseguiu um lugar no comboio?"
+/3 = "Os primeiros computadores eram do mesmo tamanho que os computadores pessoais modernos?"
+/4 = "As Monarcas migram anulamente?"
+/5 = "Está a ler um livro sobre ADN?"
+/6 = "Está a assistir a um video sobre uma ponte?"
+/7 = "O programa tem apresentador?"
+/8 = "Esteve a aspirar?"
+/9 = "As ilusões visuais revela como o cérebro normalmente organiza a informação?"
+/10 = "Estava na fila?"
+
+/11 = "Encomendou CDs de música da AMAZON?"
+/12 = "Está a fazer um bolo de maçã?"
+/13 = "O seu vizinho tem um Golden Retriever?"
+/14 = "Estava a ler sobre os efeitos das inundações?"
+/15 = "Acredita-se que os plifenóis tenham efeitos antioxidantes?"
+/16 = "Dirigiu-se à loja para fazer as compras?"
+/17 = "Encontrou um livro interessante?"
+/18 = "O seu colega trouxe um telefone novo para o escritório?"
+/19 = "Está a construir uma cerca?"
+/20 = "Está a construir um castelo de areia?"
+
+/21 = "Assistiu ao boletim meteorológico na televisão?"
+/22 = "Está a preparar muffins?"
+/23 = "Encontrou uma mochila?"
+/24 = "Esta a deslocar-se para uma galeria?"
+/25 = "Comeu um bolo fresco?"
+/26 = "Está a costurar um botão solto?"
+/27 = "Está a montar uma mesa?"
+/28 = "Escreveu a morada em letras maiúsculas?"
+/29 = "Limpou a casa?"
+/30 = "Estava a ouvir a rádio da BBC?"
+</item>
+
+
+
+//need to enter 1 (for yes) or 0 (for no)
+<item filler_comprehensionquestionACC>
+/1 = "1"
+/2 = "1"
+/3 = "0"
+/4 = "1"
+/5 = "1"
+/6 = "1"
+/7 = "1"
+/8 = "0"
+/9 = "1"
+/10 = "1"
+
+/11 = "0"
+/12 = "1"
+/13 = "0"
+/14 = "0"
+/15 = "1"
+/16 = "0"
+/17 = "1"
+/18 = "0"
+/19 = "1"
+/20 = "1"
+
+/21 = "0"
+/22 = "1"
+/23 = "0"
+/24 = "0"
+/25 = "0"
+/26 = "1"
+/27 = "0"
+/28 = "1"
+/29 = "0"
+/30 = "0"
+</item>
+
+<list fillerSelection>
+/items = (
+1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 
+11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+21, 22, 23, 24, 25, 26, 27, 28, 29, 30)
+/ replace = false //selection is done randomly without replacement across all 10 blocks
+/ resetinterval = 0 //selection is reset only after the last number has been selected
+</list>
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE INSTRUCTIONS: change instructions here
+**************************************************************************************************************
+**************************************************************************************************************
+<instruct>
+/ inputdevice = keyboard
+/ nextlabel = "pressione [espaço] para continuar"
+/ lastlabel = "pressione [espaço] para começar"
+/ prevlabel = "pressione [backspace] para a página anterior"
+/ screencolor = black
+/ txcolor = white
+</instruct>
+
+<page intro>
+<h1>Instruções</h1><hr>
+Nesta tarefa iram ser-lhe apresentadas um conjunto de situações curtas que por vezes acontecem na nossa vida. Cada situação terminará com <u>uma palavra incompleta</u>.
+Assim que consiga identificar a palavra incompleta deve pressionar a tecla [espaço]. Em seguida deve introduzir a palavra na caixa de texto.
+<u>NOTA: NÃO UTILIZE ACENTOS</u><br><br>
+No final de cada uma das situações terá de responder a uma questão sobre a situação. Esta questão terá sempre uma resposta de SIM ou NÃO.<br><br>
+Vamos realizar alguns exercícios de treino<br><br>
+</page>
+
+<page test>
+<h1>Instruções</h1><hr>
+Agora que já praticamos, vamos iniciar a tarefa. O procedimento é o mesmo que executou anteriormente. <br><br>
+Vão ser apresentadas situações que por vezes ocorrem na nossa vida e cada uma destas situações termina com uma palavra incompleta. <br><br>
+Assim que consiga identificar a palavra incompleta pressione a tecla [espaço]. Em seguida introduza a palavra na caixa de texto. 
+<u>NOTA: NÃO UTILIZE ACENTOS</u><br><br>
+Cada situação termina com uma questão sobre a situação. Esta questão terá sempre uma resposta de SIM ou NÃO. <br><br>
+Vamos começar.
+</page>
+
+
+<text scenarioContinue>
+/ items = ("pressione [espaço] assim que consiga completar a palavra")
+/ fontstyle = ("Arial", 3%, false, false, false, false, 5, 1)
+/ position = (50%, 95%)
+/ size = (80%, 5%)
+/ vjustify = center
+/ valign = center
+/ halign = center
+/ txbgcolor = gray
+</text>
+
+<text wordFragmentInstructions>
+/ items = ("Introduza a palavra que completava a última frase da situação anterior")
+/ fontstyle = ("Arial", 4%, false, false, false, false, 5, 1)
+/ position = (50%, 30%)
+/ size = (80%, 10%)
+/ vjustify = center
+/ valign = center
+</text>
+
+<text comprehensionQuestionContinue>
+/ items = ("
+pressione <%parameters.yesKey%> se SIM
+pressione <%parameters.noKey%> se NÃO")
+/ fontstyle = ("Arial", 4%, false, false, false, false, 5, 1)
+/ position = (50%, 70%)
+/ size = (80%, 5%)
+/ vjustify = center
+/ valign = center
+/ halign = center
+</text>
+
+<text blockCount>
+/ items = ("Bloco <%values.blockCount%> de 5")
+/ position = (50%, 50%)
+/ fontstyle = ("Arial", 5%, false, false, false, false, 5, 1)
+/ size = (80%, 80%)
+/ vjustify = center
+</text>
+
+<text blockContinue>
+/ items = ("pressione [espaço] para começar")
+/ fontstyle = ("Arial", 3%, false, false, false, false, 5, 1)
+/ position = (50%, 95%)
+/ size = (80%, 5%)
+/ vjustify = center
+/ valign = center
+/ halign = center
+/ txbgcolor = gray
+</text>
+
+<text finish>
+/ items = ("Obrigado!")
+/ fontstyle = ("Arial", 8%, true, false, false, false, 5, 1)
+/ position = (50%, 50%)
+/ size = (80%, 10%)
+/ vjustify = center
+/ valign = center
+/ halign = center
+</text>
+
+<text exit>
+/ items = ("pressione [espaço] para sair")
+/ fontstyle = ("Arial", 3%, false, false, false, false, 5, 1)
+/ position = (50%, 95%)
+/ size = (80%, 5%)
+/ vjustify = center
+/ valign = center
+/ halign = center
+/ txbgcolor = gray
+</text>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE LISTS: change editable lists here
+**************************************************************************************************************
+**************************************************************************************************************
+
+**************************************************************************************************************
+				!!!REMAINING CODE: Customize after careful consideration only!!!
+**************************************************************************************************************
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	DEFAULTS
+**************************************************************************************************************
+**************************************************************************************************************
+script requires Inquisit 6.3.4.0 or higher
+
+<defaults>
+/canvasaspectratio = (4,3)
+/minimumversion = "6.3.4.0"
+/ fontstyle = ("Arial", 3%, false, false, false, false, 5, 1)
+/txbgcolor = black
+/ txcolor = white
+/ screencolor = black
+</defaults>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	DATA
+**************************************************************************************************************
+**************************************************************************************************************
+
+Note: data file explanations under User Manual Information at the top
+
+To change from one data file per participant to one data file for all participants, set
+/separatefiles = false
+
+***********************
+raw data file
+***********************
+<data>
+/ columns = (build, computer.platform, date, time, subject, group, session, 
+blockcode, blocknum, trialcode, trialnum,
+
+//basic scenario Information: 
+values.scenarioType, values.itemnumber, 
+
+//custom DVs:
+values.RT_scenario, 
+values.RT_wordFragment, values.RSP_wordFragment, values.wordFragment_correctResponse, values.ACC_wordFragment,
+values.RT_comprehensionQ, values.RSP_comprehensionQ, values.comprehensionQ_correctResponse,
+values.ACC_comprehensionQ,
+
+//built-in DV:
+response, correct, latency, 
+
+//detailed scenario Information:
+values.title, values.comprehensionQ, values.scenario)
+</data>
+
+***********************
+summary data file
+***********************
+<summarydata>
+/ columns = (inquisit.build, computer.platform, inquisit.build, expressions.task, script.startdate, script.starttime, 
+script.subjectid, script.groupid, script.sessionid, 
+script.elapsedtime, script.completed
+
+expressions.propCorrect_comprehension, expressions.meanCorrRT_comprehension,
+expressions.propCorrect_comprehension_probe, expressions.meanCorrRT_comprehension_probe,
+expressions.propCorrect_comprehension_nprobe, expressions.meanCorrRT_comprehension_nprobe,
+expressions.propCorrect_comprehension_training, expressions.meanCorrRT_comprehension_training,
+expressions.propCorrect_comprehension_filler, expressions.meanCorrRT_comprehension_filler)
+
+</summarydata>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	VALUES: automatically updated
+**************************************************************************************************************
+**************************************************************************************************************
+
+<values>
+/itemnumber = 1
+/scenarioType = ""
+/wordFragmentSolution = ""
+/comprehensionQ_correctResponse = ""
+/wordFragment_correctResponse = ""
+/scenario = ""
+/comprehensionQ = ""
+/title = ""
+/RT_scenario = ""
+/RT_wordFragment = ""
+/RSP_wordFragment = ""
+/ACC_wordFragment = ""
+/RSP_comprehensionQ = ""
+/RT_comprehensionQ = ""
+/ACC_comprehensionQ = ""
+/blockCount = 0
+</values>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EXPRESSIONS
+**************************************************************************************************************
+**************************************************************************************************************
+
+<expressions>
+/task = "CBM-I"
+/propCorrect_comprehension = list.ACC_comprehension.mean
+/meanCorrRT_comprehension = list.RT_comprehension.mean
+
+/propCorrect_comprehension_probe = list.ACC_comprehension_probe.mean
+/meanCorrRT_comprehension_probe = list.RT_comprehension_probe.mean
+
+/propCorrect_comprehension_nprobe = list.ACC_comprehension_nprobe.mean
+/meanCorrRT_comprehension_nprobe = list.RT_comprehension_nprobe.mean
+
+/propCorrect_comprehension_training = list.ACC_comprehension_training.mean
+/meanCorrRT_comprehension_training = list.RT_comprehension_training.mean
+
+/propCorrect_comprehension_filler = list.ACC_comprehension_filler.mean
+/meanCorrRT_comprehension_filler = list.RT_comprehension_filler.mean
+</expressions>
+
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	INSTRUCTIONS
+**************************************************************************************************************
+**************************************************************************************************************
+
+**************************************************************************************************************
+finish trial
+**************************************************************************************************************
+<trial finish>
+/ inputdevice = keyboard
+/ stimulusframes = [1 = finish, exit]
+/ validresponse = (" ")
+/ recorddata = false
+</trial>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	STIMULI
+**************************************************************************************************************
+**************************************************************************************************************
+
+*****************************************
+Practice
+*****************************************
+
+<text practice_title>
+/ items = item.practice_titles
+/ select = values.itemnumber
+/ fontstyle = ("Arial", 4%, false, false, false, false, 5, 1)
+/ position = (50%, 10%)
+/ size = (90%, 5%)
+/ vjustify = center
+</text>
+
+<text practice_scenario>
+/ items = item.practice_scenarios
+/ select = values.itemnumber
+/ fontstyle = ("Arial", 3%, false, false, false, false, 5, 1)
+/ position = (50%, 50%)
+/ size = (90%, 70%)
+/ vjustify = center
+/ hjustify = left
+</text>
+
+<text practice_comprehensionQuestion>
+/ items = item.practice_comprehensionquestion
+/ select = values.itemnumber
+/ fontstyle = ("Arial", 4%, false, false, false, false, 5, 1)
+/ position = (50%, 30%)
+/ size = (80%, 50%)
+/ vjustify = center
+/ hjustify = left
+</text>
+
+*****************************************
+probe
+*****************************************
+
+<text probe_title>
+/ items = item.probe_titles
+/ select = values.itemnumber
+/ fontstyle = ("Arial", 4%, false, false, false, false, 5, 1)
+/ position = (50%, 10%)
+/ size = (90%, 5%)
+/ vjustify = center
+</text>
+
+<text probe_scenario>
+/ items = item.probe_scenarios
+/ select = values.itemnumber
+/ fontstyle = ("Arial", 3%, false, false, false, false, 5, 1)
+/ position = (50%, 50%)
+/ size = (90%, 70%)
+/ vjustify = center
+/ hjustify = left
+</text>
+
+<text probe_comprehensionQuestion>
+/ items = item.probe_comprehensionquestion
+/ select = values.itemnumber
+/ fontstyle = ("Arial", 4%, false, false, false, false, 5, 1)
+/ position = (50%, 30%)
+/ size = (80%, 50%)
+/ vjustify = center
+/ hjustify = left
+</text>
+
+*****************************************
+negative probe
+*****************************************
+
+<text nprobe_title>
+/ items = item.nprobe_titles
+/ select = values.itemnumber
+/ fontstyle = ("Arial", 4%, false, false, false, false, 5, 1)
+/ position = (50%, 10%)
+/ size = (90%, 5%)
+/ vjustify = center
+</text>
+
+<text nprobe_scenario>
+/ items = item.nprobe_scenarios
+/ select = values.itemnumber
+/ fontstyle = ("Arial", 3%, false, false, false, false, 5, 1)
+/ position = (50%, 50%)
+/ size = (90%, 70%)
+/ vjustify = center
+/ hjustify = left
+</text>
+
+<text nprobe_comprehensionQuestion>
+/ items = item.nprobe_comprehensionquestion
+/ select = values.itemnumber
+/ fontstyle = ("Arial", 4%, false, false, false, false, 5, 1)
+/ position = (50%, 30%)
+/ size = (80%, 50%)
+/ vjustify = center
+/ hjustify = left
+</text>
+
+
+*****************************************
+training
+*****************************************
+
+<text training_title>
+/ items = item.training_titles
+/ select = values.itemnumber
+/ fontstyle = ("Arial", 4%, false, false, false, false, 5, 1)
+/ position = (50%, 10%)
+/ size = (90%, 5%)
+/ vjustify = center
+</text>
+
+<text training_scenario>
+/ items = item.training_scenarios
+/ select = values.itemnumber
+/ fontstyle = ("Arial", 3%, false, false, false, false, 5, 1)
+/ position = (50%, 50%)
+/ size = (90%, 70%)
+/ vjustify = center
+/ hjustify = left
+</text>
+
+<text training_comprehensionQuestion>
+/ items = item.training_comprehensionquestion
+/ select = values.itemnumber
+/ fontstyle = ("Arial", 4%, false, false, false, false, 5, 1)
+/ position = (50%, 30%)
+/ size = (80%, 50%)
+/ vjustify = center
+/ hjustify = left
+</text>
+
+*****************************************
+filler
+*****************************************
+
+<text filler_title>
+/ items = item.filler_titles
+/ select = values.itemnumber
+/ fontstyle = ("Arial", 4%, false, false, false, false, 5, 1)
+/ position = (50%, 10%)
+/ size = (90%, 5%)
+/ vjustify = center
+</text>
+
+<text filler_scenario>
+/ items = item.filler_scenarios
+/ select = values.itemnumber
+/ fontstyle = ("Arial", 3%, false, false, false, false, 5, 1)
+/ position = (50%, 50%)
+/ size = (90%, 70%)
+/ vjustify = center
+/ hjustify = left
+</text>
+
+<text filler_comprehensionQuestion>
+/ items = item.filler_comprehensionquestion
+/ select = values.itemnumber
+/ fontstyle = ("Arial", 4%, false, false, false, false, 5, 1)
+/ position = (50%, 30%)
+/ size = (80%, 50%)
+/ vjustify = center
+/ hjustify = left
+</text>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	LISTS	
+**************************************************************************************************************
+**************************************************************************************************************
+
+
+*************************************************
+Data Lists: used for descriptive statistics
+store correct latencies/accuracy data
+fill up during runtime
+*************************************************
+
+Note: list stores 1 = correct response; 0 = incorrect response for each relevant trial
+any response coded as an error is automatically coded as 0
+<list ACC_comprehension>
+</list>
+
+Note: list stores the latency of correct responses for each relevant trial
+<list RT_comprehension>
+</list>
+
+Note: list stores 1 = correct response; 0 = incorrect response for each relevant trial
+any response coded as an error is automatically coded as 0
+<list ACC_comprehension_probe>
+</list>
+
+Note: list stores the latency of correct responses for each relevant trial
+<list RT_comprehension_probe>
+</list>
+
+Note: list stores 1 = correct response; 0 = incorrect response for each relevant trial
+any response coded as an error is automatically coded as 0
+<list ACC_comprehension_nprobe>
+</list>
+
+Note: list stores the latency of correct responses for each relevant trial
+<list RT_comprehension_nprobe>
+</list>
+
+Note: list stores 1 = correct response; 0 = incorrect response for each relevant trial
+any response coded as an error is automatically coded as 0
+<list ACC_comprehension_training>
+</list>
+
+Note: list stores the latency of correct responses for each relevant trial
+<list RT_comprehension_training>
+</list>
+
+Note: list stores 1 = correct response; 0 = incorrect response for each relevant trial
+any response coded as an error is automatically coded as 0
+<list ACC_comprehension_filler>
+</list>
+
+Note: list stores the latency of correct responses for each relevant trial
+<list RT_comprehension_filler>
+</list>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	TRIALS 	
+**************************************************************************************************************
+**************************************************************************************************************
+
+**************************************
+practice
+**************************************
+
+<trial practice_scenario>
+/ ontrialbegin = [
+	values.scenarioType = "practice";
+	values.itemnumber = list.practiceselection.nextvalue;
+	values.comprehensionQ_correctResponse = item.practice_comprehensionquestionACC.item(values.itemnumber);
+	values.wordFragment_correctResponse = item.practice_wordFragmentSolution.item(values.itemnumber);
+]
+
+/ stimulusframes = [1 = practice_title, practice_scenario, scenarioContinue]
+/ ontrialend = [
+	values.RT_scenario = trial.practice_scenario.latency;
+	values.scenario = text.practice_scenario.currentitem;
+	values.title = text.practice_title.currentitem;
+]
+/ validresponse = (" ")
+/ branch = [
+	return openended.practice_wordFragment;
+]
+/ recorddata = false
+</trial>
+
+<openended practice_wordFragment>
+/ stimulusframes = [1 = wordFragmentInstructions]
+/ multiline = false
+/ mask = alphabetic
+/ charlimit = 100
+/ fontstyle = ("Arial", 4%, false, false, false, false, 5, 1)
+/ buttonlabel = "press [enter] to continue"
+/ navigationbuttonfontstyle = ("Arial", 2.5%, false, false, false, false, 5, 1)
+/ position = (50%, 50%)
+/ size = (60%, 8%)
+/ iscorrectresponse = [
+	tolower(openended.practice_wordFragment.response) == tolower(values.wordFragment_correctResponse);
+]
+/ ontrialend = [
+	values.comprehensionQ = text.practice_comprehensionQuestion.currentitem;
+	values.RSP_wordFragment = openended.practice_wordFragment.response;
+	values.RT_wordFragment = openended.practice_wordFragment.latency;
+	values.ACC_wordFragment = openended.practice_wordFragment.correct;
+]
+/ branch = [
+	return trial.practice_comprehensionQuestion;
+]
+/ recorddata = false
+</openended>
+
+<trial practice_comprehensionQuestion>
+/ stimulusframes = [1 = practice_comprehensionQuestion, comprehensionQuestionContinue]
+/ validresponse = (parameters.yesKey, parameters.noKey)
+/ iscorrectresponse = [
+	return (
+		(trial.practice_comprehensionQuestion.responsetext == parameters.yesKey && values.comprehensionQ_correctResponse == 1) ||
+		(trial.practice_comprehensionQuestion.responsetext == parameters.noKey && values.comprehensionQ_correctResponse == 0)	
+	)
+]
+/ ontrialend = [
+	values.RSP_comprehensionQ = trial.practice_comprehensionQuestion.responsetext;
+	values.ACC_comprehensionQ = trial.practice_comprehensionQuestion.correct;
+	values.RT_comprehensionQ = trial.practice_comprehensionQuestion.latency;
+	values.comprehensionQ = text.practice_comprehensionQuestion.currentitem;
+]
+/ posttrialpause = parameters.iti
+</trial>
+
+**************************************
+probe
+**************************************
+
+<trial probe_scenario>
+/ ontrialbegin = [
+	values.scenarioType = "probe";
+	values.itemnumber = list.probeselection.nextvalue;
+	values.comprehensionQ_correctResponse = item.probe_comprehensionquestionACC.item(values.itemnumber);
+	values.wordFragment_correctResponse = item.probe_wordFragmentSolution.item(values.itemnumber);	
+]
+
+/ stimulusframes = [1 = probe_title, probe_scenario, scenarioContinue]
+/ ontrialend = [
+	values.RT_scenario = trial.probe_scenario.latency;
+	values.scenario = text.probe_scenario.currentitem;
+	values.title = text.probe_title.currentitem;
+]
+/ validresponse = (" ")
+/ branch = [
+	return openended.probe_wordFragment;
+]
+/ recorddata = false
+</trial>
+
+<openended probe_wordFragment>
+/ stimulusframes = [1 = wordFragmentInstructions]
+/ multiline = false
+/ mask = alphabetic
+/ charlimit = 100
+/ fontstyle = ("Arial", 4%, false, false, false, false, 5, 1)
+/ buttonlabel = "pressione [enter] para continuar"
+/ navigationbuttonfontstyle = ("Arial", 2.5%, false, false, false, false, 5, 1)
+/ position = (50%, 50%)
+/ size = (60%, 8%)
+/ iscorrectresponse = [
+	tolower(openended.probe_wordFragment.response) == tolower(values.wordFragment_correctResponse);
+]
+/ ontrialend = [
+	values.comprehensionQ = text.probe_comprehensionQuestion.currentitem;
+	values.RSP_wordFragment = openended.probe_wordFragment.response;
+	values.RT_wordFragment = openended.probe_wordFragment.latency;
+	values.ACC_wordFragment = openended.probe_wordFragment.correct;
+]
+/ branch = [
+	return trial.probe_comprehensionQuestion;
+]
+/ recorddata = false
+</openended>
+
+<trial probe_comprehensionQuestion>
+/ stimulusframes = [1 = probe_comprehensionQuestion, comprehensionQuestionContinue]
+/ validresponse = (parameters.yesKey, parameters.noKey)
+/ iscorrectresponse = [
+	return (
+		(trial.probe_comprehensionQuestion.responsetext == parameters.yesKey && values.comprehensionQ_correctResponse == 1) ||
+		(trial.probe_comprehensionQuestion.responsetext == parameters.noKey && values.comprehensionQ_correctResponse == 0)	
+	)
+]
+/ ontrialend = [
+	values.RSP_comprehensionQ = trial.probe_comprehensionQuestion.responsetext;
+	values.ACC_comprehensionQ = trial.probe_comprehensionQuestion.correct;
+	values.RT_comprehensionQ = trial.probe_comprehensionQuestion.latency;
+	values.comprehensionQ = text.probe_comprehensionQuestion.currentitem;
+
+	list.ACC_comprehension.appenditem(values.ACC_comprehensionQ);
+	list.ACC_comprehension_probe.appenditem(values.ACC_comprehensionQ);
+
+	if (trial.probe_comprehensionQuestion.correct){
+		list.RT_comprehension.appenditem(values.RT_comprehensionQ);
+		list.RT_comprehension_probe.appenditem(values.RT_comprehensionQ);		
+	};
+]
+/ posttrialpause = parameters.iti
+</trial>
+
+
+**************************************
+negative probe
+**************************************
+
+<trial nprobe_scenario>
+/ ontrialbegin = [
+	values.scenarioType = "negative probe";
+	values.itemnumber = list.nprobeselection.nextvalue;
+	values.comprehensionQ_correctResponse = item.nprobe_comprehensionquestionACC.item(values.itemnumber);
+	values.wordFragment_correctResponse = item.nprobe_wordFragmentSolution.item(values.itemnumber);	
+]
+
+/ stimulusframes = [1 = nprobe_title, nprobe_scenario, scenarioContinue]
+/ ontrialend = [
+	values.RT_scenario = trial.nprobe_scenario.latency;
+	values.scenario = text.nprobe_scenario.currentitem;
+	values.title = text.nprobe_title.currentitem;
+]
+/ validresponse = (" ")
+/ branch = [
+	return openended.nprobe_wordFragment;
+]
+/ recorddata = false
+</trial>
+
+<openended nprobe_wordFragment>
+/ stimulusframes = [1 = wordFragmentInstructions]
+/ multiline = false
+/ mask = alphabetic
+/ charlimit = 100
+/ fontstyle = ("Arial", 4%, false, false, false, false, 5, 1)
+/ buttonlabel = "press [enter] to continue"
+/ navigationbuttonfontstyle = ("Arial", 2.5%, false, false, false, false, 5, 1)
+/ position = (50%, 50%)
+/ size = (60%, 8%)
+/ iscorrectresponse = [
+	tolower(openended.nprobe_wordFragment.response) == tolower(values.wordFragment_correctResponse);
+]
+/ ontrialend = [
+	values.comprehensionQ = text.nprobe_comprehensionQuestion.currentitem;
+	values.RSP_wordFragment = openended.nprobe_wordFragment.response;
+	values.RT_wordFragment = openended.nprobe_wordFragment.latency;
+	values.ACC_wordFragment = openended.nprobe_wordFragment.correct;
+]
+/ branch = [
+	return trial.nprobe_comprehensionQuestion;
+]
+/ recorddata = false
+</openended>
+
+<trial nprobe_comprehensionQuestion>
+/ stimulusframes = [1 = nprobe_comprehensionQuestion, comprehensionQuestionContinue]
+/ validresponse = (parameters.yesKey, parameters.noKey)
+/ iscorrectresponse = [
+	return (
+		(trial.nprobe_comprehensionQuestion.responsetext == parameters.yesKey && values.comprehensionQ_correctResponse == 1) ||
+		(trial.nprobe_comprehensionQuestion.responsetext == parameters.noKey && values.comprehensionQ_correctResponse == 0)	
+	)
+]
+/ ontrialend = [
+	values.RSP_comprehensionQ = trial.nprobe_comprehensionQuestion.responsetext;
+	values.ACC_comprehensionQ = trial.nprobe_comprehensionQuestion.correct;
+	values.RT_comprehensionQ = trial.nprobe_comprehensionQuestion.latency;
+	values.comprehensionQ = text.nprobe_comprehensionQuestion.currentitem;
+
+	list.ACC_comprehension.appenditem(values.ACC_comprehensionQ);
+	list.ACC_comprehension_nprobe.appenditem(values.ACC_comprehensionQ);
+
+	if (trial.nprobe_comprehensionQuestion.correct){
+		list.RT_comprehension.appenditem(values.RT_comprehensionQ);
+		list.RT_comprehension_nprobe.appenditem(values.RT_comprehensionQ);		
+	};
+]
+/ posttrialpause = parameters.iti
+</trial>
+
+**************************************
+training
+**************************************
+
+<trial training_scenario>
+/ ontrialbegin = [
+	values.scenarioType = "training";
+	values.itemnumber = list.trainingselection.nextvalue;
+	values.comprehensionQ_correctResponse = item.training_comprehensionquestionACC.item(values.itemnumber);
+	values.wordFragment_correctResponse = item.training_wordFragmentSolutions.item(values.itemnumber);
+]
+
+/ stimulusframes = [1 = training_title, training_scenario, scenarioContinue]
+/ ontrialend = [
+	values.RT_scenario = trial.training_scenario.latency;
+	values.scenario = text.training_scenario.currentitem;
+	values.title = text.training_title.currentitem;
+]
+/ validresponse = (" ")
+/ branch = [
+	return openended.training_wordFragment;
+]
+/ recorddata = false
+</trial>
+
+<openended training_wordFragment>
+/ stimulusframes = [1 = wordFragmentInstructions]
+/ multiline = false
+/ mask = alphabetic
+/ charlimit = 100
+/ fontstyle = ("Arial", 4%, false, false, false, false, 5, 1)
+/ buttonlabel = "press [enter] to continue"
+/ navigationbuttonfontstyle = ("Arial", 2.5%, false, false, false, false, 5, 1)
+/ position = (50%, 50%)
+/ size = (60%, 8%)
+/ iscorrectresponse = [
+	tolower(openended.training_wordFragment.response) == tolower(values.wordFragment_correctResponse);
+]
+/ ontrialend = [
+	values.comprehensionQ = text.training_comprehensionQuestion.currentitem;
+	values.RSP_wordFragment = openended.training_wordFragment.response;
+	values.RT_wordFragment = openended.training_wordFragment.latency;
+	values.ACC_wordFragment = openended.training_wordFragment.correct;
+]
+/ branch = [
+	return trial.training_comprehensionQuestion;
+]
+/ recorddata = false
+</openended>
+
+<trial training_comprehensionQuestion>
+/ stimulusframes = [1 = training_comprehensionQuestion, comprehensionQuestionContinue]
+/ validresponse = (parameters.yesKey, parameters.noKey)
+/ iscorrectresponse = [
+	return (
+		(trial.training_comprehensionQuestion.responsetext == parameters.yesKey && values.comprehensionQ_correctResponse == 1) ||
+		(trial.training_comprehensionQuestion.responsetext == parameters.noKey && values.comprehensionQ_correctResponse == 0)	
+	)
+]
+/ ontrialend = [
+	values.RSP_comprehensionQ = trial.training_comprehensionQuestion.responsetext;
+	values.ACC_comprehensionQ = trial.training_comprehensionQuestion.correct;
+	values.RT_comprehensionQ = trial.training_comprehensionQuestion.latency;
+	values.comprehensionQ = text.training_comprehensionQuestion.currentitem;
+
+	list.ACC_comprehension.appenditem(values.ACC_comprehensionQ);
+	list.ACC_comprehension_training.appenditem(values.ACC_comprehensionQ);
+
+	if (trial.training_comprehensionQuestion.correct){
+		list.RT_comprehension.appenditem(values.RT_comprehensionQ);
+		list.RT_comprehension_training.appenditem(values.RT_comprehensionQ);		
+	};
+]
+/ posttrialpause = parameters.iti
+</trial>
+
+**************************************
+filler
+**************************************
+
+<trial filler_scenario>
+/ ontrialbegin = [
+	values.scenarioType = "filler";
+	values.itemnumber = list.fillerselection.nextvalue;
+	values.comprehensionQ_correctResponse = item.filler_comprehensionquestionACC.item(values.itemnumber);
+	values.wordFragmentSolution = item.filler_wordFragmentSolutions.item(values.itemnumber);
+]
+
+/ stimulusframes = [1 = filler_title, filler_scenario, scenarioContinue]
+/ ontrialend = [
+	values.RT_scenario = trial.filler_scenario.latency;
+	values.scenario = text.filler_scenario.currentitem;
+	values.title = text.filler_title.currentitem;
+]
+/ validresponse = (" ")
+/ branch = [
+	return openended.filler_wordFragment;
+]
+/ recorddata = false
+</trial>
+
+<openended filler_wordFragment>
+/ stimulusframes = [1 = wordFragmentInstructions]
+/ multiline = false
+/ mask = alphabetic
+/ charlimit = 100
+/ fontstyle = ("Arial", 4%, false, false, false, false, 5, 1)
+/ buttonlabel = "press [enter] to continue"
+/ navigationbuttonfontstyle = ("Arial", 2.5%, false, false, false, false, 5, 1)
+/ position = (50%, 50%)
+/ size = (60%, 8%)
+/ iscorrectresponse = [
+	tolower(openended.filler_wordFragment.response) == tolower(values.wordFragment_correctResponse);
+]
+/ ontrialend = [
+	values.comprehensionQ = text.filler_comprehensionQuestion.currentitem;
+	values.RSP_wordFragment = openended.filler_wordFragment.response;
+	values.RT_wordFragment = openended.filler_wordFragment.latency;
+	values.ACC_wordFragment = openended.filler_wordFragment.correct;
+]
+/ branch = [
+	return trial.filler_comprehensionQuestion;
+]
+/ recorddata = false
+</openended>
+
+<trial filler_comprehensionQuestion>
+/ stimulusframes = [1 = filler_comprehensionQuestion, comprehensionQuestionContinue]
+/ validresponse = (parameters.yesKey, parameters.noKey)
+/ iscorrectresponse = [
+	return (
+		(trial.filler_comprehensionQuestion.responsetext == parameters.yesKey && values.comprehensionQ_correctResponse == 1) ||
+		(trial.filler_comprehensionQuestion.responsetext == parameters.noKey && values.comprehensionQ_correctResponse == 0)	
+	)
+]
+/ ontrialend = [
+	values.RSP_comprehensionQ = trial.filler_comprehensionQuestion.responsetext;
+	values.ACC_comprehensionQ = trial.filler_comprehensionQuestion.correct;
+	values.RT_comprehensionQ = trial.filler_comprehensionQuestion.latency;
+	values.comprehensionQ = text.filler_comprehensionQuestion.currentitem;
+
+	list.ACC_comprehension.appenditem(values.ACC_comprehensionQ);
+	list.ACC_comprehension_filler.appenditem(values.ACC_comprehensionQ);
+
+	if (trial.filler_comprehensionQuestion.correct){
+		list.RT_comprehension.appenditem(values.RT_comprehensionQ);
+		list.RT_comprehension_filler.appenditem(values.RT_comprehensionQ);		
+	};
+]
+/ posttrialpause = parameters.iti
+</trial>
+
+<trial testBlockStart>
+/ stimulusframes = [1 = blockCount, blockContinue]
+/ validresponse = (" ")
+/ recorddata = false
+</trial>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	BLOCKS
+**************************************************************************************************************
+**************************************************************************************************************
+
+<block practice>
+/ preinstructions = (intro)
+/ trials = [1-3 = trial.practice_scenario]
+/ postinstructions = (test)
+</block>
+
+<block test>
+/ onblockbegin = [
+	values.blockCount += 1;
+]
+/ trials = [
+	1 = testBlockStart;
+	2-14 = noreplace(trial.probe_scenario, trial.nprobe_scenario,
+trial.training_scenario, trial.training_scenario, trial.training_scenario, trial.training_scenario,
+trial.training_scenario, trial.training_scenario, trial.training_scenario, trial.training_scenario,
+trial.filler_scenario, trial.filler_scenario, trial.filler_scenario)]
+</block>
+
+<block finish>
+/ trials = [
+	1 = finish;
+]
+</block>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EXPERIMENT 
+**************************************************************************************************************
+**************************************************************************************************************
+
+<expt>
+/ blocks = [
+	1 = practice;
+	2-6 = test; //5 test blocks
+	7 = finish;
+]
+</expt>
+
+**************************************************************************************************************
+												End of File
+**************************************************************************************************************

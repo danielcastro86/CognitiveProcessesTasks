@@ -1,0 +1,1011 @@
+﻿<usermanual>
+___________________________________________________________________________________________________________________	
+						
+								Adaptive Paced Auditory Serial Addition Test (Adaptive PASAT)
+								Control Version (custom)
+___________________________________________________________________________________________________________________	
+
+Script Author: Jeffrey Q. Ouyang for Millisecond Software, LLC
+last updated:  01-05-2021 by K. Borchert (katjab@millisecond.com) for Millisecond Software, LLC
+
+Script Copyright © 01-05-2021 Millisecond Software
+
+__________________________________________________________________________________________________________________
+BACKGROUND INFO 	
+___________________________________________________________________________________________________________________	
+This script implements a custom control condition to the the Adaptive Paced Auditory Serial Addition Test (PASAT),
+a measure of information processing rate. The procedure is adaptive in that the presentation rate of the 
+digits adapts to performance.
+
+The control version presents a low cognitive load version of the Adaptive PASAT.
+Instead of having to add the last two digits, participants are simply asked to 
+press the button that corresponds to the last number they have heard.
+
+The implemented procedure is based on:
+
+//regular PASAT:
+Gronwall, D. (1977). Paced auditory serial-addition task: a measure of recovery from concussion. 
+Perceptual and Motor Skills, 44, 367–373.
+
+//adaptive PASAT:
+Siegle, G. J., Ghinassi, F., & Thase, M. E. (2007). Neurobehavioral therapies in the 21st century: 
+Summary of an emerging field and an extended example of cognitive control training for depression. 
+Cognitive Therapy and Research, 31(2), 235–262. doi: 10.1007/s10608-006-9118-6
+
+//control version of the Adaptive PSAT:
+Hoorelbeke, K., Faelens, L., Behiels, J. et al. Internet-delivered cognitive control training as a preventive 
+intervention for remitted depressed patients: Protocol for a randomized controlled trial. 
+BMC Psychiatry 15, 125 (2015). 
+https://doi.org/10.1186/s12888-015-0511-0
+
+___________________________________________________________________________________________________________________
+TASK DESCRIPTION
+___________________________________________________________________________________________________________________	
+Participants hear a sequence of single digit numbers (1-9) presented at a constant speed 
+and are asked to press the number that corresponds to the current digit in the number circle.
+
+___________________________________________________________________________________________________________________	
+DURATION 
+___________________________________________________________________________________________________________________	
+the default set-up of the script takes appr. 10 minutes to complete
+
+___________________________________________________________________________________________________________________	
+DATA FILE INFORMATION 
+___________________________________________________________________________________________________________________	
+The default data stored in the data files are:
+
+(1) Raw data file: 'pasat_adaptive_control_raw*.iqdat' (a separate file for each participant)
+
+build:								The specific Inquisit version used (the 'build') that was run
+computer.platform:					the platform the script was run on (win/mac/ios/android)
+date, time, 						date and time script was run 
+subject, group, 					with the current subject/groupnumber
+session:							with the current session id
+
+blockcode, blocknum:				the name and number of the current block (built-in Inquisit variable)
+trialcode, trialnum: 				the name and number of the currently recorded trial (built-in Inquisit variable)
+										Note: trialnum is a built-in Inquisit variable; it counts all trials run; even those
+										that do not store data to the data file such as feedback trials. Thus, trialnum 
+										may not reflect the number of main trials run per block. 
+										
+values.countTestBlocks:				custom test block counter										
+																				
+values.SOA:							the currently used SOA (in ms); Stimulus Onset Asynchrony																			
+values.currentLevel:				the currently tested level
+values.currentDigit:				the currently presented digit
+
+response:							the participant's response (selected number)
+correct:							the correctness of the response (1 = correct; 0 = incorrect)
+latency: 							the response latency (in ms); measured from onset of digit
+
+values.NR:							1 = no response was made within response window; 
+									0 = otherwise (=no response)
+								
+values.error:						1 = error; 
+									0 = otherwise
+																
+values.consecutiveCorrect:			counts the strings of consecutive correct responses
+									Reset each time an error is made
+									
+values.consecutiveErrors:			counts the strings of consecutive error responses
+									Reset each time a correct response is made
+
+
+(2) Summary data file: 'pasat_adaptive_control_summary*.iqdat' (a separate file for each participant)
+
+computer.platform:					the platform the script was run on (win/mac/ios/android)
+script.startdate:					date script was run
+script.starttime:					time script was started
+script.subjectid:					assigned subject id number
+script.groupid:						assigned group id number
+script.sessionid:					assigned session id number
+script.elapsedtime:					time it took to run script (in ms); measured from onset to offset of script
+script.completed:					0 = script was not completed (prematurely aborted); 
+									1 = script was completed (all conditions run)
+
+
+values.countCorrect:				counts the number of correct responses across all test blocks
+values.countNR:						counts the number of no responses 
+
+values.countErrors:					counts the number of addition errors across all test blocks
+									(could include random selections)
+
+expressions.mean_consecutiveCorrect:	the mean number of consecutive Correct responses across all test blocks
+expressions.median_consecutiveCorrect:	the median number of consecutive Correct responses across all test blocks
+expressions.min_consecutiveCorrect:		the minimum number of consecutive Correct responses across all test blocks 
+expressions.max_consecutiveCorrect:		the maximum number of consecutive Correct responses across all test blocks 
+
+expressions.mean_consecutiveErrors:		the mean number of consecutive error responses across all test blocks
+expressions.median_consecutiveErrors:	the median number of consecutive error responses across all test blocks
+expressions.min_consecutiveErrors:		the minimum number of consecutive error responses across all test blocks 
+expressions.max_consecutiveErrors:		the maximum number of consecutive error responses across all test blocks 
+
+expressions.meanSOA:					mean SOA (in ms) across all test blocks 
+expressions.sd_SOA:						standard deviation (in ms) of all SOAs across all test blocks 
+expressions.minSOA:						minimum SOA (in ms) across all test blocks
+
+___________________________________________________________________________________________________________________	
+EXPERIMENTAL SET-UP 
+___________________________________________________________________________________________________________________	
+	
+(I)	Practice:
+* 11 practice trials (+ start trial)
+* provides feedback
+* default SOA: 4000ms (SOA = stimulus onset asynchrony => every 4 seconds a new number is presented)
+	
+(II) Test:
+* by default, this script runs 4 test blocks
+* by default, the first block starts with SOA = 3000ms (SOA = stimulus onset asynchrony => every 3 seconds a new number is presented)
+(a parameters setting controls whether all blocks start with 3000ms or whether SOAs carry over from one block to the next)
+* SOAs are adapted in the following way:
+	- after 4 (default) consecutive correct responses, the SOA gets decreased by 100ms (default)
+	- after 4 (default) consecutive error responses, the SOA gets increased by 100ms (default)
+* each test block runs for 5 minutes (default)
+
+Trial Sequence:
+verbal digit presentation (SOA: varies): select sum of last 2 digits from a circle of numbers 1-18
+
+Note: by default, the next number is selected randomly without replacement.
+Edit under section Editable Stimulus (list.number)
+
+__________________________________________________________________________________________________________________	
+INSTRUCTIONS 
+___________________________________________________________________________________________________________________	
+provided by Millisecond Software - can be edited under section Editable Instructions
+
+___________________________________________________________________________________________________________________	
+EDITABLE CODE 
+___________________________________________________________________________________________________________________
+check below for (relatively) easily editable values, stimuli, instructions etc. 
+Keep in mind that you can use this script as a template and therefore always "mess" with the entire code to further
+customize your experiment.
+
+The values you can change are:
+
+/circleproportion:				proportion of canvas height used for the circle radius of response buttons (default: 0.4)
+
+/practiceTrials:				number of practice trials to run
+/SOAPractice: 					Stimulus Onset Asynchrony (SOA) in practice trials (= trialduration)
+
+/ testBlockDuration:			the duration (in ms) of each test block (default: 300000ms = 5 minutes)
+/ numberTestBlocksToRun:		the number of test blocks to run (default: 4)
+
+/ continuousSOAsAcrossBlocks    true (1): only the first test blocks starts with maxSOA of 3000ms; 
+								the SOAs carry over for the remaining test blocks (default)
+								false (0): all test blocks start with maxSOA of 3000ms
+
+
+/ maxSOA:						the maximum SOA (in ms) used in this script (default: 3000ms)
+								Note: this is also the starting SOA
+								
+/ minSOA:						the minimum SOA (in ms) used in this script (default: 1000ms)
+/ SOAchange:					the ms increase or decrease if SOA needs to be adapted (default: 100ms)
+/ SOAadaptionCriterium:			the number of correct(error) trials after which SOA needs to be adapted
+
+
+/debugmode:						1 = the correct answer is displayed on the screen
+								0 = the correct answer is not displayed on the screen (default)
+</usermanual>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE values: change editable values here
+**************************************************************************************************************
+**************************************************************************************************************
+
+<parameters>
+/ circleproportion = 0.4
+
+/ practiceTrials = 11
+/ SOAPractice = 4000
+
+/ testBlockDuration = 300000
+/ numberTestBlocksToRun = 3
+/ continuousSOAsAcrossBlocks = true
+
+/ maxSOA = 3000
+/ minSOA = 1000
+/ SOAchange = 100
+/ SOAadaptionCriterium = 4
+
+/ debugmode = 0
+</parameters>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE STIMULI: change editable stimuli here
+**************************************************************************************************************
+**************************************************************************************************************
+
+//edit soundfiles here
+<item soundfiles>
+/1 = "1.wav"
+/2 = "2.wav"
+/3 = "3.wav"
+/4 = "4.wav"
+/5 = "5.wav"
+/6 = "6.wav"
+/7 = "7.wav"
+/8 = "8.wav"
+/9 = "9.wav"
+
+/10 = "10.wav"
+/11 = "11.wav"
+/12 = "12.wav"
+/13 = "13.wav"
+/14 = "14.wav"
+/15 = "15.wav"
+/16 = "16.wav"
+/17 = "17.wav"
+/18 = "18.wav"
+</item>
+
+<list number>
+/items = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18)
+/ selectionrate = always
+/replace = false //random selection without replacement (change to true if selection should be with replacement)
+</list>
+
+<sound buttonfeedback>
+/ items = ("responsebuttonclick.wav")
+</sound>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE INSTRUCTIONS: change instructions here
+**************************************************************************************************************
+**************************************************************************************************************
+
+<instruct>
+/ inputdevice = mouse
+/ nextlabel = "Continuar"
+/ lastlabel = "INICIAR"
+/ prevlabel = "Página anterior"
+/ screencolor = black
+/ txcolor = white
+</instruct>
+
+<page intro1>
+<h1>Instruções</h1><hr>
+Vai ouvir números de um só digito a cada <%parameters.SOAPractice/1000%> segundos. <br><br>
+De cada vez que ouvir um número, pressione o número correspondente no circulo de números o mais rapidamente possível.<br><br>
+</page>
+
+<page intro2>
+<h1>Treino</h1><hr>	
+Primeiro, vamos praticar o exercicio. Durante o exercicio de treino, vai receber feedback sobre se a sua resposta foi correta ou errada.<br><br>
+Inicie os exercicios de treino assim que esteja pronto.
+</page>
+
+<page testStart>
+<h1>Exercicio</h1><hr>	
+Agora que já terminamos os exercicios de treino, vamos iniciar o exercicio de teste.<br><br>
+Agora não receberá feedback sobre se a sua resposta estava certa ou errada. <br><br>
+O exercicio demorará aproximadamente <%(parameters.testBlockDuration*parameters.numberTestBlocksToRun)/1000/60%> minutos. <br><br>
+Inicie o exercicio quando estiver preparado/a.
+</page>
+
+<text correctMark>
+/ items = ("CORRETO!")
+/ fontstyle = ("Verdana", 6%, true, false, false, false, 5, 0)
+/ txcolor = (0,255,0)
+/ txbgcolor = transparent
+/ position = (50, 50)
+/ halign = center
+</text>
+
+<text errorMark>
+/ items = ("X")
+/ fontstyle = ("Verdana", 10%, true, false, false, false, 5, 0)
+/ txcolor = red
+/ txbgcolor = transparent
+/ position = (50, 50)
+/ halign = center
+</text>
+
+<text finish>
+/ items = ("Obrigado!")
+/ fontstyle = ("Arial", 8%, true, false, false, false, 5, 1)
+/ position = (50%, 50%)
+/ size = (80%, 80%)
+/ vjustify = center
+/ valign = center
+/ halign = center
+/ txbgcolor = black
+</text>
+
+<button exitbutton>
+/ caption = "SAIR"
+/ fontstyle = ("Arial", 3%, false, false, false, false, 5, 1)
+/ position = (50%, 80%)
+/ size = (20%, 5%)
+/ valign = center
+/ halign = center
+</button>
+
+
+****************************************************************************************************
+general instruction expressions: adjust the instruction text depending on device used to run script
+****************************************************************************************************
+<expressions>
+/buttoninstruct1 = if (computer.touch && !computer.haskeyboard) {"tapping with your finger";} else {"clique com o rato";}
+
+/task = "A-PASAT"
+</expressions>
+
+**************************************************************************************************************
+								!!!REMAINING CODE: Customize after careful consideration only!!!
+**************************************************************************************************************
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	DEFAULTS
+**************************************************************************************************************
+**************************************************************************************************************
+script requires Inquisit 6.0.0.0 or higher
+
+<defaults>
+/ screencolor = black
+/ txbgcolor = blue
+/ txcolor = white
+/ fontstyle = ("Arial", 3.5%, false, false, false, false, 5, 0)
+/minimumversion = "6.3.4.0"
+/ canvasaspectratio = (4,3)
+</defaults>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	DATA
+**************************************************************************************************************
+**************************************************************************************************************
+
+Note: data file explanations under User Manual Information at the top
+
+***********************
+raw data file
+***********************
+
+<data>
+/ columns = (build, computer.platform, date, time, subject, group, session, blockcode, blocknum, 
+trialcode, trialnum, values.countTestBlocks,
+values.SOA, values.currentLevel, values.currentDigit, 
+stimulusitem, response, correct, latency, values.NR, values.error,
+values.consecutiveCorrect, values.consecutiveErrors,
+values.count_consecutiveCorrect, values.count_consecutiveErrors)
+</data>
+
+***************
+summary data
+***************
+
+<summarydata>
+/ columns = (inquisit.build, computer.platform, expressions.task, script.startdate, script.starttime, script.subjectid, script.groupid, 
+script.sessionid, script.elapsedtime, script.completed,
+values.countCorrect,
+values.countNR,
+values.countErrors,
+
+expressions.mean_consecutiveCorrect, expressions.median_consecutiveCorrect,
+expressions.min_consecutiveCorrect, expressions.max_consecutiveCorrect,
+expressions.mean_consecutiveErrors, expressions.median_consecutiveErrors,
+expressions.min_consecutiveErrors, expressions.max_consecutiveErrors,
+
+expressions.meanSOA, expressions.sd_SOA, expressions.minSOA)
+</summarydata>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	VALUES: automatically updated
+**************************************************************************************************************
+**************************************************************************************************************
+                                    
+/ prevDigit:					stores the previously selected digit
+/ currentDigit:					stores the current digit
+/prevSum:						stores the sum of the previous trial
+/ currentSum:					stores the sum of the previous and current digit
+/ totalTrials:					counts the trials to be run in a block
+/ SOA:							stores the SOA of the current trial (level)
+/ currentLevel:					stores the current level tested
+/NR:							1 = no response; 0 = otherwise
+/error:							1 = addition error; 0 = otherwise
+/suppressionFailure:			1 = response is consistent with using previous sum (not digit); 0 = otherwise
+/consecutiveCorrect:			counts the number of consecutive correct responses (resets after 3 correct responses in a row)
+/count_consecutiveCorrect:		counts how many times 3 correct responses in a row were made
+
+/countCorrect:					counts the number of correct responses across all test blocks run
+/countNR:						counts the number of no responses across all test blocks run
+/countErrors:					counts the number of addition errors (could include random selections) across all test blocks run
+/countSF:						counts the number of suppression failures across all test blocks run
+								Suppression Failure = the given response equals the previous SUM (not previous digit) plus the new digit
+
+<values>
+/ prevDigit = 1
+/ currentDigit = 1 
+/ currentSum = 1
+/prevSum = 0
+/ totalTrials = 0
+/ nextSOA = 0
+/ SOA =  0
+/ currentLevel = 0
+/NR = 0
+/error = 0
+/suppressionFailure = 0
+/consecutiveCorrect = 0
+/consecutiveErrors = 0
+/count_consecutiveCorrect = 0
+/count_consecutiveErrors = 0
+/countTestBlocks = 0
+
+/countCorrect = 0
+/countNR = 0
+/countErrors = 0
+/countSF = 0
+
+/trialcount = 0
+</values>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EXPRESSIONS: CIRCLE COORDINATES
+**************************************************************************************************************
+**************************************************************************************************************
+The following expressions are used to calculate the coordinates of the 18 circle positions (in px)
+
+/centerx-
+/centery:					x and y center coordinates in pixels based on canvas dimensions
+/radius_px:					the radius of the circle in pixels
+/Radians_angle20 -
+/Radians_angle340:			the radians angles of the 18 circle positions
+/heightchange_angle60: 		change in height (measured from screen center) for circleposition on angle60 with radius expressions.radius_px
+/widthchange_angle60: 		change in width (measured from screen center) for circleposition on angle60 with radius expressions.radius_px
+(same for all other angles)
+
+<expressions>
+/centerx=0.5*display.canvaswidth
+/centery=0.5*display.canvasheight
+/radius_px = parameters.circleproportion * display.canvasheight
+/Radians_angle20 = rad(20)
+/Radians_angle40 = rad(40)
+/Radians_angle60 = rad(60)
+/Radians_angle80 = rad(80)
+/Radians_angle100 = rad(100)
+/Radians_angle120 = rad(120)
+/Radians_angle140 = rad(140)
+/Radians_angle160 = rad(160)
+/Radians_angle180 = rad(180)
+/Radians_angle200 = rad(200)
+/Radians_angle220 = rad(220)
+/Radians_angle240 = rad(240)
+/Radians_angle260 = rad(260)
+/Radians_angle280 = rad(280)
+/Radians_angle300 = rad(300)
+/Radians_angle320 = rad(320)
+/Radians_angle340 = rad(340)
+/heightchange_angle60 = sin(expressions.Radians_angle60) * expressions.radius_px
+/widthchange_angle60 = cos(expressions.Radians_angle60) * expressions.radius_px
+/heightchange_angle40 = sin(expressions.Radians_angle40) * expressions.radius_px
+/widthchange_angle40 = cos(expressions.Radians_angle40) * expressions.radius_px
+/heightchange_angle20 = sin(expressions.Radians_angle20) * expressions.radius_px
+/widthchange_angle20 = cos(expressions.Radians_angle20) * expressions.radius_px
+
+/heightchange_angle80 = sin(expressions.Radians_angle80) * expressions.radius_px
+/widthchange_angle80 = cos(expressions.Radians_angle80) * expressions.radius_px
+/heightchange_angle100 = sin(expressions.Radians_angle100) * expressions.radius_px
+/widthchange_angle100 = cos(expressions.Radians_angle100) * expressions.radius_px
+/heightchange_angle120 = sin(expressions.Radians_angle120) * expressions.radius_px
+/widthchange_angle120 = cos(expressions.Radians_angle120) * expressions.radius_px
+/heightchange_angle140 = sin(expressions.Radians_angle140) * expressions.radius_px
+/widthchange_angle140 = cos(expressions.Radians_angle140) * expressions.radius_px
+/heightchange_angle160 = sin(expressions.Radians_angle160) * expressions.radius_px
+/widthchange_angle160 = cos(expressions.Radians_angle160) * expressions.radius_px
+/heightchange_angle180 = sin(expressions.Radians_angle180) * expressions.radius_px
+/widthchange_angle180 = cos(expressions.Radians_angle180) * expressions.radius_px
+/heightchange_angle200 = sin(expressions.Radians_angle200) * expressions.radius_px
+/widthchange_angle200 = cos(expressions.Radians_angle200) * expressions.radius_px
+/heightchange_angle220 = sin(expressions.Radians_angle220) * expressions.radius_px
+/widthchange_angle220 = cos(expressions.Radians_angle220) * expressions.radius_px
+/heightchange_angle240 = sin(expressions.Radians_angle240) * expressions.radius_px
+/widthchange_angle240 = cos(expressions.Radians_angle240) * expressions.radius_px
+/heightchange_angle260 = sin(expressions.Radians_angle260) * expressions.radius_px
+/widthchange_angle260 = cos(expressions.Radians_angle260) * expressions.radius_px
+/heightchange_angle280 = sin(expressions.Radians_angle280) * expressions.radius_px
+/widthchange_angle280 = cos(expressions.Radians_angle280) * expressions.radius_px
+/heightchange_angle300 = sin(expressions.Radians_angle300) * expressions.radius_px
+/widthchange_angle300 = cos(expressions.Radians_angle300) * expressions.radius_px
+/heightchange_angle320 = sin(expressions.Radians_angle320) * expressions.radius_px
+/widthchange_angle320 = cos(expressions.Radians_angle320) * expressions.radius_px
+/heightchange_angle340 = sin(expressions.Radians_angle340) * expressions.radius_px
+/widthchange_angle340 = cos(expressions.Radians_angle340) * expressions.radius_px
+/heightchange_angle0 = 0
+/widthchange_angle0 = expressions.radius_px
+</expressions>
+
+<expressions>
+/mean_consecutiveCorrect = list.consecutiveCorrect.mean
+/median_consecutiveCorrect = list.consecutiveCorrect.median
+/max_consecutiveCorrect = list.consecutiveCorrect.maximum
+/min_consecutiveCorrect = list.consecutiveCorrect.minimum
+
+/mean_consecutiveErrors = list.consecutiveError.mean
+/median_consecutiveErrors = list.consecutiveError.median
+/max_consecutiveErrors = list.consecutiveError.maximum
+/min_consecutiveErrors = list.consecutiveError.minimum
+
+/meanSOA = list.SOAs.mean
+/sd_SOA = list.SOAs.standarddeviation
+/minSOA = list.SOAs.minimum
+</expressions>
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	STIMULI
+**************************************************************************************************************
+**************************************************************************************************************
+
+**********************************************************************************
+Defines text and sound stimuli used for the task 
+**********************************************************************************
+<text 1>
+/ erase = false
+/ items = ("1")
+/ fontstyle = ("Verdana", 5%, true, false, false, false, 5, 0)
+/ hposition = 1px * (expressions.centerx + expressions.widthchange_angle280)
+/ vposition = 1px * (expressions.centery + expressions.heightchange_angle280)
+/ size = (9%, 9%)
+/ vjustify = center
+</text>
+
+<text 2>
+/ erase = false
+/ items = ("2")
+/ fontstyle = ("Verdana", 5%, true, false, false, false, 5, 0)
+/ hposition = 1px * (expressions.centerx + expressions.widthchange_angle300)
+/ vposition = 1px * (expressions.centery + expressions.heightchange_angle300)
+/ size = (9%, 9%)
+/ vjustify = center
+</text>
+
+<text 3>
+/ erase = false
+/ items = ("3")
+/ fontstyle = ("Verdana", 5%, true, false, false, false, 5, 0)
+/ hposition = 1px * (expressions.centerx + expressions.widthchange_angle320)
+/ vposition = 1px * (expressions.centery + expressions.heightchange_angle320)
+/ size = (9%, 9%)
+/ vjustify = center
+</text>
+
+<text 4>
+/ erase = false
+/ items = ("4")
+/ fontstyle = ("Verdana", 5%, true, false, false, false, 5, 0)
+/ hposition = 1px * (expressions.centerx + expressions.widthchange_angle340)
+/ vposition = 1px * (expressions.centery + expressions.heightchange_angle340)
+/ size = (9%, 9%)
+/ vjustify = center
+</text>
+
+<text 5>
+/ erase = false
+/ items = ("5")
+/ fontstyle = ("Verdana", 5%, true, false, false, false, 5, 0)
+/ hposition = 1px * (expressions.centerx + expressions.widthchange_angle0)
+/ vposition = 1px * (expressions.centery + expressions.heightchange_angle0)
+/ size = (9%, 9%)
+/ vjustify = center
+</text>
+
+<text 6>
+/ erase = false
+/ items = ("6")
+/ fontstyle = ("Verdana", 5%, true, false, false, false, 5, 0)
+/ hposition = 1px * (expressions.centerx + expressions.widthchange_angle20)
+/ vposition = 1px * (expressions.centery + expressions.heightchange_angle20)
+/ size = (9%, 9%)
+/ vjustify = center
+</text>
+
+<text 7>
+/ erase = false
+/ items = ("7")
+/ fontstyle = ("Verdana", 5%, true, false, false, false, 5, 0)
+/ hposition = 1px * (expressions.centerx + expressions.widthchange_angle40)
+/ vposition = 1px * (expressions.centery + expressions.heightchange_angle40)
+/ size = (9%, 9%)
+/ vjustify = center
+</text>
+
+<text 8>
+/ erase = false
+/ items = ("8")
+/ fontstyle = ("Verdana", 5%, true, false, false, false, 5, 0)
+/ hposition = 1px * (expressions.centerx + expressions.widthchange_angle60)
+/ vposition = 1px * (expressions.centery + expressions.heightchange_angle60)
+/ size = (9%, 9%)
+/ vjustify = center
+</text>
+
+<text 9>
+/ erase = false
+/ items = ("9")
+/ fontstyle = ("Verdana", 5%, true, false, false, false, 5, 0)
+/ hposition = 1px * (expressions.centerx + expressions.widthchange_angle80)
+/ vposition = 1px * (expressions.centery + expressions.heightchange_angle80)
+/ size = (9%, 9%)
+/ vjustify = center
+</text>
+
+<text 10>
+/ erase = false
+/ items = ("10")
+/ fontstyle = ("Verdana", 5%, true, false, false, false, 5, 0)
+/ hposition = 1px * (expressions.centerx + expressions.widthchange_angle100)
+/ vposition = 1px * (expressions.centery + expressions.heightchange_angle100)
+/ size = (9%, 9%)
+/ vjustify = center
+</text>
+
+<text 11>
+/ erase = false
+/ items = ("11")
+/ fontstyle = ("Verdana", 5%, true, false, false, false, 5, 0)
+/ hposition = 1px * (expressions.centerx + expressions.widthchange_angle120)
+/ vposition = 1px * (expressions.centery + expressions.heightchange_angle120)
+/ size = (9%, 9%)
+/ vjustify = center
+</text>
+
+<text 12>
+/ erase = false
+/ items = ("12")
+/ fontstyle = ("Verdana", 5%, true, false, false, false, 5, 0)
+/ hposition = 1px * (expressions.centerx + expressions.widthchange_angle140)
+/ vposition = 1px * (expressions.centery + expressions.heightchange_angle140)
+/ size = (9%, 9%)
+/ vjustify = center
+</text>
+
+<text 13>
+/ erase = false
+/ items = ("13")
+/ fontstyle = ("Verdana", 5%, true, false, false, false, 5, 0)
+/ hposition = 1px * (expressions.centerx + expressions.widthchange_angle160)
+/ vposition = 1px * (expressions.centery + expressions.heightchange_angle160)
+/ size = (9%, 9%)
+/ vjustify = center
+</text>
+
+<text 14>
+/ erase = false
+/ items = ("14")
+/ fontstyle = ("Verdana", 5%, true, false, false, false, 5, 0)
+/ hposition = 1px * (expressions.centerx + expressions.widthchange_angle180)
+/ vposition = 1px * (expressions.centery + expressions.heightchange_angle180)
+/ size = (9%, 9%)
+/ vjustify = center
+</text>
+
+<text 15>
+/ erase = false
+/ items = ("15")
+/ fontstyle = ("Verdana", 5%, true, false, false, false, 5, 0)
+/ hposition = 1px * (expressions.centerx + expressions.widthchange_angle200)
+/ vposition = 1px * (expressions.centery + expressions.heightchange_angle200)
+/ size = (9%, 9%)
+/ vjustify = center
+</text>
+
+<text 16>
+/ erase = false
+/ items = ("16")
+/ fontstyle = ("Verdana", 5%, true, false, false, false, 5, 0)
+/ hposition = 1px * (expressions.centerx + expressions.widthchange_angle220)
+/ vposition = 1px * (expressions.centery + expressions.heightchange_angle220)
+/ size = (9%, 9%)
+/ vjustify = center
+</text>
+
+<text 17>
+/ erase = false
+/ items = ("17")
+/ fontstyle = ("Verdana", 5%, true, false, false, false, 5, 0)
+/ hposition = 1px * (expressions.centerx + expressions.widthchange_angle240)
+/ vposition = 1px * (expressions.centery + expressions.heightchange_angle240)
+/ size = (9%, 9%)
+/ vjustify = center
+</text>
+
+<text 18>
+/ erase = false
+/ items = ("18")
+/ fontstyle = ("Verdana", 5%, true, false, false, false, 5, 0)
+/ hposition = 1px * (expressions.centerx + expressions.widthchange_angle260)
+/ vposition = 1px * (expressions.centery + expressions.heightchange_angle260)
+/ size = (9%, 9%)
+/ vjustify = center
+</text>
+
+<sound numbers>
+/ items = soundfiles
+/ playthrough = true
+/ select = values.currentDigit
+</sound>
+
+<text debug>
+/ onprepare = [text.debug.skip = !parameters.debugmode;]
+/ items = ("<%values.currentSum%>")
+/ fontstyle = ("Verdana", 8%, true, false, false, false, 5, 0)
+/ txcolor = red
+/ txbgcolor = black
+/ position = (50, 50)
+/ halign = center
+</text>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	LISTS	
+**************************************************************************************************************
+**************************************************************************************************************
+
+
+
+//list collects the number of consecutive correct responses before each error
+<list consecutiveCorrect>
+</list>
+
+//list collects the number of consecutive error responses before each correct response
+<list consecutiveError>
+</list>
+
+//list contains all test trial SOAs
+<list SOAs>
+</list>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	TRIALS 	
+**************************************************************************************************************
+**************************************************************************************************************
+
+
+Note: trial.practice
+* stores the last presented digit under values.prevDigit
+* randomly (without replacement) draws a digit between 1-9 for the current Digit
+* calculates the sum
+* waits for mouse input for values.SOA
+* presents accuracy feedback
+<trial practice>
+/ inputdevice = mouse
+/ ontrialbegin = [
+	values.currentDigit = list.number.nextvalue;
+	values.currentSum = format("%i", values.prevDigit + values.currentDigit);
+	values.NR = 0;
+	values.error = 0;
+	values.suppressionFailure = 0;
+	values.trialcount += 1;
+	values.SOA = values.nextSOA;
+]
+/ stimulusframes = [1=numbers,1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, debug]
+/ validresponse = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18)
+
+/ iscorrectresponse = [
+	trial.practice.response == values.currentDigit;//the correct response is pressing the current digit
+]
+
+/ correctmessage = true(correctMark, 0)
+/ errormessage = true(errorMark, 0)
+/ trialduration =  values.SOA
+/ branch = [
+	if (trial.practice.count < values.totalTrials) {
+		return trial.practice;
+	};
+]
+/ responsemessage = (anyresponse, sound.buttonfeedback, 0)
+</trial>
+
+
+
+
+Note: trial.test
+* stores the last presented digit under values.prevDigit
+* randomly (without replacement) draws a digit between 1-9 for the current Digit
+* calculates the sum
+* waits for mouse input for values.SOA
+<trial test>
+/ inputdevice = mouse
+/ ontrialbegin = [
+	values.currentDigit = list.number.nextvalue;
+	values.prevSum = values.currentSum;
+	values.currentSum = format("%i", values.prevDigit + values.currentDigit);
+	values.NR = 0;
+	values.error = 0;
+	values.suppressionFailure = 0;
+	values.SOA = values.nextSOA;
+	values.trialcount += 1;
+]
+/ stimulusframes = [1=numbers,1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, debug]
+/ validresponse = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18)
+/ iscorrectresponse = [
+	trial.test.response == values.currentDigit;//the correct response is pressing the current digit
+]
+/ trialduration =  values.SOA
+/ responsemessage = (anyresponse, sound.buttonfeedback, 0)
+/ branch = [
+	return trial.test;
+]
+</trial>
+
+<trial finish_mouse>
+/ inputdevice = mouse
+/ stimulusframes = [1 = finish, exitButton]
+/ validresponse = (exitButton)
+/ recorddata = false
+</trial>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	BLOCKS
+**************************************************************************************************************
+**************************************************************************************************************
+
+<block practice>
+/ onblockbegin = [
+	values.trialcount = 0;
+	values.currentLevel = 0;
+	values.nextSOA = parameters.SOAPractice;
+	values.totalTrials = parameters.practiceTrials;
+	values.currentSum = "";
+	values.consecutiveCorrect = 0;	
+	values.count_consecutiveCorrect = 0;
+]
+/ preinstructions = (intro1, intro2)
+/ trials = [
+	1=practice;
+]
+/ recorddata = true
+/ ontrialend = [
+	if (block.practice.currenttrialnumber > 1){
+	
+		if (trial.practice.response == 0){
+			values.NR = 1;
+		} else if (trial.practice.error){
+			if (values.prevSum != ""){
+				if (trial.practice.response == (values.prevSum + values.currentDigit)){
+					values.suppressionFailure = 1;
+				} else {
+					values.error = 1;
+				};			
+			};
+		} else if (trial.practice.correct){
+			values.consecutiveErrors = 0;
+			values.count_consecutiveErrors = 0;
+			values.count_consecutiveCorrect += 1;
+			values.consecutiveCorrect += 1;
+		} else {
+			values.consecutiveCorrect = 0;
+			values.count_consecutiveCorrect = 0;
+			values.count_consecutiveErrors += 1;
+			values.consecutiveErrors += 1;
+		};
+	};
+]
+</block>
+
+<block testStart>
+/ preinstructions = (testStart)
+</block>
+
+<block adaptiveTest>
+/ timeout = parameters.testBlockDuration
+/ onblockbegin = [
+	values.countTestBlocks += 1;
+	values.trialcount = 0;
+	
+	if (values.countTestBlocks == 1){
+		values.nextSOA = parameters.maxSOA;		
+	} else if (parameters.continuousSOAsAcrossBlocks == false){
+		values.nextSOA = parameters.maxSOA;
+	};
+	
+	values.currentSum = "";
+	values.count_consecutiveCorrect = 0;
+	values.consecutiveCorrect = 0;
+	values.count_consecutiveErrors = 0;
+	values.consecutiveErrors = 0;
+]
+/ trials = [1=test]
+/ ontrialend = [
+	if (block.adaptiveTest.currenttrialnumber > 1){
+	
+		list.SOAs.appenditem(values.SOA);
+	
+		if (trial.test.response == 0){
+			values.NR = 1;
+		} else if (trial.test.error){
+			if (values.prevSum != ""){
+				if (trial.test.response == (values.prevSum + values.currentDigit)){
+					values.suppressionFailure = 1;
+				} else {
+					values.error = 1;
+				};			
+			};
+		};	
+			
+		values.countCorrect += trial.test.correct;
+		values.countNR += values.NR;
+		values.countErrors += values.error;
+		values.countSF += values.suppressionFailure;
+		
+		if (trial.test.correct){
+			list.consecutiveError.appenditem(values.consecutiveErrors);
+			values.count_consecutiveErrors = 0;
+			values.consecutiveErrors = 0;
+			values.count_consecutiveCorrect +=1;
+			values.consecutiveCorrect += 1;
+		} else {
+			list.consecutiveCorrect.appenditem(values.consecutiveCorrect);
+			values.count_consecutiveCorrect = 0;
+			values.consecutiveCorrect = 0;
+			values.count_consecutiveErrors += 1;
+			values.consecutiveErrors += 1;
+		};
+
+		
+		//check if SOA needs to be adjusted:
+		if (values.count_consecutiveCorrect >= parameters.SOAadaptionCriterium){
+			values.nextSOA -= parameters.SOAchange; //decrease the SOA by 100ms (default) for 4 (default) consecutive correct responses
+			if (values.nextSOA < parameters.minSOA){ //check that next SOA is not lower than the minimum SOA
+				values.nextSOA = parameters.minSOA;
+			};
+			values.count_consecutiveCorrect = 0;//reset the counter for consecutive correct responses
+		};
+	
+		if (values.count_consecutiveErrors >= parameters.SOAadaptionCriterium){
+			values.nextSOA += parameters.SOAchange;//increase the SOA by 100ms (default) for 4 (default) consecutive error responses
+			if (values.nextSOA > parameters.maxSOA){
+				values.nextSOA = parameters.maxSOA;//check that next SOA does not exceed the maximum allowed SOA
+			};
+			values.count_consecutiveErrors = 0;//reset the counter for consecutive error responses
+		};
+	};
+]
+/ recorddata = true
+/ branch = [
+	if (values.countTestBlocks < parameters.numberTestBlocksToRun){
+		return block.adaptiveTest;
+	};
+]
+</block>
+
+<block finish>
+/ trials = [
+	1 = finish_mouse;
+]
+</block>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EXPERIMENT 
+**************************************************************************************************************
+**************************************************************************************************************
+
+<expt>
+
+/ blocks = [
+	1 = practice; 
+	2 = testStart;
+	3 = adaptiveTest;
+	4 = finish;
+]
+</expt>
+
+<monkey>
+/ latencydistribution = normal(200, 150)
+</monkey>
+
+
+**************************************************************************************************************
+												End of File
+**************************************************************************************************************

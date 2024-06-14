@@ -1,0 +1,1070 @@
+﻿<usermanual>
+___________________________________________________________________________________________________________________	
+
+											DOT PROBE TASK
+										Measure of Attentional Bias
+___________________________________________________________________________________________________________________	
+
+Author: Katja Borchert, Ph.D. (katjab@millisecond.com) for Millisecond Software LLC
+Date: 11-28-2012
+last updated:  03-09-2020 by K. Borchert (katjab@millisecond.com) for Millisecond Software, LLC
+
+Script Copyright © 03-09-2020 Millisecond Software
+
+___________________________________________________________________________________________________________________
+BACKGROUND INFO 	
+___________________________________________________________________________________________________________________	
+This script implements a dotprobe procedure to measure attentional bias.
+The implemented procedure is based on:
+
+MacLeod, C. , Soong, L.Y., Rutherford, E., & Campbell, L.W. (2007). Internet-delivered assessment and manipulation 
+of anxiety-linked attentional bias: Validation of a free-access attentional probe software package. 
+Behavior Research Methods, 39, 533-538.
+
+(the free-access attentional probe software package as well as the stimuli used is available under:
+http://www.psy.uwa.edu.au/labs/cogemo/AttProbe1.html)
+
+___________________________________________________________________________________________________________________
+TASK DESCRIPTION	
+___________________________________________________________________________________________________________________
+After presentation of a fixation cross in the center of the screen, participants are presented with 
+2 words from two categories (here: threat and neutral words). The position of the words is randomly
+chosen to be either above or below the location of the fixation cross. After a short duration,
+the two words disappear and a probe stimulus (here: < or >) appears in the location of one of the
+words. Participants are asked to press one key if the probe is < and another if the probe is >.
+
+___________________________________________________________________________________________________________________	
+DURATION 
+___________________________________________________________________________________________________________________	
+the default set-up of the script takes appr. 6 minutes to complete
+
+___________________________________________________________________________________________________________________	
+DATA FILE INFORMATION 
+___________________________________________________________________________________________________________________
+The default data stored in the data files are:
+
+(1) Raw data file: 'dotprobe_macleod_raw*.iqdat' (a separate file for each participant)
+
+build:								The specific Inquisit version used (the 'build') that was run
+computer.platform:					the platform the script was run on (win/mac/ios/android)
+date, time, 						date and time script was run 
+subject, group, 					with the current subject/groupnumber
+script.sessionid:					with the current session id
+
+blockcode, blocknum:				the name and number of the current block (built-in Inquisit variable)
+trialcode, trialnum: 				the name and number of the currently recorded trial (built-in Inquisit variable)
+										Note: trialnum is a built-in Inquisit variable; it counts all trials run; even those
+										that do not store data to the data file.
+											
+parameters.probetaskselection:		determines which type of dotprobe task to run
+											1 = probe always in threat position
+											2 = probe always in neutral position
+											3 = probe randomly in threat or neutral position (half the time in threat position) (default)
+
+parameters.randomprobe_x:			1 = the x-coordinate of the probe is randomly determined within the space that the 
+											target previously occupied (see MacLeod et al, 2007); default
+									2 = the probe is always presented at parameters.target_x (location of target)											
+											
+congruence:							1 = probe and target (threat) congruent; 2 = probe and target (threat) incongruent
+targetlocation:						1 = target is displayed top (and comp is presented bottom); 2 = target is presented bottom (comp is presented top)
+probeposition:						1 = probe is displayed on top; 2 = probe is displayed on bottom
+probetype:							determines the type of the probe presented (1 vs. 2)
+
+threat_y-probe_x:					the y-coordinate (in %) of the threat/neutral/probe (and x-coordinate of probe)
+itemnumber							the itemnumber of the current word pair
+threatword-neutralword:				contain the current stimuli
+text.probe.currentitem:				current probe item
+
+response:							the participant's response (scancode of response button): 18 vs. 23
+correct:							accuracy of response (1 = correct; 0 = error)
+latency: 							the response latency in ms (measured from onset of probe until response)
+
+
+(2) Summary data file: 'dotprobe_macleod_summary*.iqdat' (a separate file for each participant)
+
+computer.platform:					the platform the script was run on (win/mac/ios/android)
+script.startdate:					date script was run
+script.starttime:					time script was started
+script.subjectid:					assigned subject id number
+script.groupid:						assigned group id number
+script.sessionid:					assigned session id number
+script.elapsedtime:					time it took to run script (in ms); measured from onset to offset of script
+script.completed:					0 = script was not completed (prematurely aborted); 
+									1 = script was completed (all conditions run)
+
+Task Parameters:
+									
+parameters.probetaskselection:		determines which type of dotprobe task to run
+										1 = probe always in threat position
+										2 = probe always in neutral position
+										3 = probe randomly in threat or neutral position (half the time in threat position) (default)
+											
+parameters.fixationduration/targetduration:	the duration of the fixation crosses in ms (default: 500ms)/the targets (default: 500ms)
+
+TP_ISI:							the interstimulus interval between offset of target and onset of probe in ms (default: 0)
+probe_posttrialpause:			the interstimulus interval between offset of probe and begin of next trial in ms (default: 0)
+probe1-probe2:					the symbols used for probe1 and probe 2 (default: >,<)
+
+parameters.randomprobe_x:		1 = the x-coordinate of the probe is randomly determined within the space that the target previously occupied (see MacLeod et al, 2007); default
+								2 = the probe is always presented at parameters.target_x (right above fixation)
+								
+Summary Variables:									
+									
+propcorrect:					overall proportion correct of all test trials
+meanRT:							overall mean latency in ms of correct responses of all test trials
+
+propcorrect_congruent:			proportion correct of all congruent test trials (congruent = target/threat and probe position congruent)
+propcorrect_incongruent:		proportion correct of all incongruent test trials (congruent = target/threat and probe position incongruent)
+
+meanRT_congruent:				mean latency in ms of correct congruent test trials
+meanRT_incongruent:				mean latency in ms of correct incongruent test trials
+
+TBI:							threat bias index calculated by subtracting the mean latency of responses to probes in threat positions (congruent)
+								from mean latency of responses to probes in neutral positions (incongruent)
+											Note: MacLeod et al (2007) use the medians instead of the means
+								=>If positive: attentional bias towards threats words
+								(the bigger the number, the higher the attentional focus on the threat words)
+
+___________________________________________________________________________________________________________________	
+EXPERIMENTAL SET-UP 
+___________________________________________________________________________________________________________________
+2 target positions (up, down) x 2 target-probe congruence (congruent, incongruent) x 2 probe symbols, tested within participants
+
+- 1 Block of 20 practice trials with digits; not original; practice trials give errorfeedback
+- 1 Block of 96 trials
+	- it can be set (see section Editable Values) whether 
+			a) all the trials are threat-probe congruent
+			b) all the trials are threat-probe incongruent
+			c) 1/2 trials are congruent; 1/2 trials are incongruent (default)
+
+- Default trialsequence: fixation (500ms)->targets(500ms)->TP_ISI(0ms)->Probe (until response) -> ISI (1000ms)
+- stimuli pairs are randomly determined for each trial
+- target positions/target-probe congruence/probe symbol randomly determined
+- Probe can be right above the fixation cross or it is randomly placed in one of the previously occupied letter positions (default)
+(can be set under section Editable Values)
+
+___________________________________________________________________________________________________________________	
+STIMULI
+___________________________________________________________________________________________________________________
+This script uses the stimuli generously provided by MacLeod et al (2007) on their website (see above)
+They can be edited under section Editable Stimuli
+Probes can be edited under section Editable Parameters.
+
+___________________________________________________________________________________________________________________	
+INSTRUCTIONS 
+___________________________________________________________________________________________________________________	
+Instructions are not original to the task. They are provided by Millisecond Software
+as htm/html pages and can be edited by changing the provided htm/html files.
+To edit htm/html-files: open the respective documents in simple Text Editors such as TextEdit (Mac)
+or Notepad (Windows).
+
+___________________________________________________________________________________________________________________	
+EDITABLE CODE 
+___________________________________________________________________________________________________________________	
+check below for (relatively) easily editable parameters, stimuli, instructions etc. 
+Keep in mind that you can use this script as a template and therefore always "mess" with the entire code 
+to further customize your experiment.
+
+The parameters you can change are:
+
+/probetaskselection:					1 = probe always in threat position (all probe-threat congruent)
+										2 = probe always in neutral position (all probe-threat incongruent)
+										3 = probe randomly in threat or neutral position (half the time in threat position) (default)
+										
+/fixationduration/targetduration:		the duration of the fixation crosses (default: 500ms)/the targets (default: 500ms)
+/fixation_posttrialpause :				the posttrialpauses for the fixation crosses/the targets/the probe
+/TP_ISI:								the interstimulus interval between offset of target and onset of probe in ms (default: 0)
+/probe_posttrialpause:					the interstimulus interval between offset of probe and begin of next trial in ms (default: 0)
+/probe1-probe2:							the symbols used for probe1 (E) and probe 2 (I)
+
+/responsekey_probe1-
+responsekey_probe2:						the response keys associated with probe1 (default: "E" - left response button) 
+										and probe2 (default: "I", right response button)
+										
+/letterheight:							the height of the letter in % of screen height (default: 5%)
+											!!!NOTE: this script uses mono-spaced Lucinda Console as the default font;
+											we suggest to not change the fontstyle as the calculation of the width of a single letter
+											is based on this particular fontstyle.
+											
+/target_top_y-target_bottom_y:			the y-coordinate in % of the top/bottom target (default: 25%, 75%)
+/target_x:								the x-coordinate of the target (default: center at 50%)
+
+/randomprobe_x:							1 = the x-coordinate of the probe is randomly determined within the space that the 
+											target previously occupied (see MacLeod et al, 2007); default
+										2 = the probe is always presented at parameters.target_x (location of target)
+
+
+</usermanual>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE PARAMETERS: change editable parameters here
+**************************************************************************************************************
+**************************************************************************************************************
+
+<parameters>
+/ probetaskselection = 3
+/ fixationduration = 500
+/ targetduration = 1500
+/ TP_ISI = 0
+/ probe_posttrialpause = 1000
+/ probe1 = "E"
+/ probe2 = "I"
+/ responsekey_probe1 = "E"
+/ responsekey_probe2 = "I"
+/ letterheight = 5%
+/ target_top_y = 43%
+/ target_bottom_y = 57%
+/ target_x = 50%
+/ randomprobe_x = 1 
+</parameters>
+
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE STIMULI: change editable stimuli here
+**************************************************************************************************************
+**************************************************************************************************************
+
+<item threatwords>
+/ 1 = "FUNERAL"
+/ 2 = "MAUS-TRATOS"
+/ 3 = "MASSACRE"
+/ 4 = "TUMOR"
+/ 5 = "INFELIZ"
+/ 6 = "ASSASSINAR"
+/ 7 = "MORTO"
+/ 8 = "CANCRO"
+/ 9 = "FRACASSO"
+/ 10 = "MISÉRIA"
+/ 11 = "TRAIR"
+/ 12 = "TORTURA"
+/ 13 = "SUICÍDIO"
+/ 14 = "RAPTO"
+/ 15 = "DEPRESSÃO"
+/ 16 = "GANGRENA"
+/ 17 = "DOR"
+/ 18 = "AFOGAR-SE"
+/ 19 = "DOR-DE-DENTE"
+/ 20 = "MORTE"
+/ 21 = "SOFRIMENTO"
+/ 22 = "AGRESSÃO"
+/ 23 = "POBREZA"
+/ 24 = "CAIXÃO"
+/ 25 = "MALÁRIA"
+/ 26 = "MUTILAR"
+/ 27 = "SIFÍLIS"
+/ 28 = "CADÁVER"
+/ 29 = "AGONIA"
+/ 30 = "ÓDIO"
+/ 31 = "PARALISIA"
+/ 32 = "ESCRAVO"
+/ 33 = "HUMILHAR"
+/ 34 = "ASSALTANTE"
+/ 35 = "TRISTE"
+/ 36 = "VIOLAÇÃO"
+/ 37 = "FÉTIDO"
+/ 38 = "DESLEAL"
+/ 39 = "DECECIONAR"
+/ 40 = "ODIAR"
+/ 41 = "DESPREZO"
+/ 42 = "SOLIDÃO"
+/ 43 = "NEGLIGÊNCIA"
+/ 44 = "INFIEL"
+/ 45 = "TRAGÉDIA"
+/ 46 = "LEPRA"
+/ 47 = "CEGO"
+/ 48 = "DEPRIMIDO"
+/ 49 = "CHANTAGEM"
+/ 50 = "SUFOCAR"
+/ 51 = "TERRORISTA"
+/ 52 = "TRAIDOR"
+/ 53 = "SEPULTURA"
+/ 54 = "CEMITÉRIO"
+/ 55 = "MORGUE"
+/ 56 = "INFEÇÃO"
+/ 57 = "CORRUPTO"
+/ 58 = "QUEIMADURA"
+/ 59 = "ABANDONADO"
+/ 60 = "PESSIMISMO"
+/ 61 = "DOENÇA"
+/ 62 = "ACIDENTE"
+/ 63 = "REFÉM"
+/ 64 = "ESCORBUTO"
+/ 65 = "ASSASSINO"
+/ 66 = "CULPA"
+/ 67 = "DESGOSTO"
+/ 68 = "MULTA"
+/ 69 = "VÍTIMA"
+/ 70 = "MENDIGO"
+/ 71 = "FUZIL"
+/ 72 = "GUERRA"
+/ 73 = "VIOLENTO"
+/ 74 = "DESTRUIÇÃO"
+/ 75 = "INSULTO"
+/ 76 = "CRUEL"
+/ 77 = "HOMICIDA"
+/ 78 = "DERROTADO"
+/ 79 = "ENXAQUECA"
+/ 80 = "CRIME"
+/ 81 = "REJEITADO"
+/ 82 = "STRESS"
+/ 83 = "DESANIMADO"
+/ 84 = "CHACINA"
+/ 85 = "AMEAÇA"
+/ 86 = "COBARDE"
+/ 87 = "FRAUDE"
+/ 88 = "POLUIR"
+/ 89 = "DESPREZADOR"
+/ 90 = "PIOLHOS"
+/ 91 = "FALÊNCIA"
+/ 92 = "PESADELO"
+/ 93 = "VÓMITO"
+/ 94 = "SANGRENTO"
+/ 95 = "EGOÍSTA"
+/ 96 = "TÉDIO"
+</item>
+
+<item neutralwords>
+/ 1 = "VINHO"
+/ 2 = "VARIÁVEIS"
+/ 3 = "COLAR"
+/ 4 = "EDIÇÕES"
+/ 5 = "PALNETA"
+/ 6 = "SELIM"
+/ 7 = "LIGA"
+/ 8 = "ESTANTE"
+/ 9 = "RECIBOS"
+/ 10 = "ORDENAR"
+/ 11 = "PISTA"
+/ 12 = "OUVIR"
+/ 13 = "CRIATURA"
+/ 14 = "DEFESA"
+/ 15 = "ROLAR"
+/ 16 = "ARRANJO"
+/ 17 = "COLORIDO"
+/ 18 = "TRAGO"
+/ 19 = "CONTEXTO"
+/ 20 = "CONFERIR"
+/ 21 = "OBSERVAÇÕES"
+/ 22 = "DOBRAR"
+/ 23 = "INTEGRAL"
+/ 24 = "DECANTAÇÃO"
+/ 25 = "RESULTADO"
+/ 26 = "GARRAFAS"
+/ 27 = "CONSTITUINTE"
+/ 28 = "APROXIMAR"
+/ 29 = "LER"
+/ 30 = "MEIO DIA"
+/ 31 = "COSTAS"
+/ 32 = "LOTUS"
+/ 33 = "GEOMETRICO"
+/ 34 = "RAQUETE"
+/ 35 = "MICROSCÓPICO"
+/ 36 = "INSTRUMENTAL"
+/ 37 = "MOMENTÂNEO"
+/ 38 = "ÉPOCA"
+/ 39 = "CARRUAGENS"
+/ 40 = "ASSINATURA"
+/ 41 = "LAREIRA"
+/ 42 = "BUSCAR"
+/ 43 = "RECUPERADO"
+/ 44 = "VERÕES"
+/ 45 = "CAÇA"
+/ 46 = "MARCA"
+/ 47 = "REQUERIMENTO"
+/ 48 = "BATERIAS"
+/ 49 = "COSTA"
+/ 50 = "VASSOURA"
+/ 51 = "REFEITÓRIO"
+/ 52 = "PAPAGAIO"
+/ 53 = "QUANTIDADE"
+/ 54 = "MULTITUDE"
+/ 55 = "FICHAS"
+/ 56 = "PÓSTER"
+/ 57 = "LIVROS"
+/ 58 = "OUVIDOS"
+/ 59 = "MUSEU"
+/ 60 = "CAMISOLA"
+/ 61 = "ABACATE"
+/ 62 = "CADEIRA"
+/ 63 = "TEXTURIZADO"
+/ 64 = "FLAUTA"
+/ 65 = "PADRÃO"
+/ 66 = "PROTEINAS"
+/ 67 = "MERCADORIA"
+/ 68 = "TOMATES"
+/ 69 = "PALETE"
+/ 70 = "PROVA-DE-ÁGUA"
+/ 71 = "CÉDULA"
+/ 72 = "COEFICIENTE"
+/ 73 = "ANAGRAMA"
+/ 74 = "CETIM"
+/ 75 = "ALA"
+/ 76 = "MEIO"
+/ 77 = "PENAS"
+/ 78 = "TRATO"
+/ 79 = "MARCHAR"
+/ 80 = "TRAJE"
+/ 81 = "SCANNER"
+/ 82 = "CONNECÇÕES"
+/ 83 = "TRANSIÇÃO"
+/ 84 = "TÚNEL"
+/ 85 = "ENTREPOSTO"
+/ 86 = "MANIFESTAÇÃO"
+/ 87 = "PASTEL"
+/ 88 = "FLUIR"
+/ 89 = "FECHADURA"
+/ 90 = "MITOLOGIA"
+/ 91 = "AMACIADOR"
+/ 92 = "PONTES"
+/ 93 = "VOAR"
+/ 94 = "COMPUTADOR"
+/ 95 = "EDITADO"
+/ 96 = "QUARTO"
+</item>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE INSTRUCTIONS: change instructions here
+**************************************************************************************************************
+**************************************************************************************************************
+<instruct>
+/ fontstyle = ("Arial", 3.00%, false, false, false, false, 5, 1)
+</instruct>
+
+<htmlpage instructions>
+/ file = "dotprobe_macleod_intro1.htm"
+</htmlpage>
+
+
+<htmlpage practice>
+/ file = "dotprobe_macleod_teststart.htm"
+</htmlpage>
+
+<text finish>
+/ items = ("Obrigado!")
+/ fontstyle = ("Arial", 8%, true, false, false, false, 5, 1)
+/ position = (50%, 50%)
+/ size = (80%, 80%)
+/ vjustify = center
+/ valign = center
+/ halign = center
+</text>
+
+<text exit>
+/ items = ("<pressione a [barra de espaços] para sair>")
+/ fontstyle = ("Arial", 3%, false, false, false, false, 5, 1)
+/ position = (50%, 90%)
+/ size = (80%, 5%)
+/ vjustify = center
+/ valign = center
+/ halign = center
+</text>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE LISTS: change editable lists here
+**************************************************************************************************************
+**************************************************************************************************************
+
+<list itemnumbers>
+/ poolsize = 96
+/ replace = false
+</list>
+
+<list targetlocation>
+/ items = (
+1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+1, 1, 1, 1, 1, 1, 1, 1,
+2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+2, 2, 2, 2, 2, 2, 2, 2)
+/ replace = false
+</list>
+
+<list congruence>
+/ items = (
+1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 
+2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+2, 2, 2, 2, 2, 2, 2, 2,
+1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 
+2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+2, 2, 2, 2, 2, 2, 2, 2)
+/ selectionmode = list.targetlocation.currentindex
+</list>
+
+<list probetype>
+/ items = (
+1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 
+2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 
+1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 
+2, 2, 2, 2, 2, 2, 2, 2,
+1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 
+2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 
+1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 
+2, 2, 2, 2, 2, 2, 2, 2)
+/ selectionmode = list.targetlocation.currentindex
+</list>
+
+
+**************************************************************************************************************
+								!!!REMAINING CODE: Customize after careful consideration only!!!
+**************************************************************************************************************
+
+*******************************************************************************************************************
+*******************************************************************************************************************
+	DEFAULTS
+*******************************************************************************************************************
+*******************************************************************************************************************
+requires Inquisit 6.1.0.0 or higher
+
+<defaults>
+/ minimumversion = "6.1.0.0"
+/ fontstyle = ("Lucida Console", parameters.letterheight, false, false, false, false, 5, 1)
+/ txcolor = black
+/ txcolor = black
+/ screencolor = white
+/ canvasaspectratio = (4,3)
+</defaults>
+
+*******************************************************************************************************************
+*******************************************************************************************************************
+	DATA
+*******************************************************************************************************************
+*******************************************************************************************************************
+
+********************
+raw data
+********************
+
+
+<data>
+/ columns = (build, computer.platform, date, time, subject, group, script.sessionid, blockcode, blocknum, 
+trialcode, trialnum, 
+parameters.probetaskselection, 
+parameters.randomprobe_x,
+values.congruence, values.targetlocation, values.probeposition, values.probetype,
+values.neutral_y, values.threat_y, values.probe_y, values.probe_x,
+values.itemnumber, values.threatword, values.neutralword, text.probe.currentitem,
+response, correct, latency)
+</data>
+
+********************
+summary data
+********************
+
+<summarydata>
+/ columns = (computer.platform, expressions.task, script.startdate, script.starttime, script.subjectid, script.groupid, script.sessionid, script.elapsedtime, 
+script.completed, 
+parameters.probetaskselection, parameters.fixationduration, parameters.targetduration, parameters.TP_ISI, parameters.probe_posttrialpause,
+parameters.probe1, parameters.probe2, parameters.randomprobe_x,
+expressions.propcorrect, expressions.meanRT,
+expressions.propcorrect_congruent, expressions.propcorrect_incongruent,
+expressions.meanRT_congruent, expressions.meanRT_incongruent, expressions.TBI)
+
+</summarydata>
+
+
+*******************************************************************************************************************
+*******************************************************************************************************************
+	VALUES: automatically updated
+*******************************************************************************************************************
+*******************************************************************************************************************
+
+/itemnumber:										stores the itemnumber of the current threat-neutral pairing
+/congruence:										1 = probe and target (threat) congruent; 2 = probe and target (threat) incongruent
+/probeposition:										determines whether the probe is presented in the threat or neutral position
+/targetlocation:									1 = target is displayed top (and comp is presented bottom); 2 = target is presented bottom (comp is presented top)
+													1 = threat position; 0 = neutral position
+/probetype:											determines the type of the probe presented
+
+/threat_y-probe_y:									the y-coordinate (in %) of the threat/neutral/probe
+/neutralword-threatword:							contain the current stimuli
+
+/trialcount:										counts all trials
+/letterwidth:										the width of one letter in % of screen width 
+													!!! NOTE: this percentage depends on the fonttype and height used
+													the ratio used in this script (0.45) is calculated based on monospaced LUCINDA CONSOLE
+													(monospaced = all letters take up the same width)
+/wordwidth_threatword:								contains the width of the current threat word
+/wordwidth_neutralword:								contains the width of the current neutral word 
+/wordwidth:											contains the smaller of the two widths
+/index:												helper variable to calculate the x-coordinate of the probe
+
+<values>
+/ itemnumber = 0
+/ congruence = 0
+/ targetlocation = 0
+/ probeposition = 0
+/ probetype = 0
+
+/ threat_y = 0
+/ neutral_y = 0
+/ probe_y = 0
+/ probe_x = 0
+
+/ neutralword = ""
+/ threatword = ""
+
+/ trialcount = 0
+/ letterwidth = 0.45 * parameters.letterheight
+/ wordwidth_threatword = 0
+/ wordwidth_neutralword = 0
+/ wordwidth = 0
+/ index = 0
+</values>
+
+*******************************************************************************************************************
+*******************************************************************************************************************
+	EXPRESSIONS
+*******************************************************************************************************************
+*******************************************************************************************************************
+/propcorrect:				overall proportion correct of all test trials
+/meanRT:					overall mean latency in ms of correct responses of all test trials
+
+/propcorrect_congruent:		proportion correct of all congruent test trials (congruent = target/threat and probe position congruent)
+/propcorrect_incongruent:	proportion correct of all incongruent test trials (congruent = target/threat and probe position incongruent)
+
+/meanRT_congruent:			mean latency in ms of correct congruent test trials
+/meanRT_incongruent:		mean latency in ms of correct incongruent test trials
+
+/TBI:						threat bias index calculated by subtracting the mean latency of responses to probes in threat positions (congruent)
+							from mean latency of responses to probes in neutral positions (incongruent)
+
+<expressions>
+/ propcorrect = list.accuracy.mean
+/ meanRT = list.latencies.mean
+/ SD = list.latencies.standarddeviation
+
+/ propcorrect_congruent = list.accuracy_C.mean
+/ propcorrect_incongruent = list.accuracy_IC.mean
+
+/ meanRT_congruent = list.latencies_C.mean
+/ SD_C = list.latencies_C.standarddeviation
+/ meanRT_incongruent = list.latencies_IC.mean
+/ SD_IC = list.latencies_IC.standarddeviation
+
+/TBI = expressions.meanRT_incongruent - expressions.meanRT_congruent
+/task = "ABM"
+</expressions>
+
+*******************************************************************************************************************
+*******************************************************************************************************************
+	INSTRUCTIONS
+*******************************************************************************************************************
+*******************************************************************************************************************
+ 
+<trial finish>
+/ stimulusframes = [1 = finish, exit]
+/ validresponse = (" ")
+/ recorddata = false
+</trial>
+ 
+*******************************************************************************************************************
+*******************************************************************************************************************
+	STIMULI
+*******************************************************************************************************************
+*******************************************************************************************************************
+
+<text threatword>
+/ items = threatwords
+/ select = values.itemnumber
+/ hposition = parameters.target_x
+/ vposition = values.threat_y
+/ erase = false
+</text>
+
+<text neutralword>
+/ items = neutralwords
+/ select = values.itemnumber
+/ hposition = parameters.target_x
+/ vposition = values.neutral_y
+/ erase = false
+</text>
+
+******************************
+other stimuli
+******************************
+<text fixation>
+/ items = ("+++")
+/ erase = false
+</text>
+
+<text probe>
+/ items = ("<%parameters.probe1%>", "<%parameters.probe2%>")
+/ select = values.probetype
+/ hposition = values.probe_x
+/ vposition = values.probe_y
+/ color = black
+</text>
+
+<shape eraser>
+/ shape = rectangle
+/ size = (100%, 100%)
+/ color = white
+/ position = (50%, 50%)
+/ erase = false
+</shape>
+
+<text feedback>
+/ items = ("X")
+/ txcolor = red
+/ position = (50%, 50%)
+/ fontstyle = ("Arial", 10%, true, false, false, false, 5, 1)
+</text>
+
+*******************************************************************************************************************
+*******************************************************************************************************************
+	LISTS
+*******************************************************************************************************************
+*******************************************************************************************************************
+
+*************NOTE: The following lists operate regardless of number of trials
+
+NOTE: list.oddnumbers is used to calculate the random position of the probe for even
+numbered targets
+*values.index is randomly determined and depends on the length of the word
+<list oddnumbers>
+/ items = (1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21)
+/ selectionmode = values.index
+</list>
+
+Note: list.evennumbers is used to calculate the random position of the probe for odd
+numbered targets
+<list evennumbers>
+/ items = (0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20)
+/ selectionmode = values.index
+</list>
+
+Note: list.multiplicator is used to decide whether the probe should appear 
+on the left or right side of the monitor 
+(1 = right side, -1 = left side)
+<list multiplicator>
+/ items = (1, -1)
+/ replace = true
+</list>
+
+
+*************************************************
+Data Lists: used for descriptive statistics
+store correct latencies/accuracy data
+fill up during runtime
+*************************************************
+
+<list accuracy>
+</list>
+
+<list latencies>
+</list>
+
+<list accuracy_C>
+</list>
+
+<list latencies_C>
+</list>
+
+<list accuracy_IC>
+</list>
+
+<list latencies_IC>
+</list>
+
+*******************************************************************************************************************
+*******************************************************************************************************************
+	EXPERIMENTAL TRIALS
+*******************************************************************************************************************
+*******************************************************************************************************************
+
+<trial threat>
+/ ontrialbegin = [
+	values.trialcount += 1;
+	values.targetlocation = list.targetlocation.nextvalue;
+	if (parameters.probetaskselection == 1)
+		values.congruence = 1
+	else if (parameters.probetaskselection == 2)
+		values.congruence = 2
+	else
+		values.congruence = list.congruence.nextvalue;
+	values.probetype = list.probetype.nextvalue;
+	if (values.targetlocation == 1) {
+		values.threat_y = parameters.target_top_y;
+		values.neutral_y = parameters.target_bottom_y;
+	} else {
+		values.threat_y = parameters.target_bottom_y;
+		values.neutral_y = parameters.target_top_y;
+	};
+	if (values.congruence == 1) {
+		values.probe_y = values.threat_y;
+		values.probeposition = values.targetlocation;
+	} else {
+		values.probe_y = values.neutral_y;
+		if (values.targetlocation == 1) {
+			values.probeposition = 2;
+		} else {
+			values.probeposition = 1;
+		}
+	};
+	values.itemnumber = list.itemnumbers.nextindex;
+	values.threatword = item.threatwords.item(values.itemnumber);
+	values.neutralword = item.neutralwords.item(values.itemnumber);
+	values.wordwidth_threatword = length(values.threatword);
+	values.wordwidth_neutralword = length(values.neutralword);
+	if (values.congruence == 1)
+		values.wordwidth = values.wordwidth_threatword
+	else
+		values.wordwidth = values.wordwidth_neutralword;
+	if (parameters.randomprobe_x != 1) {
+		values.probe_x = parameters.target_x;
+	} else {
+		if (mod(values.wordwidth,2)==0) {
+			values.index = ceil(rand(0,0.5*values.wordwidth));
+			values.probe_x = parameters.target_x + list.multiplicator.nextvalue * list.oddnumbers.nextvalue * (values.letterwidth/2);
+		} else {
+			values.index = ceil(rand(0, 0.5*(values.wordwidth +1 )));
+			values.probe_x = parameters.target_x + list.multiplicator.nextvalue * list.evennumbers.nextvalue * (values.letterwidth/2);
+		}
+	};
+	trial.threat.insertstimulustime(text.threatword, parameters.fixationduration);
+	trial.threat.insertstimulustime(text.neutralword, parameters.fixationduration);
+	trial.threat.insertstimulustime(shape.eraser, (parameters.fixationduration+parameters.targetduration));
+	trial.threat.insertstimulustime(text.fixation, (parameters.fixationduration+parameters.targetduration));
+	trial.threat.insertstimulustime(text.probe,(parameters.fixationduration+parameters.targetduration+parameters.TP_ISI));
+]
+/ stimulustimes = [0 = fixation]
+/ beginresponsetime = parameters.fixationduration+parameters.targetduration+parameters.TP_ISI
+/ responseinterrupt = immediate
+/ validresponse = (parameters.responsekey_probe1, parameters.responsekey_probe2)
+/ iscorrectresponse = [
+	return ((values.probetype == 1 && trial.threat.responsetext == parameters.responsekey_probe1) || 
+			(values.probetype == 2 && trial.threat.responsetext == parameters.responsekey_probe2));
+	]
+/ ontrialend = [
+	trial.threat.resetstimulusframes();
+	list.accuracy.appenditem(trial.threat.correct);
+	if (values.congruence == 1) {
+		list.accuracy_C.appenditem(trial.threat.correct);
+		if (trial.threat.correct) {
+			list.latencies.appenditem(trial.threat.latency);
+			list.latencies_C.appenditem(trial.threat.latency);
+		};
+	} else {
+		list.accuracy_IC.appenditem(trial.threat.correct);
+		if (trial.threat.correct) {
+			list.latencies.appenditem(trial.threat.latency);
+			list.latencies_IC.appenditem(trial.threat.latency);
+		} ;
+	};
+]
+/ posttrialpause = parameters.probe_posttrialpause
+</trial>
+
+*******************************************************************************************************************
+*******************************************************************************************************************
+	PRACTICE
+*******************************************************************************************************************
+*******************************************************************************************************************
+NOTE: this practice session is not original to MacLeod et al (2007)
+
+******************************
+Practice Stimuli
+******************************
+
+<item practicewords_1>
+/ 1 = "um"
+/ 2 = "dois"
+/ 3 = "três"
+/ 4 = "quatro"
+/ 5 = "cinco"
+/ 6 = "seis"
+/ 7 = "sete"
+/ 8 = "oito"
+/ 9 = "nove"
+/ 10 = "dez"
+</item>
+
+<item practicewords_2>
+/ 1 = "dois"
+/ 2 = "dez"
+/ 3 = "sete"
+/ 4 = "nove"
+/ 5 = "quatro"
+/ 6 = "um"
+/ 7 = "oito"
+/ 8 = "três"
+/ 9 = "cinco"
+/ 10 = "seis"
+</item>
+
+<text practiceword_1>
+/ items = practicewords_1
+/ select = values.itemnumber
+/ hposition = parameters.target_x
+/ vposition = values.threat_y
+</text>
+
+<text practiceword_2>
+/ items = practicewords_2
+/ select = values.itemnumber
+/ hposition = parameters.target_x
+/ vposition = values.neutral_y
+</text>
+
+******************************
+Practice Lists
+******************************
+
+<list practiceitemnumbers>
+/ poolsize = 10
+/ replace = false
+</list>
+
+
+<list practicetargetposition>
+/ items = (1, 1, 1, 1, 1, 2, 2, 2, 2, 2)
+/ replace = false
+</list>
+
+<list practicecongruence>
+/ items = (1, 1, 1, 1, 1, 2, 2, 2, 2, 2)
+/ replace = false
+</list>
+
+<list practiceprobetype>
+/ items = (1, 1, 1, 1, 1, 2, 2, 2, 2, 2)
+/ replace = false
+</list>
+
+******************************
+Practice Trials
+******************************
+
+<trial practice>
+/ ontrialbegin = [
+	values.targetlocation = list.practicetargetposition.nextvalue;
+	if (parameters.probetaskselection == 1)
+		values.congruence = 1;
+	else if (parameters.probetaskselection == 2)
+		values.congruence = 2;
+	else
+		values.congruence = list.practicecongruence.nextvalue;
+		
+	values.probetype = list.practiceprobetype.nextvalue;
+	if (values.targetlocation == 1) {
+		values.threat_y = parameters.target_top_y;
+		values.neutral_y = parameters.target_bottom_y;
+	} else {
+		values.threat_y = parameters.target_bottom_y;
+		values.neutral_y = parameters.target_top_y;
+	};
+	
+	if (values.congruence == 1) {
+		values.probe_y = values.threat_y;
+		values.probeposition = values.targetlocation;
+	} else {
+		values.probe_y = values.neutral_y;
+		if (values.targetlocation == 1) {
+			values.probeposition = 2;
+		} else {
+			values.probeposition = 1;
+		};
+	};
+	values.itemnumber = list.practiceitemnumbers.nextindex;
+	
+	values.threatword = item.practicewords_1.item(values.itemnumber);
+	values.neutralword = item.practicewords_2.item(values.itemnumber);
+	
+	values.wordwidth_threatword = length(values.threatword);
+	values.wordwidth_neutralword = length(values.neutralword);
+	if (values.congruence == 1)
+		values.wordwidth = values.wordwidth_threatword
+	else
+		values.wordwidth = values.wordwidth_neutralword;
+		
+	if (parameters.randomprobe_x != 1) {
+		values.probe_x = parameters.target_x;
+	} else {
+		if (mod(values.wordwidth,2)==0) {
+			values.index = ceil(rand(0,0.5*values.wordwidth));
+			values.probe_x = parameters.target_x + list.multiplicator.nextvalue * list.oddnumbers.nextvalue * (values.letterwidth/2);
+		} else {
+			values.index = ceil(rand(0, 0.5*(values.wordwidth +1 )));
+			values.probe_x = parameters.target_x + list.multiplicator.nextvalue * list.evennumbers.nextvalue * (values.letterwidth/2);
+		}
+	};
+	
+	trial.practice.insertstimulustime(text.practiceword_1, parameters.fixationduration);
+	trial.practice.insertstimulustime(text.practiceword_2, parameters.fixationduration);
+	trial.practice.insertstimulustime(shape.eraser, (parameters.fixationduration+parameters.targetduration));
+	trial.practice.insertstimulustime(text.fixation, (parameters.fixationduration+parameters.targetduration));
+	trial.practice.insertstimulustime(text.probe,(parameters.fixationduration+parameters.targetduration+parameters.TP_ISI));
+]
+
+/ stimulustimes = [0 = fixation]
+/ beginresponsetime = parameters.fixationduration+parameters.targetduration+parameters.TP_ISI
+/ responseinterrupt = immediate
+/ validresponse = (parameters.responsekey_probe1, parameters.responsekey_probe2)
+/ iscorrectresponse = [
+	return ((values.probetype == 1 && trial.practice.responsetext == parameters.responsekey_probe1) || 
+			(values.probetype == 2 && trial.practice.responsetext == parameters.responsekey_probe2));
+	]
+/ ontrialend = [
+	trial.practice.resetstimulusframes();
+]					
+/ errormessage = (feedback, 1000)
+/ posttrialpause = parameters.probe_posttrialpause
+</trial>
+
+******************************
+Practice Block
+******************************
+
+<block practice>
+/ postinstructions = (practice)
+/ trials = [1-20 = practice]
+</block>
+
+*******************************************************************************************************************
+*******************************************************************************************************************
+	EXPERIMENTAL BLOCKS
+*******************************************************************************************************************
+*******************************************************************************************************************
+
+<block DotProbeTask>
+/ trials = [1-96 = threat]
+</block>
+
+<block finish>
+/ trials = [1 = finish]
+</block>
+
+*******************************************************************************************************************
+*******************************************************************************************************************
+	EXPERIMENT
+*******************************************************************************************************************
+*******************************************************************************************************************
+
+<expt>
+/ preinstructions = (instructions)
+/ blocks = [
+	1 = practice; 
+	2  = DotProbeTask;
+	3 = finish;
+]
+</expt>
+
+*******************************************************************************************************************
+End of File
+*******************************************************************************************************************

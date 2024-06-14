@@ -1,0 +1,1581 @@
+﻿<usermanual>
+___________________________________________________________________________________________________________________	
+
+						SINGLE N-BACK TASK - shapes (nonadaptive, 1-key version)
+___________________________________________________________________________________________________________________	
+
+Script Author: Katja Borchert, Ph.D. (katjab@millisecond.com) for Millisecond Software LLC
+Date: March, 2012
+last updated:  06-30-2020 by K. Borchert (katjab@millisecond.com) for Millisecond Software, LLC
+
+Script Copyright © 06-30-2020 Millisecond Software
+
+___________________________________________________________________________________________________________________
+BACKGROUND INFO 	
+___________________________________________________________________________________________________________________	
+											
+This script implements a basic shape n-back procedure. The n-back task is a go/nogo working-memory performance task
+with increasing levels of difficulty.
+
+The implemented procedure is based on:	
+								
+Jaeggi, Susanne M.; Studer-Luethi, Barbara; Buschkuehl, Martin; Su, Yi-Fen; Jonides, John; Perrig, Walter J. (2010). The 
+relationship between n-back performance and matrix reasoning - implications for training and transfer. Intelligence, 38, 625–635.
+
+Millisecond Software thanks Dr. Susanne Jaeggi for kindly providing original instruction materials, stimuli, as well as assistance!
+
+Adjustments to z-scores as recommended by:
+Gregg, A. & Sedikides, C. (2010). Narcissistic Fragility:
+Rethinking Its Links to Explicit and Implicit Self-esteem, Self and Identity, 9:2, 142-161 (p.148)
+											
+___________________________________________________________________________________________________________________
+TASK DESCRIPTION	
+___________________________________________________________________________________________________________________	
+In the 1-key single n-back task, participants are shown a sequence of stimuli (here: a sequence of yellow shapes
+on a black background) and are asked to indicate whether the currently presented stimulus fulfills the following criteria:
+
+for N=0 trials:
+- is the shape the same as the shape '1.gif'? If so (it's a target), and press "A". If not, don't respond.
+
+for N=1 trials:
+- is the shape the same as the one that preceded it? If so (it's a target), and press "A". If not, don't respond.
+
+for N=2 trials:
+- is the shape the same as the one presented two trials before? If so (it's a target), and press "A". If not, don't respond.
+
+for N=3 trials:
+- is the shape the same as the one presented three trials before? If so (it's a target), and press "A". If not, don't respond.
+
+etc. for increasing levels of N
+
+___________________________________________________________________________________________________________________	
+DURATION 
+___________________________________________________________________________________________________________________	
+the default set-up of the script takes appr. 15 minutes to complete
+
+___________________________________________________________________________________________________________________	
+DATA FILE INFORMATION 
+___________________________________________________________________________________________________________________	
+The default data stored in the data files are:
+
+(1) Raw data file: 'singlenbacktask_shapes_raw.iqdat' (a separate file for each participant)
+
+build:								The specific Inquisit version used (the 'build') that was run
+computer.platform:					the platform the script was run on (win/mac/ios/android)
+date, time, 						date and time script was run 
+subject, group, 					with the current subject/groupnumber
+session:							with the current session id
+
+blockcode, blocknum:				the name and number of the current block (built-in Inquisit variable)
+trialcode, trialnum: 				the name and number of the currently recorded trial (built-in Inquisit variable)
+										Note: trialnum is a built-in Inquisit variable; it counts all trials run; even those
+										that do not store data to the data file such as feedback trials. Thus, trialnum 
+										may not reflect the number of main trials run per block. 
+										
+values.TotalBlocks:					the total number of experimental blocks run
+values.N:							the current level N tested
+values.starttrialcounter:			keeps track of how many start trials have been run
+stimulusitem.1:						the shape presented
+stimulusnumber.1: 					the item number of the presented shape
+values.currenttarget:				the item number of the current target
+
+response:							the Response of the participant (scancode of response button):
+											0 = no response
+											31 = 'A' key (positive response)
+											
+values.responseCategory:			"Hit" vs. "Omission Error" vs. "CorrReject" vs. "Commission Error"
+correct:							the correctness of the response (1 = correct; 0 = otherwise)
+
+latency:							how fast a participant responded within the given timeframe, if at all (in ms)
+									no responses = the entire trialduration
+									
+list.blockACC.mean:					proportion correct during the current block (start trials are excluded from block ACC assessment by default, editable)
+									
+									
+(2) Summary data file: 'singlenbacktask_shapes_summary*.iqdat' (a separate file for each participant)
+
+computer.platform:					the platform the script was run on (win/mac/ios/android)
+script.startdate:					date script was run
+script.starttime:					time script was started
+script.subjectid:					assigned subject id number
+script.groupid:						assigned group id number
+script.sessionid:					assigned session id number
+script.elapsedtime:					time it took to run script (in ms); measured from onset to offset of script
+script.completed:					0 = script was not completed (prematurely aborted); 
+									1 = script was completed (all conditions run)
+																		
+values.Round:						the total number of experimental blocks run
+
+the following summary variables are only based on performance on trial.target/trial.nontarget 
+(excludes trial.start even if parameters.excludeStartTrialfromPerformanceMeasure = false)
+
+expressions.propCorrect:			overall proportion correct (across all test blocks)
+expressions.meanHit_RT:				overall mean correct response time (in ms); is equal to the overall mean hit response time		
+
+
+Note: z-score calculations: adjustments (see Gregg & Sedikides, 2010, p.148)
+If the hit rate  FA rate is 0 => 0.005 is used instead (aka 0.005 is added to the hitFA rate)
+IF the hit rate  FA rate is 1.0 => 0.995 is used instead (aka 0.005 is subtracted from the hitFA rate)
+
+expressions.hitRate_overall:		overall hit rate (across all test blocks) = hitting 'A' for targets
+list.hits.itemcount:				the absolute number of target trials (across all test blocks)							
+expressions.meanHit_RT:				overall mean hit response time (in ms; across all test blocks)
+expressions.FArate_overall:			overall False Alarm/Commission Error Rate (across all test blocks) = hitting 'A' for nontargets
+list.commissions.itemcount:			the absolute number of nontarget trials (across all test blocks)
+expressions.meanFA_RT:				overall mean False Alarm response time (in ms; across all test blocks)
+expressions.zhitrate_overall:		the z-score of the overall hit rate
+expressions.zFArate_overall:		the z-score of the overall False Alarm rate
+
+expressions.dprime_overall:			Computes d' (parametric measure of sensitivity):
+										The higher the value, the better targets were overall correctly distinguished 
+										from nontargets (d' = 0: chance performance; negative values: nontargets were treated as targets
+										and targets were treated as nontargets)
+										
+expressions.DV:						dependent variable suggested by Jaeggi et al (2010):
+									(TotalHits - TotalFA)/number of experimental blocks				
+
+
+The following variables look at the different levels of N. If a level of N was not run,
+the variables will store "not run"										
+										
+expressions.hitRate_N0:				hit rate (hitting 'A' for targets) for level N = 0
+expressions.meanHit_RT_N0:			mean hit response time (in ms)  for level N = 0
+expressions.FArate_N0:				False Alarm/Commission Error Rate (hitting 'A' for nontargets) for level N = 0
+expressions.meanFA_RT_N0:			mean False Alarm response time (in ms) for level N = 0
+expressions.zhitrate_N0:			the z-score of the hit rate  for level N = 0
+expressions.zFArate_N0:				the z-score of the False Alarm rate for level N = 0
+
+expressions.dprime_N0:				Computes d' (parametric measure of sensitivity):
+										The higher the value, the better targets were overall correctly distinguished 
+										from nontargets (d' = 0: chance performance) for level N = 0											
+									
+(same for Level N=1-6)
+Note: if additional levels of N are run, go to section DATA and follow further instructions
+
+___________________________________________________________________________________________________________________	
+EXPERIMENTAL SET-UP 
+___________________________________________________________________________________________________________________	
+- After instructions, participants receive 10 trials of practice per level N tested (here: N = 2 to N = 4), 
+Note: edit list.nextN_practice to change levels of N practiced
+
+- once practice is done, participants get the option to repeat practice (see parameters.allowPracticeRepeat)
+
+- After practice, participants receive 3 blocks per level of N tested. By default, the level of N increases from
+1 to 3.
+Note: edit list.Nlevel to change a) N levels tested b) number of testblocks c)selection of N-levels
+
+Block Information:
+- Each single n-task block consists of 20+ trials using 8 different shapes. 
+=> + trials are the N trials that cannot display target shapes yet (=start trials). Their numbers vary depending on N. 
+		The data collected during these  start trials are NOT included in performance counts for Correct Rejections/False Alarms.
+=> Of the actual  20 experimental trials, 6 present a target and 14 do not (3:7 ratio). 
+To change the ratio, you need to change the relevant code under block.Test
+- The computer selects randomly 
+a) whether it is a target trial or not and 
+b) what shape to show if it is not a target trial
+
+Trial Information:
+- Each trial presents the shape for 500ms and waits another 2500ms before presenting the next shape in the sequence.
+The trialduration can be edited by experimenter.
+- Participants have the entire 3000ms to respond by pressing "A" if they detect a target.
+
+___________________________________________________________________________________________________________________
+STIMULI
+___________________________________________________________________________________________________________________
+8 shapes, see section Editable Stimuli
+
+___________________________________________________________________________________________________________________	
+INSTRUCTIONS 
+___________________________________________________________________________________________________________________	
+provided by Millisecond Software - can be edited under section Editable Instructions
+
+Instructions are not original to the task. They are provided by Millisecond Software
+as htm pages and simple page elements and can be edited either by changing
+the provided html files or directly under Editable Instructions.
+
+Note: in order for the instructions to reflect alternative parameter settings,
+some of the conditionalized code used in the htm files can be found in the script itself.
+
+___________________________________________________________________________________________________________________	
+EDITABLE CODE 
+___________________________________________________________________________________________________________________	
+check below for (relatively) easily editable parameters, stimuli, instructions etc. 
+Keep in mind that you can use this script as a template and therefore always "mess" with the entire code 
+to further customize your experiment.
+
+The parameters you can change are:
+
+/allowPracticeRepeat:					true: practice can be repeated as often as indicated (default)
+										false: practice cannot be repeated
+										
+/excludeStartTrialfromPerformanceMeasure:	true (1): performance during start trials that cannot be targets yet is not considered 
+											for Block level performance analyses, e.g. for feedback purposes (default)									
+											false (0): performance during start trials that cannot be targets yet IS considered for block performance analyses (default)									
+										
+
+/SOA:									Stimulus Onset Asynchrony (default: 3000ms) 																						
+/stimulusPresentationtime:				the presentation time (in ms) of the stimuli (default: 500ms)										
+										
+																			
+debugmode = 0							debugmode = 1: targetalerts are shown on screen, 
+										debugmode = 0, no targetalerts are shown (default)
+
+
+(in general: if levels of N are changed, adjustments need to be made to instructions and list.Nlevel)
+
+</usermanual>
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE PARAMETERS: change editable parameters here
+**************************************************************************************************************
+**************************************************************************************************************
+
+<parameters>
+/allowPracticeRepeat = true
+/excludeStartTrialfromPerformanceMeasure = true
+
+/SOA = 3000
+/stimulusPresentationtime = 500
+
+/debugmode = 0
+</parameters>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE STIMULI: change editable stimuli here
+**************************************************************************************************************
+**************************************************************************************************************
+
+*yellow on black background
+*original shapes, kindly provided by Jaeggi et al (2010)
+
+<item shapes>
+/ 1 = "1.gif"
+/ 2 = "2.gif"
+/ 3 = "3.gif"
+/ 4 = "4.gif"
+/ 5 = "5.gif"
+/ 6 = "6.gif"
+/ 7 = "7.gif"
+/ 8 = "8.gif"
+</item>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE INSTRUCTIONS: change instructions here
+**************************************************************************************************************
+**************************************************************************************************************
+<instruct>
+/ fontstyle = ("Arial", 2.67%, false, false, false, false, 5, 0)
+</instruct>
+
+*******************************************************************************
+General Introduction pages:
+see below for possible edits of General Instruction Block
+*******************************************************************************
+
+<htmlpage generalintro>
+/ file = "nback_generalintro.htm"
+</htmlpage>
+
+<htmlpage intro0back>
+/ file = "nback_intro0back.htm"
+</htmlpage>
+
+<htmlpage intro1back>
+/ file = "nback_intro1back.htm"
+</htmlpage>
+
+<htmlpage intro2back>
+/ file = "nback_intro2back.htm"
+</htmlpage>
+
+<htmlpage intro3back>
+/ file = "nback_intro3back.htm"
+</htmlpage>
+
+<htmlpage intro4back>
+/ file = "nback_intro4back.htm"
+</htmlpage>
+
+Note: if you changed the levels of N tested, you need to adapt this intro page
+<htmlpage practicestart>
+/ file = "nback_practicestart.htm"
+</htmlpage>
+
+Note: if you changed the levels of N tested, you need to adapt this intro page
+<htmlpage practiceend>
+/ file = "nback_practiceend.htm"
+</htmlpage>
+
+**************************************
+Change instructions:
+if not all instruction pages should be
+run, remove pages from 
+/preinstruction = ()
+
+Alternatively, you can also add
+as many pages as you want
+**************************************
+
+
+<block Introduction>
+/ preinstructions = (generalintro, intro2back, practicestart)
+/ recorddata = false
+</block>
+
+*******************************************************************************
+Level N Instructions:
+*******************************************************************************
+
+<htmlpage nback_levelInstructions>
+/ file = "nback_levelinstructions.htm"
+</htmlpage>
+
+<expressions>
+/nback_levelInstructions = {
+	if (values.N == 0){
+		"é esta forma:<br>
+		<img src='1.gif' style='height: 20vh' />"		
+	} else {
+		"igual à forma apresentada há  <%values.N%> formas atrás"
+	}
+}
+
+/task = "WMC"
+</expressions>
+
+*******************************************************************************
+Repeat and Start pages
+*******************************************************************************
+
+
+<html repeatpractice_page>
+/items =  ("nback_repeatpractice.htm")
+/size = (100%, 100%)
+</html> 
+
+<htmlpage nback_testStart>
+/ file = "nback_expstart.htm"
+</htmlpage>
+
+*******************************************************************************
+Feedback Pages
+*******************************************************************************
+*A feedback page that is presented at the end of each practice  block 
+
+<htmlpage BlockFeedback>
+/ file = "nback_blockfeedback.htm"
+</htmlpage>
+
+*******************************************************************************
+Finish Pages
+*******************************************************************************
+
+<text finish>
+/ items = ("Obrigado!")
+/ fontstyle = ("Arial", 8%, true, false, false, false, 5, 1)
+/ position = (50%, 50%)
+/ size = (80%, 80%)
+/ vjustify = center
+/ valign = center
+/ halign = center
+/ txbgcolor = black
+/ txcolor = white
+</text>
+
+<text exit>
+/ items = ("<pressione a [barra de espaços] para continuar>")
+/ fontstyle = ("Arial", 3%, false, false, false, false, 5, 1)
+/ position = (50%, 90%)
+/ size = (80%, 5%)
+/ vjustify = center
+/ valign = center
+/ halign = center
+/ txbgcolor = black
+/ txcolor = white
+</text>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE LISTS: change editable lists here
+**************************************************************************************************************
+**************************************************************************************************************
+
+Note: list controls the level of N run during practice. By default, practice runs level 2, 3, 4 once and
+in sequence
+<list nextN_practice>
+/items = (2)
+/ selectionmode = sequence
+/ selectionrate = block
+/ resetinterval = 0
+</list>
+
+*list.Nlevel  selects the next N level (the experiment runs as many blocks as there are
+items in this list) in sequence
+! if you do NOT run level N = 3, remove all 3s from the item list of this list
+! if you want to run a level more or fewer times adjust the number of the digits in the item list accordingly
+! if you want to run the levels in sequence, replace /replace=false with /selectionmode = sequence
+! you can add levels other than 1-3 (e.g. you can add level 5); however, summary variables are
+only collected for 0 <= N <= 6 
+
+IN GENERAL: if you run different levels of N or change the number of repetitions, you need to adjust the item list of 
+list.nlevel (no other changes are required)
+<list Nlevel>
+/items = (2,2,2)
+/ selectionmode = sequence
+/ resetinterval = 0
+</list>
+
+**************************************************************************************************************
+								!!!REMAINING CODE: Customize after careful consideration only!!!
+**************************************************************************************************************
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	DEFAULTS
+**************************************************************************************************************
+**************************************************************************************************************
+script requires Inquisit 6.1.0.0 or higher
+
+<defaults>
+/canvasaspectratio = (4,3)
+/minimumversion = "6.1.0.0"
+/ fontstyle = ("Arial", 3%, false, false, false, false, 5, 1)
+/txbgcolor = white
+/ txcolor = (0, 0, 0)
+/ screencolor = black
+</defaults>
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	DATA
+**************************************************************************************************************
+**************************************************************************************************************
+
+Note: data file explanations under User Manual Information at the top
+
+*********************
+raw data
+*********************
+<data>
+/ columns = (build, computer.platform, date, time, subject, group, session, blockcode, blocknum, 
+trialcode, trialnum, 
+values.TotalBlocks, values.N, values.starttrialcounter, stimulusitem, stimulusnumber,
+values.currenttarget, response, values.responseCategory, correct, latency, list.blockACC.mean)
+</data>
+
+*********************
+summary data
+*********************
+
+<summarydata>
+/ columns = (inquisit.build, computer.platform, expressions.task, script.startdate, script.starttime, 
+script.subjectid, script.groupid, script.sessionid, script.elapsedtime, 
+script.completed,
+values.TotalBlocks, expressions.propCorrect, expressions.meanHit_RT,
+expressions.hitRate_overall, list.hits.itemcount, expressions.meanHit_RT, 
+expressions.FArate_overall, list.commissions.itemcount, expressions.meanFA_RT,
+expressions.zhitrate_overall, expressions.zFArate_overall, expressions.dprime_overall,expressions.DV,
+
+expressions.hitRate_N0, expressions.meanHit_RT_N0, expressions.FArate_N0, expressions.meanFA_RT_N0,
+expressions.zhitrate_N0, expressions.zFArate_N0, expressions.dprime_N0,
+
+expressions.hitRate_N1, expressions.meanHit_RT_N1, expressions.FArate_N1, expressions.meanFA_RT_N1,
+expressions.zhitrate_N1, expressions.zFArate_N1, expressions.dprime_N1,
+
+expressions.hitRate_N2, expressions.meanHit_RT_N2, expressions.FArate_N2, expressions.meanFA_RT_N2,
+expressions.zhitrate_N2, expressions.zFArate_N2, expressions.dprime_N2,
+
+expressions.hitRate_N3, expressions.meanHit_RT_N3, expressions.FArate_N3, expressions.meanFA_RT_N3,
+expressions.zhitrate_N3, expressions.zFArate_N3, expressions.dprime_N3,
+
+expressions.hitRate_N4, expressions.meanHit_RT_N4, expressions.FArate_N4, expressions.meanFA_RT_N4,
+expressions.zhitrate_N4, expressions.zFArate_N4, expressions.dprime_N4,
+
+expressions.hitRate_N5, expressions.meanHit_RT_N5, expressions.FArate_N5, expressions.meanFA_RT_N5,
+expressions.zhitrate_N5, expressions.zFArate_N5, expressions.dprime_N5,
+
+expressions.hitRate_N6, expressions.meanHit_RT_N6, expressions.FArate_N6, expressions.meanFA_RT_N6,
+expressions.zhitrate_N6, expressions.zFArate_N6, expressions.dprime_N6)
+</summarydata>
+
+Note: by default, this script only stores summary variables of N=0 to N=6 (though other level of N can be run).
+To store, summary variables for levels of N higher than 6, you need to:
+
+1. add the necessary lists under section "Lists"
+2. add necessary code to trial.target/trial.nontarget
+3. add necessary expressions to section "Expressions"
+4. reset necessary lists under block.StartTest
+5. add necessary expressions to the summary data file
+
+**************************************************************************************************************
+**************************************************************************************************************
+	VALUES: automatically updated
+**************************************************************************************************************
+**************************************************************************************************************
+                                    
+
+/N:								the lag between a target and the stimulus it repeats
+/currenttarget:					contains the stimulusnumber of the current target
+									(a target in N = 0 trials, is the shape 'M')
+/TotalBlocks:					the total number of experimental blocks run
+/starttrialcounter:				keeps track of how many start trials have been run		
+/lastIndex:						helper variable to manage the last N presented shape list
+/responseCategory:				"Hit" vs. "Omission Error" vs. "CorrReject" vs. "Commission Error"									
+							
+
+<values>
+
+/N = 0
+/currenttarget = 0
+/TotalBlocks = 0
+/starttrialcounter = 0
+/lastIndex = 0
+/responseCategory = ""
+</values> 
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EXPRESSIONS
+**************************************************************************************************************
+**************************************************************************************************************
+
+/fillitemlist:			recursive function that fills list.items with N items at the beginning of each new block
+<expressions>
+/fillitemlist = {
+	if (values.lastIndex < values.N){
+		list.items.insertitem(0, 1);
+		values.lastIndex += 1;
+		expressions.fillitemlist;
+	} else {
+		list.items.insertitem(0, 1);
+	};
+}
+</expressions>
+
+
+<expressions>
+/propCorrect = ((list.hits.mean*list.hits.itemcount) + ((1-list.commissions.mean)*list.commissions.itemcount))/(list.hits.itemcount + list.commissions.itemcount)
+
+/hitRate_overall = list.hits.mean
+/meanHit_RT = list.hitsRT.mean
+/FArate_overall = list.commissions.mean
+/meanFA_RT = list.commissionsRT.mean
+/ zhitrate_overall = {
+	if (expressions.hitRate_overall == 0){
+		zofp(expressions.hitRate_overall + 0.005)		
+	} else if (expressions.hitRate_overall == 1){
+		zofp(expressions.hitRate_overall - 0.005)
+	} else {
+		zofp(expressions.hitRate_overall)	
+	};
+}
+/ zFArate_overall = {
+	if (expressions.FArate_overall == 0){
+		zofp(expressions.FArate_overall + 0.005)		
+	} else if (expressions.FArate_overall == 1){
+		zofp(expressions.FArate_overall - 0.005)
+	} else {
+		zofp(expressions.FArate_overall)	
+	};
+}
+/ dprime_overall = (expressions.zhitrate_overall-expressions.zFArate_overall)
+
+/hitRate_N0 = if (list.hits_N0.itemcount > 0){
+	list.hits_N0.mean;
+} else {
+	"not run";
+}
+/meanHit_RT_N0 = if (list.hits_N0.itemcount > 0){
+	list.hitsRT_N0.mean;	
+} else {
+	"not run";
+}
+/FArate_N0 = if (list.hits_N0.itemcount > 0){
+	list.commissions_N0.mean;	
+} else {
+	"not run";
+}
+/meanFA_RT_N0 = 
+if (list.hits_N0.itemcount > 0){
+	list.commissionsRT_N0.mean;	
+} else {
+	"not run";
+}
+
+/ zhitrate_N0 = 
+if (list.hits_N0.itemcount > 0){
+	if (expressions.hitRate_N0 == 0){
+		zofp(expressions.hitRate_N0 + 0.005)		
+	} else if (expressions.hitRate_N0 == 1){
+		zofp(expressions.hitRate_N0 - 0.005)
+	} else {
+		zofp(expressions.hitRate_N0);	
+	};
+} else {
+	"not run";
+}
+
+/ zFArate_N0 = 
+if (list.hits_N0.itemcount > 0){
+	if (expressions.FArate_N0 == 0){
+		zofp(expressions.FArate_N0 + 0.005)		
+	} else if (expressions.FArate_N0 == 1){
+		zofp(expressions.FArate_N0 - 0.005)
+	} else {
+		zofp(expressions.FArate_N0)	
+	};
+} else {
+	"not run";
+}
+/ dprime_N0 = if (list.hits_N0.itemcount > 0){
+	(expressions.zhitrate_N0-expressions.zFArate_N0);
+} else {
+	"not run";
+}
+
+/hitRate_N1 = if (list.hits_N1.itemcount > 0){
+	list.hits_N1.mean;
+} else {
+	"not run";
+}
+/meanHit_RT_N1 = if (list.hits_N1.itemcount > 0){
+	list.hitsRT_N1.mean;	
+} else {
+	"not run";
+}
+/FArate_N1 = if (list.hits_N1.itemcount > 0){
+	list.commissions_N1.mean;	
+} else {
+	"not run";
+}
+/meanFA_RT_N1 = 
+if (list.hits_N1.itemcount > 0){
+	list.commissionsRT_N1.mean;	
+} else {
+	"not run";
+}
+
+/ zhitrate_N1 = 
+if (list.hits_N1.itemcount > 0){
+	if (expressions.hitRate_N1 == 0){
+		zofp(expressions.hitRate_N1 + 0.005)		
+	} else if (expressions.hitRate_N1 == 1){
+		zofp(expressions.hitRate_N1 - 0.005)
+	} else {
+		zofp(expressions.hitRate_N1);	
+	};
+} else {
+	"not run";
+}
+
+/ zFArate_N1 = 
+if (list.hits_N1.itemcount > 0){
+	if (expressions.FArate_N1 == 0){
+		zofp(expressions.FArate_N1 + 0.005)		
+	} else if (expressions.FArate_N1 == 1){
+		zofp(expressions.FArate_N1 - 0.005)
+	} else {
+		zofp(expressions.FArate_N1)	
+	};
+} else {
+	"not run";
+}
+/ dprime_N1 = if (list.hits_N1.itemcount > 0){
+	(expressions.zhitrate_N1-expressions.zFArate_N1);
+} else {
+	"not run";
+}
+
+/hitRate_N2 = if (list.hits_N2.itemcount > 0){
+	list.hits_N2.mean;
+} else {
+	"not run";
+}
+/meanHit_RT_N2 = if (list.hits_N2.itemcount > 0){
+	list.hitsRT_N2.mean;	
+} else {
+	"not run";
+}
+/FArate_N2 = if (list.hits_N2.itemcount > 0){
+	list.commissions_N2.mean;	
+} else {
+	"not run";
+}
+/meanFA_RT_N2 = 
+if (list.hits_N2.itemcount > 0){
+	list.commissionsRT_N2.mean;	
+} else {
+	"not run";
+}
+
+/ zhitrate_N2 = 
+if (list.hits_N2.itemcount > 0){
+	if (expressions.hitRate_N2 == 0){
+		zofp(expressions.hitRate_N2 + 0.005)		
+	} else if (expressions.hitRate_N2 == 1){
+		zofp(expressions.hitRate_N2 - 0.005)
+	} else {
+		zofp(expressions.hitRate_N2);	
+	};
+} else {
+	"not run";
+}
+
+/ zFArate_N2 = 
+if (list.hits_N2.itemcount > 0){
+	if (expressions.FArate_N2 == 0){
+		zofp(expressions.FArate_N2 + 0.005)		
+	} else if (expressions.FArate_N2 == 1){
+		zofp(expressions.FArate_N2 - 0.005)
+	} else {
+		zofp(expressions.FArate_N2)	
+	};
+} else {
+	"not run";
+}
+/ dprime_N2 = if (list.hits_N2.itemcount > 0){
+	(expressions.zhitrate_N2-expressions.zFArate_N2);
+} else {
+	"not run";
+}
+
+/hitRate_N3 = if (list.hits_N3.itemcount > 0){
+	list.hits_N3.mean;
+} else {
+	"not run";
+}
+/meanHit_RT_N3 = if (list.hits_N3.itemcount > 0){
+	list.hitsRT_N3.mean;	
+} else {
+	"not run";
+}
+/FArate_N3 = if (list.hits_N3.itemcount > 0){
+	list.commissions_N3.mean;	
+} else {
+	"not run";
+}
+/meanFA_RT_N3 = 
+if (list.hits_N3.itemcount > 0){
+	list.commissionsRT_N3.mean;	
+} else {
+	"not run";
+}
+
+/ zhitrate_N3 = 
+if (list.hits_N3.itemcount > 0){
+	if (expressions.hitRate_N3 == 0){
+		zofp(expressions.hitRate_N3 + 0.005)		
+	} else if (expressions.hitRate_N3 == 1){
+		zofp(expressions.hitRate_N3 - 0.005)
+	} else {
+		zofp(expressions.hitRate_N3);	
+	};
+} else {
+	"not run";
+}
+
+/ zFArate_N3 = 
+if (list.hits_N3.itemcount > 0){
+	if (expressions.FArate_N3 == 0){
+		zofp(expressions.FArate_N3 + 0.005)		
+	} else if (expressions.FArate_N3 == 1){
+		zofp(expressions.FArate_N3 - 0.005)
+	} else {
+		zofp(expressions.FArate_N3)	
+	};
+} else {
+	"not run";
+}
+/ dprime_N3 = if (list.hits_N3.itemcount > 0){
+	(expressions.zhitrate_N3-expressions.zFArate_N3);
+} else {
+	"not run";
+}
+
+/hitRate_N4 = if (list.hits_N4.itemcount > 0){
+	list.hits_N4.mean;
+} else {
+	"not run";
+}
+/meanHit_RT_N4 = if (list.hits_N4.itemcount > 0){
+	list.hitsRT_N4.mean;	
+} else {
+	"not run";
+}
+/FArate_N4 = if (list.hits_N4.itemcount > 0){
+	list.commissions_N4.mean;	
+} else {
+	"not run";
+}
+/meanFA_RT_N4 = 
+if (list.hits_N4.itemcount > 0){
+	list.commissionsRT_N4.mean;	
+} else {
+	"not run";
+}
+
+/ zhitrate_N4 = 
+if (list.hits_N4.itemcount > 0){
+	if (expressions.hitRate_N4 == 0){
+		zofp(expressions.hitRate_N4 + 0.005)		
+	} else if (expressions.hitRate_N4 == 1){
+		zofp(expressions.hitRate_N4 - 0.005)
+	} else {
+		zofp(expressions.hitRate_N4);	
+	};
+} else {
+	"not run";
+}
+
+/ zFArate_N4 = 
+if (list.hits_N4.itemcount > 0){
+	if (expressions.FArate_N4 == 0){
+		zofp(expressions.FArate_N4 + 0.005)		
+	} else if (expressions.FArate_N4 == 1){
+		zofp(expressions.FArate_N4 - 0.005)
+	} else {
+		zofp(expressions.FArate_N4)	
+	};
+} else {
+	"not run";
+}
+/ dprime_N4 = if (list.hits_N4.itemcount > 0){
+	(expressions.zhitrate_N4-expressions.zFArate_N4);
+} else {
+	"not run";
+}
+
+/hitRate_N5 = if (list.hits_N5.itemcount > 0){
+	list.hits_N5.mean;
+} else {
+	"not run";
+}
+/meanHit_RT_N5 = if (list.hits_N5.itemcount > 0){
+	list.hitsRT_N5.mean;	
+} else {
+	"not run";
+}
+/FArate_N5 = if (list.hits_N5.itemcount > 0){
+	list.commissions_N5.mean;	
+} else {
+	"not run";
+}
+/meanFA_RT_N5 = 
+if (list.hits_N5.itemcount > 0){
+	list.commissionsRT_N5.mean;	
+} else {
+	"not run";
+}
+
+/ zhitrate_N5 = 
+if (list.hits_N5.itemcount > 0){
+	if (expressions.hitRate_N5 == 0){
+		zofp(expressions.hitRate_N5 + 0.005)		
+	} else if (expressions.hitRate_N5 == 1){
+		zofp(expressions.hitRate_N5 - 0.005)
+	} else {
+		zofp(expressions.hitRate_N5);	
+	};
+} else {
+	"not run";
+}
+
+/ zFArate_N5 = 
+if (list.hits_N5.itemcount > 0){
+	if (expressions.FArate_N5 == 0){
+		zofp(expressions.FArate_N5 + 0.005)		
+	} else if (expressions.FArate_N5 == 1){
+		zofp(expressions.FArate_N5 - 0.005)
+	} else {
+		zofp(expressions.FArate_N5)	
+	};
+} else {
+	"not run";
+}
+/ dprime_N5 = if (list.hits_N5.itemcount > 0){
+	(expressions.zhitrate_N5-expressions.zFArate_N5);
+} else {
+	"not run";
+}
+
+/hitRate_N6 = if (list.hits_N6.itemcount > 0){
+	list.hits_N6.mean;
+} else {
+	"not run";
+}
+/meanHit_RT_N6 = if (list.hits_N6.itemcount > 0){
+	list.hitsRT_N6.mean;	
+} else {
+	"not run";
+}
+/FArate_N6 = if (list.hits_N6.itemcount > 0){
+	list.commissions_N6.mean;	
+} else {
+	"not run";
+}
+/meanFA_RT_N6 = 
+if (list.hits_N6.itemcount > 0){
+	list.commissionsRT_N6.mean;	
+} else {
+	"not run";
+}
+
+/ zhitrate_N6 = 
+if (list.hits_N6.itemcount > 0){
+	if (expressions.hitRate_N6 == 0){
+		zofp(expressions.hitRate_N6 + 0.005)		
+	} else if (expressions.hitRate_N6 == 1){
+		zofp(expressions.hitRate_N6 - 0.005)
+	} else {
+		zofp(expressions.hitRate_N6);	
+	};
+} else {
+	"not run";
+}
+
+/ zFArate_N6 = 
+if (list.hits_N6.itemcount > 0){
+	if (expressions.FArate_N6 == 0){
+		zofp(expressions.FArate_N6 + 0.005)		
+	} else if (expressions.FArate_N6 == 1){
+		zofp(expressions.FArate_N6 - 0.005)
+	} else {
+		zofp(expressions.FArate_N6)	
+	};
+} else {
+	"not run";
+}
+/ dprime_N6 = if (list.hits_N6.itemcount > 0){
+	(expressions.zhitrate_N6-expressions.zFArate_N6);
+} else {
+	"not run";
+}
+
+/DV = ((expressions.hitRate_overall * list.hits.itemcount) - (expressions.FArate_overall * list.commissions.itemcount))/values.TotalBlocks
+</expressions>
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	INSTRUCTIONS
+**************************************************************************************************************
+**************************************************************************************************************
+
+<trial repeatpractice>
+/ stimulusframes = [1 = repeatpractice_page]
+/ validresponse = ("S", "N")
+/ recorddata = false
+</trial>
+
+<trial finish>
+/ inputdevice = keyboard
+/ stimulusframes = [1 = finish, exit]
+/ validresponse = (" ")
+/ recorddata = false
+</trial>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	STIMULI
+**************************************************************************************************************
+**************************************************************************************************************
+
+***randomly selects one of the shapes 
+<picture startshape>
+/ items = shapes
+/select = replace
+/size = (40%, 40%)
+</picture>
+
+***selects any shape but the  established target 
+<picture nontargetshape>
+/ items = shapes
+/ select = list.notargetvalue.nextvalue
+/size = (40%, 40%)
+</picture>
+
+***selects the item with the same item number as the established target
+<picture targetshape>
+/items = shapes
+/select = values.currenttarget
+/size = (40%, 40%)
+</picture>
+
+
+FEEDBACK MESSAGES FOR PRACTICE TRIALS ONLY (default: they are NOT used)
+<text ErrorFeedback>
+/ items = ("ERRADO")
+/ fontstyle = ("Arial", 5.00%, true, false, false, false, 5, 0)
+/ txcolor = red
+/ txbgcolor = black
+/ position = (50%, 70%)
+</text>
+
+<text CorrectFeedback>
+/ items = ("CORRETO")
+/ fontstyle = ("Arial", 5.00%, true, false, false, false, 5, 0)
+/ txcolor = green
+/ txbgcolor = black
+/ position = (50%, 70%)
+</text>
+
+ASSISTANT STIMULI:
+
+*****reminder that the shape participants see during the first trial in N = 0 nback trials is the target
+<text targetreminder>
+/ items = ("Este é o alvo")
+/ position = (50%, 25%)
+/ txbgcolor = black
+/ txcolor = black
+/ fontstyle = ("Arial", 3.00%, false, false, false, false, 5, 0)
+</text>
+
+*****For timed instructions, this shape covers up the original instructions (on slides)
+that instruct participants to use the Spacebar to continue
+<shape eraserrec>
+/shape = rectangle
+/color = black
+/ position = (50%, 95%)
+/ size = (100%, 8%)
+</shape>
+
+*****Debug Code:
+<text targetalert>
+/ onprepare = [text.targetalert.skip = !parameters.debugmode;]
+/items = ("target")
+/position = (50%, 80%)
+/txcolor = red
+/txbgcolor = black
+/ fontstyle = ("Arial", 3%, true, false, false, false, 5, 1)
+</text>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	LISTS	
+**************************************************************************************************************
+**************************************************************************************************************
+
+****list Variables to select notargetvalue
+
+*list.notargetvalue selects any of the 8 numbers but the one selected for targetvalue
+<list notargetvalue>
+/items = (1, 2, 3, 4, 5, 6, 7, 8)
+/ not = (values.currenttarget)
+/ replace = true
+</list>
+
+Note: list contains the itemnumbers of the presented shapes in reversed order (dynamic list)
+(item 1 is always the last one presented)
+<list items>
+</list>
+
+*************************************************
+Data Lists: used for descriptive statistics
+store correct latencies/accuracy data
+fill up during runtime
+*************************************************
+
+<list blockACC>
+</list>
+
+Note: list stores 1 = hit; 0 = omission error for all target trials
+<list hits>
+</list>
+
+Note: list stores all reaction times for correct hits
+<list hitsRT>
+</list>
+
+Note: list stores 1 = commission error; 0 = correct rejection for all nontarget trials
+<list commissions>
+</list>
+
+Note: list stores all reaction times for incorrect commission errors
+<list commissionsRT>
+</list>
+
+************************************************
+separate lists for levels N=0 to N=6
+************************************************
+
+<list hits_N0>
+</list>
+
+<list hitsRT_N0>
+</list>
+
+<list commissions_N0>
+</list>
+
+<list commissionsRT_N0>
+</list>
+
+
+<list hits_N1>
+</list>
+
+<list hitsRT_N1>
+</list>
+
+<list commissions_N1>
+</list>
+
+<list commissionsRT_N1>
+</list>
+
+
+<list hits_N2>
+</list>
+
+<list hitsRT_N2>
+</list>
+
+<list commissions_N2>
+</list>
+
+<list commissionsRT_N2>
+</list>
+
+
+<list hits_N3>
+</list>
+
+<list hitsRT_N3>
+</list>
+
+<list commissions_N3>
+</list>
+
+<list commissionsRT_N3>
+</list>
+
+
+<list hits_N4>
+</list>
+
+<list hitsRT_N4>
+</list>
+
+<list commissions_N4>
+</list>
+
+<list commissionsRT_N4>
+</list>
+
+
+<list hits_N5>
+</list>
+
+<list hitsRT_N5>
+</list>
+
+<list commissions_N5>
+</list>
+
+<list commissionsRT_N5>
+</list>
+
+
+<list hits_N6>
+</list>
+
+<list hitsRT_N6>
+</list>
+
+<list commissions_N6>
+</list>
+
+<list commissionsRT_N6>
+</list>
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	TRIALS 	
+**************************************************************************************************************
+**************************************************************************************************************
+
+*there are 3 types of trials
+	1. start: 				presented at beginning of block when number of trials too small for Target trials; they can present
+								any of the stimuli (N = 0,  start trial is skipped)
+	2. nontarget:			trials that present stimuli that do not repeat the stimulus of n-trials before
+	3. target:				trials that present Target stimuli
+
+
+
+**********************************
+Starttrial
+**********************************
+NOTE:
+* for N = 0 trials: the trial is skipped
+* for any other N: start trial runs N-times 
+<trial start>
+/skip =[
+	values.N == 0;
+]
+/ ontrialbegin = [
+	trial.start.insertstimulustime(clearscreen, parameters.stimulusPresentationtime);
+	values.starttrialcounter += 1;
+]
+/ stimulustimes = [0 = startshape, targetreminder]
+/ beginresponsetime = 0
+/ validresponse = (noresponse, "A")
+/ correctresponse = (noresponse)
+/ ontrialend = [	
+	trial.start.resetstimulusframes();			
+	list.items.insertitem(picture.startshape.currentitemnumber, 1);
+	text.targetreminder.textcolor = black;
+	
+	if (trial.start.correct){
+		values.responseCategory = "CorrReject";
+	} else {
+		values.responseCategory = "Commission Error";
+	};
+	
+	if (parameters.excludeStartTrialfromPerformanceMeasure == false){
+		list.blockACC.appenditem(trial.start.correct);
+	};	
+]
+
+/trialduration = parameters.SOA
+/branch = [
+	if (values.starttrialcounter < values.N) {
+		return trial.start;
+	};
+]
+</trial>
+
+**********************************
+Nontarget Trials
+**********************************
+
+<trial nontarget>
+/ ontrialbegin = [
+	trial.nontarget.insertstimulustime(clearscreen, parameters.stimulusPresentationtime);
+	if (values.N > 0){
+		values.currenttarget = list.items.item(values.N);	
+	};
+]
+/ stimulustimes = [0 = nontargetshape]
+/validresponse = (noresponse, "A")
+/ beginresponsetime = 0
+/ correctresponse = (noresponse)
+/ ontrialend = [	
+	trial.nontarget.resetstimulusframes();
+	list.items.insertitem(picture.nontargetshape.currentitemnumber, 1);
+	list.blockACC.appenditem(trial.nontarget.correct);	
+	
+	//summary variables:
+	if (trial.nontarget.correct){
+		values.responseCategory = "CorrReject";
+		list.commissions.appenditem(0);
+		
+		if (values.N == 0){
+			list.commissions_N0.appenditem(0);		
+		} else if (values.N == 1){
+			list.commissions_N1.appenditem(0);			
+		} else if (values.N == 2){
+			list.commissions_N2.appenditem(0);			
+		} else if (values.N == 3){
+			list.commissions_N3.appenditem(0);		
+		} else if (values.N == 4){
+			list.commissions_N4.appenditem(0);		
+		} else if (values.N == 5){
+			list.commissions_N5.appenditem(0);		
+		} else if (values.N == 6){
+			list.commissions_N6.appenditem(0);		
+		};//if further values of N should be added, add the necessary code here
+	} else {
+		values.responseCategory = "Commission Error";
+		list.commissions.appenditem(1);
+		list.commissionsRT.appenditem(trial.nontarget.latency);	
+	
+		if (values.N == 0){
+			list.commissions_N0.appenditem(1);
+			list.commissionsRT_N0.appenditem(trial.nontarget.latency);			
+		} else if (values.N == 1){
+			list.commissions_N1.appenditem(1);
+			list.commissionsRT_N1.appenditem(trial.nontarget.latency);			
+		} else if (values.N == 2){
+			list.commissions_N2.appenditem(1);
+			list.commissionsRT_N2.appenditem(trial.nontarget.latency);			
+		} else if (values.N == 3){
+			list.commissions_N3.appenditem(1);
+			list.commissionsRT_N3.appenditem(trial.nontarget.latency);			
+		} else if (values.N == 4){
+			list.commissions_N4.appenditem(1);
+			list.commissionsRT_N4.appenditem(trial.nontarget.latency);			
+		} else if (values.N == 5){
+			list.commissions_N5.appenditem(1);
+			list.commissionsRT_N5.appenditem(trial.nontarget.latency);			
+		} else if (values.N == 6){
+			list.commissions_N6.appenditem(1);
+			list.commissionsRT_N6.appenditem(trial.nontarget.latency);			
+		};//if further values of N should be added, add the necessary code here
+	};
+]
+/ trialduration = parameters.SOA
+</trial>
+
+**********************************
+Target Trials
+**********************************
+
+**if target, press the shape "A" (code: "A")
+<trial target>
+/ ontrialbegin = [
+	trial.target.insertstimulustime(clearscreen, parameters.stimulusPresentationtime);
+	if (values.N > 0){
+		values.currenttarget = list.items.item(values.N);	
+	};
+]
+/ stimulustimes = [0 = targetshape, targetalert]
+/validresponse = (noresponse, "A")
+/ beginresponsetime = 0
+/ correctresponse = ("A")
+/ ontrialend = [
+	trial.target.resetstimulusframes();
+	list.items.insertitem(picture.targetshape.currentitemnumber, 1);
+	list.blockACC.appenditem(trial.target.correct);	
+	
+	//summary variables:
+	if (trial.target.error){
+		values.responseCategory = "Omission Error";
+		list.hits.appenditem(0);		
+	
+		if (values.N == 0){
+			list.hits_N0.appenditem(0);		
+		} else if (values.N == 1){
+			list.hits_N1.appenditem(0);			
+		} else if (values.N == 2){
+			list.hits_N2.appenditem(0);			
+		} else if (values.N == 3){
+			list.hits_N3.appenditem(0);		
+		} else if (values.N == 4){
+			list.hits_N4.appenditem(0);		
+		} else if (values.N == 5){
+			list.hits_N5.appenditem(0);		
+		} else if (values.N == 6){
+			list.hits_N6.appenditem(0);		
+		};//if further values of N should be added, add the necessary code here
+	} else {
+		values.responseCategory = "Hit";
+		list.hits.appenditem(1);
+		list.hitsRT.appenditem(trial.target.latency);
+	
+		if (values.N == 0){
+			list.hits_N0.appenditem(1);
+			list.hitsRT_N0.appenditem(trial.target.latency);			
+		} else if (values.N == 1){
+			list.hits_N1.appenditem(1);
+			list.hitsRT_N1.appenditem(trial.target.latency);			
+		} else if (values.N == 2){
+			list.hits_N2.appenditem(1);
+			list.hitsRT_N2.appenditem(trial.target.latency);			
+		} else if (values.N == 3){
+			list.hits_N3.appenditem(1);
+			list.hitsRT_N3.appenditem(trial.target.latency);			
+		} else if (values.N == 4){
+			list.hits_N4.appenditem(1);
+			list.hitsRT_N4.appenditem(trial.target.latency);			
+		} else if (values.N == 5){
+			list.hits_N5.appenditem(1);
+			list.hitsRT_N5.appenditem(trial.target.latency);			
+		} else if (values.N == 6){
+			list.hits_N6.appenditem(1);
+			list.hitsRT_N6.appenditem(trial.target.latency);			
+		};//if further values of N should be added, add the necessary code here
+	};	
+]
+/ trialduration = parameters.SOA
+</trial>
+					
+**************************************************************************************************************
+**************************************************************************************************************
+	BLOCKS
+**************************************************************************************************************
+**************************************************************************************************************
+
+
+**********************************************
+PRACTICE
+**********************************************
+
+* Practice Blocks give feedback
+* Block starts with 
+(b) N start-trials that cannot present Targets yet (for N=0, trial.start is skipped)
+(c) 10 practice trials: ratio targets : nontargets = 3 : 7
+* stops after lever N = highestN (set by experimenter)
+(d) runs level of N from list.nextN_practice in the order specified under list settings
+
+<block Practice>
+/ preinstructions = (nback_levelInstructions)
+/ onblockbegin = [
+	values.N = list.nextN_practice.nextvalue;
+	values.currenttarget = 0; 
+	if (values.N == 0){
+		values.currenttarget = 1;
+	};
+	list.items.reset();
+	values.TotalBlocks += 1;
+	values.starttrialcounter = 0;
+	list.blockACC.reset();	
+]
+/ trials = [
+	1 = start; 
+	2 - 11 = noreplace(nontarget, nontarget, nontarget, nontarget, nontarget, nontarget, nontarget,target, target, target);	
+]
+/ screencolor  = (0, 0, 0)
+/ recorddata = true
+/ postinstructions = (BlockFeedback) 
+/ branch = [
+	if (values.TotalBlocks >= list.nextN_practice.itemcount) {
+		values.TotalBlocks = 0; 
+		block.RepeatPractice;
+	} else {
+		block.Practice;
+	};
+]	
+</block>
+
+if trial feedback is desired:
+/ errormessage = true(ErrorFeedback, 500)
+/ correctmessage = true(CorrectFeedback, 500)
+
+<block RepeatPractice>
+/ skip = [
+	parameters.allowPracticeRepeat == false;
+]
+/ trials = [1 = repeatpractice]
+/ recorddata = false
+/ branch = [		
+	if (trial.repeatpractice.responsetext == "Y") {
+		return block.Practice;
+	};
+]
+/ screencolor = black
+</block>
+
+<block PracticeEnd>
+/ preinstructions = (practiceend)
+/ recorddata = false
+</block>
+
+
+**********************************************
+EXPERIMENTAL-BLOCKS NONADAPTIVE
+**********************************************
+
+<block StartTest>
+/ preinstructions = (htmlpage.nback_testStart)
+/ recorddata = false
+/ onblockbegin = [
+	values.TotalBlocks = 0;
+	
+	//reset all necessary lists
+	list.hits.reset();
+	list.hitsRT.reset();
+	list.commissions.reset();
+	list.commissionsRT.reset();
+	list.hits_N0.reset();
+	list.hitsRT_N0.reset();
+	list.commissions_N0.reset();
+	list.commissionsRT_N0.reset();
+	list.hits_N1.reset();
+	list.hitsRT_N1.reset();
+	list.commissions_N1.reset();
+	list.commissionsRT_N1.reset();
+	list.hits_N2.reset();
+	list.hitsRT_N2.reset();
+	list.commissions_N2.reset();
+	list.commissionsRT_N2.reset();	
+	list.hits_N3.reset();
+	list.hitsRT_N3.reset();
+	list.commissions_N3.reset();
+	list.commissionsRT_N3.reset();
+	list.hits_N4.reset();
+	list.hitsRT_N4.reset();
+	list.commissions_N4.reset();
+	list.commissionsRT_N4.reset();	
+	list.hits_N5.reset();
+	list.hitsRT_N5.reset();
+	list.commissions_N5.reset();
+	list.commissionsRT_N5.reset();	
+	list.hits_N6.reset();
+	list.hitsRT_N6.reset();
+	list.commissions_N6.reset();
+	list.commissionsRT_N6.reset();	
+]
+</block>
+
+* Block starts with 
+(a) Instructiontrial 
+(b) N start-trials that cannot present Targets yet 
+(c) 20 Experimental trials
+* ratio targets : nontargets = 6 : 14 = 3 : 7
+* Block runs as many times as there are items in list.Nlevel and in the sequence controlled by list.Nlevel
+
+<block Test>
+/ preinstructions = (nback_levelInstructions)
+/ onblockbegin = [
+	list.blockACC.reset();
+	values.N = list.Nlevel.nextvalue;
+	values.currenttarget = 0; 
+	if (values.N == 0){
+		values.currenttarget = 1;
+	};	
+	list.items.reset();
+	values.lastIndex = 1;
+	expressions.fillitemlist;	
+	values.TotalBlocks += 1; 
+	values.starttrialcounter = 0;
+]
+/ trials = [
+	1 = start; 
+	2 - 21 = noreplace(nontarget, nontarget, nontarget, nontarget, nontarget, nontarget, nontarget,target, target, target);
+]
+/ screencolor  = (0, 0, 0)
+/ branch = [
+	//as long as the number of test blocks run is smaller than the items in list.Nlevel, another test block will start
+	if (values.TotalBlocks < list.Nlevel.itemcount){
+		return block.Test;
+	};
+]
+</block>
+
+<block Finish>
+/ trials = [
+	1 = finish;
+]
+</block>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EXPERIMENT 
+**************************************************************************************************************
+**************************************************************************************************************
+
+*After running the initial instructions, participants work through practice blocks for N = lowestN  to N = highestN
+* After practice, participants work through 3 blocks for each of the  level of N (levels are pseudorandomly determined)
+
+<expt>
+/ blocks = [ 
+	1 = Introduction; 
+	2 = Practice; 
+	3 = PracticeEnd;
+	3 = StartTest;
+	4 = Test;
+	5 = Finish;
+]
+
+</expt>
+
+**************************************************************************************************************
+												End of File
+**************************************************************************************************************

@@ -1,0 +1,841 @@
+﻿<usermanual>
+___________________________________________________________________________________________________________________	
+
+									*Dot Probe Task (custom)*
+___________________________________________________________________________________________________________________	
+
+Script Author: Katja Borchert, Ph.D. (katjab@millisecond.com) for Millisecond Software, LLC
+Date: 01-04-2021
+last updated:  01-07-2021 by K. Borchert (katjab@millisecond.com) for Millisecond Software, LLC
+
+Script Copyright © 01-07-2021 Millisecond Software
+
+___________________________________________________________________________________________________________________
+BACKGROUND INFO 	
+___________________________________________________________________________________________________________________	
+
+This script implements a custom template for an emotional dotprobe procedure (image pairs) in which the 
+emotionProbeCongurency can be manipulated (see section Editable Parameters).
+
+The procedure is based on:
+Hsu KJ, Caffey K, Pisner D, Shumake J, Risom S, Ray KL, Smits JAJ, Schnyer DM, Beevers CG. 
+Attentional bias modification treatment for depression: Study protocol for a randomized controlled trial. 
+Contemp Clin Trials. 2018 Dec;75:59-66. 
+doi: 10.1016/j.cct.2018.10.014. Epub 2018 Oct 26. PMID: 30416089; PMCID: PMC6431548.
+
+___________________________________________________________________________________________________________________
+TASK DESCRIPTION	
+___________________________________________________________________________________________________________________	
+
+Participants view image pairs of emotion and neutral images that are followed by a probe.
+The probe is either * or **. Participants have to press '1' if the probe is * and they have to 
+press 2 if the probe is **.
+___________________________________________________________________________________________________________________	
+DATA FILE INFORMATION 
+___________________________________________________________________________________________________________________		
+The default data stored in the data files are:
+
+(1) Raw data file: 'dotprobe_ABM_raw*.iqdat' (a separate file for each participant)*
+
+
+build:								The specific Inquisit version used (the 'build') that was run
+computer.platform:					the platform the script was run on (win/mac/ios/android)
+date, time, 						date and time script was run 
+subject, group, 					with the current subject/groupnumber
+session:							with the current session id
+
+blockcode, blocknum:				the name and number of the current block (built-in Inquisit variable)
+trialcode, trialnum: 				the name and number of the currently recorded trial (built-in Inquisit variable)
+										Note: trialnum is a built-in Inquisit variable; it counts all trials run; even those
+										that do not store data to the data file. 
+										
+totalTrialNumber:					the total number of trial that should be run 
+trialcount:							trialcounter 
+emotionType:						1 = emotion1 (Note: currently the script is only set up to run one emotion => item.emotion1Faces) 
+targetDuration:						the current targetduration (in ms)
+
+congruence:							1 = the probe follows the emotion image	
+									2 = the probe follows the neutral image
+								
+target_position:					1 = target (emotion) image on left; 2 = target (emotion) image on right 
+comp_x-probe_x:						the x-coordinate (in %) of the target (emotion)/ comp (neutral) /probe stims
+
+itemnumber:							itemnumber of currently selected image pair 
+target_image:						stores the currently presented target (emotion) image
+comp_image:							stores the currently presented comp (paired neutral) image
+
+probe:								1 = *; 2 = **										
+										
+response:							the participant's response (scancode of response buttons)
+									//Note: scancodes of number buttons can be confusing (e.g. scancode2 for number1)
+								
+responsetext:						the label of the response button pressed (e.g. 1 if number1 is pressed)
+
+correct:							accuracy of response: 1 = correct response; 0 = otherwise
+latency: 							the response latency (in ms); measured from: 
+
+(2) Summary data file: 'dotprobe_ABM_summary*.iqdat' (a separate file for each participant)*
+
+inquisit.build:						the Inquisit build/version run
+computer.platform:					the platform the script was run on (win/mac/ios/android)
+inquisit.build:						the version/build of Inquisit
+script.startdate:					date script was run
+script.starttime:					time script was started
+script.subjectid:					assigned subject id number
+script.groupid:						assigned group id number
+script.sessionid:					assigned session id number
+script.elapsedtime:					time it took to run script (in ms); measured from onset to offset of script
+script.completed:					0 = script was not completed (prematurely aborted); 
+									1 = script was completed (all conditions run)
+									
+propCorrect_Emotion1:				proportion correct overall for emotion1 image pair responses 
+meanCorrRT_Emotion1:				overall mean latency (in ms) for correct responses for emotion1 image pairs
+
+propCorrect_congruent_Emotion1:		proportion correct in congruent Emotion1  trials (congruent = probe sits in emotion position)
+meanCorrRT_congruent_Emotion1:		mean latency of correct congruent Emotion1 trials
+propCorrect_incongruent_Emotion1:	proportion correct in incongruent Emotion1 trials (incongruent = probe sits in neutral position)
+meanCorrRT_incongruent_Emotion1:	mean latency of correct incongruent Emotion1 trials
+
+AB_Emotion1:						Attentional Bias for Emotion1 pics : If AB_Emotion1 > 0 
+									=> faster mean latencies to congruent (probe follows emotion) Emotion1 trials than 
+									incongruent (probe follows neutral) ones									
+
+							
+* separate data files: to change to one data file for all participants (on Inquisit Lab only), go to section
+"DATA" and follow further instructions
+
+___________________________________________________________________________________________________________________	
+EXPERIMENTAL SET-UP 
+___________________________________________________________________________________________________________________	
+
+Note: the current script is set up as a template. The main block 'dotProbe'
+runs as many trials as items are provided under item.emotion1Faces.
+The script can be edited to run more emotions but the current default set-up runs only Emotion1 (whatever
+emotion is depicted by item.emotion1Faces).
+
+- Half the trials place the emotion image on the left (neutral on the right);
+the other half place the emotion image on the right (neutral on the left)
+!NOTE: the script can be edited to present the images above or below the fixation cross if that is
+preferred to the side-by-side presentation
+
+- the probe appears in the position of the emotion image (= congruent trial)
+in 20% of the cases. This can be manipulated under section Editable Parameters.
+Note: the number of trials run per Emotion category should be compatible with the 
+frequencies chosen.
+Example: if EmotionProbeCongruency = 0.2 => the number of trials * 0.2 should result into an integer number
+
+- Half the trials present probe1 (*), the other half present probe2 (**)
+
+Trial Sequence:
+Fixation Cross (1500ms)->
+Image Pair (duration as specified under item.emotionPair1Duration) ->
+probe (* or **) (Max: 10000ms)
+Feedback (for 500ms)
+
+Note: Feedback can easily be removed if required
+
+___________________________________________________________________________________________________________________
+STIMULI
+___________________________________________________________________________________________________________________
+
+* can be edited under section Editable Stimuli
+Note: the script is currently set up to run as many trials as there are items provided under 
+item.emotion1Faces
+
+___________________________________________________________________________________________________________________	
+INSTRUCTIONS 
+___________________________________________________________________________________________________________________	
+* provided by Millisecond Software - can be edited under section Editable Instructions
+
+___________________________________________________________________________________________________________________	
+EDITABLE CODE 
+___________________________________________________________________________________________________________________	
+check below for (relatively) easily editable parameters, stimuli, instructions etc. 
+Keep in mind that you can use this script as a template and therefore always "mess" with the entire code 
+to further customize your experiment.
+
+The parameters you can change are:
+</usermanual>
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE PARAMETERS: change editable parameters here
+**************************************************************************************************************
+**************************************************************************************************************
+
+<parameters>
+/getReadyDuration = 5000
+
+//ResponseKeys:
+/responsekey_left = "1"							//correct response key for probe1 (*)
+/responsekey_right = "2"						//correct response key for probe2 (**)
+
+//Duration Parameters:
+/fixationDuration = 1500						//the duration of the fixation cross (default: 1500ms)
+/maxProbeDuration = 3000						//the maximum duration that the probe is presented (default: 10000ms)
+/tp_isi = 0										//target-probe interstimulus interval in ms (default: 0ms)
+/feedbackDuration = 500							//the duration of the feedback stims (default: 500ms)
+
+//Congruence Parameters
+/EmotionProbeCongruency = 0.2					//the frequency with which the probe will sit in the position of the emotion image (default: 20%)
+												//Note: make sure that the number of trials run per Emotion category works with the selected frequency (that is results in integer numbers)
+												//Note: by changing this value to 0.5, the probe will equally often follow the emotion image as the neutral one 
+//PositionParameters:
+//Note: 
+//horizonal: 0% (left edge of active canvas) to 100% (right edge of active canvas)
+//vertical: 0% (top edge of active canvas) to 100% (bottom edge of active canvas)
+/ target_left_x = 27%							//the proportional horizontal position of the left image
+/ target_right_x = 73%							//the proportional horizontal position of the right image
+/ target_y = 50%								//the proportional vertical position of the images/probes
+
+//Position and Sizing Parameters:
+/ fixationcross_height = 5%
+/ probe_height = 15%
+/ imageheight = 40%
+</parameters>
+
+<expressions>
+/totalTrialNumber = item.emotion1Faces.itemcount 	//sets the number of trials that should be run
+													//currently runs as many trials as items stored under item.emotion1Faces
+													//Note: if further emotion categories should be run, this value needs to be
+													//be updated accordingly
+/task = "CBM-A"													
+</expressions>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE STIMULI
+**************************************************************************************************************
+**************************************************************************************************************
+
+<item probes>
+/1 = "*"
+/2 = "**"
+</item>
+
+************************************************************************
+Emotion 1
+************************************************************************
+
+//Note: add as many emotion Faces as you would like to use
+//then update item.neutral1Faces accordingly as well as item.emotionPair1Duration
+<item emotion1Faces>
+/1 = "PAFS\01F_SA_MAX.JPG"
+/2 = "PAFS\02M_SA_MAX.JPG"
+/3 = "PAFS\03F_SA_MAX.JPG"
+/4 = "PAFS\04M_SA_MAX.JPG"
+/5 = "PAFS\05F_SA_MAX.JPG"
+/6 = "PAFS\06M_SA_MAX.JPG"
+/7 = "PAFS\07F_SA_MAX.JPG"
+/8 = "PAFS\08M_SA_MAX.JPG"
+/9 = "PAFS\09F_SA_MAX.JPG"
+/10 = "PAFS\10M_SA_MAX.JPG"
+/11 = "PAFS\11F_SA_MAX.JPG"
+/12 = "PAFS\12M_SA_MAX.JPG"
+/13 = "PAFS\13F_SA_MAX.JPG"
+/14 = "PAFS\14M_SA_MAX.JPG"
+/15 = "PAFS\15F_SA_MAX.JPG"
+/16 = "PAFS\16M_SA_MAX.JPG"
+/17 = "PAFS\17F_SA_MAX.JPG"
+/18 = "PAFS\18M_SA_MAX.JPG"
+/19 = "PAFS\19F_SA_MAX.JPG"
+/20 = "PAFS\20M_SA_MAX.JPG"
+/21 = "PAFS\01F_FE_MAX.JPG"
+/22 = "PAFS\02M_FE_MAX.JPG"
+/23 = "PAFS\03F_FE_MAX.JPG"
+/24 = "PAFS\04M_FE_MAX.JPG"
+/25 = "PAFS\05F_FE_MAX.JPG"
+/26 = "PAFS\06M_FE_MAX.JPG"
+/27 = "PAFS\07F_FE_MAX.JPG"
+/28 = "PAFS\08M_FE_MAX.JPG"
+/29 = "PAFS\09F_FE_MAX.JPG"
+/30 = "PAFS\10M_FE_MAX.JPG"
+/31 = "PAFS\11F_FE_MAX.JPG"
+/32 = "PAFS\12M_FE_MAX.JPG"
+/33 = "PAFS\13F_FE_MAX.JPG"
+/34 = "PAFS\14M_FE_MAX.JPG"
+/35 = "PAFS\15F_FE_MAX.JPG"
+/36 = "PAFS\16M_FE_MAX.JPG"
+/37 = "PAFS\17F_FE_MAX.JPG"
+/38 = "PAFS\18M_FE_MAX.JPG"
+/39 = "PAFS\19F_FE_MAX.JPG"
+/40 = "PAFS\20M_FE_MAX.JPG"
+
+</item>
+
+//Note: updates automatically if items are added to item.emotion1Faces (no changes necessary)
+<list emotion1_itemnumbers>
+/ poolsize = item.emotion1Faces.itemcount
+/ replace = false
+</list>
+
+//Note: neutral Faces are tied to emotional Faces (see item.emotionFaces) by itemnumber
+<item neutral1Faces>
+/1 = "PAFS\01F_NE.JPG"
+/2 = "PAFS\02M_NE.JPG"
+/3 = "PAFS\03F_NE.JPG"
+/4 = "PAFS\04M_NE.JPG"
+/5 = "PAFS\05F_NE.JPG"
+/6 = "PAFS\06M_NE.JPG"
+/7 = "PAFS\07F_NE.JPG"
+/8 = "PAFS\08M_NE.JPG"
+/9 = "PAFS\09F_NE.JPG"
+/10 = "PAFS\10M_NE.JPG"
+/11 = "PAFS\11F_NE.JPG"
+/12 = "PAFS\12M_NE.JPG"
+/13 = "PAFS\13F_NE.JPG"
+/14 = "PAFS\14M_NE.JPG"
+/15 = "PAFS\15F_NE.JPG"
+/16 = "PAFS\16M_NE.JPG"
+/17 = "PAFS\17F_NE.JPG"
+/18 = "PAFS\18M_NE.JPG"
+/19 = "PAFS\19F_NE_SPO.JPG"
+/20 = "PAFS\20M_NE.JPG"
+/21 = "PAFS\01F_CA.JPG"
+/22 = "PAFS\02M_CA.JPG"
+/23 = "PAFS\03F_CA.JPG"
+/24 = "PAFS\04M_CA.JPG"
+/25 = "PAFS\05F_CA.JPG"
+/26 = "PAFS\06M_CA.JPG"
+/27 = "PAFS\07F_CA.JPG"
+/28 = "PAFS\08M_CA.JPG"
+/29 = "PAFS\09F_CA.JPG"
+/30 = "PAFS\10M_CA.JPG"
+/31 = "PAFS\11F_CA.JPG"
+/32 = "PAFS\12M_CA.JPG"
+/33 = "PAFS\13F_CA.JPG"
+/34 = "PAFS\14M_CA.JPG"
+/35 = "PAFS\15F_CA.JPG"
+/36 = "PAFS\16M_CA.JPG"
+/37 = "PAFS\17F_CA_SPO.JPG"
+/38 = "PAFS\18M_CA_SPO.JPG"
+/39 = "PAFS\19F_CA_SPO.JPG"
+/40 = "PAFS\20M_CA_SPO.JPG"
+</item>
+
+//stores the picturePair Duration (in ms) with which each picture pair should be presented (Note: can be adjusted if IAPS/POFA images are used)
+//tied to particular emotion Face by itemnumber 
+//Add as many durations as there are items under item.emotionFace
+<item emotionPair1Duration>
+/1 = "3000"
+/2 = "3000"
+/3 = "3000"
+/4 = "3000"
+/5 = "3000"
+/6 = "3000"
+/7 = "3000"
+/8 = "3000"
+/9 = "3000"
+/10 = "3000"
+/11 = "3000"
+/12 = "3000"
+/13 = "3000"
+/14 = "3000"
+/15 = "3000"
+/16 = "3000"
+/17 = "3000"
+/18 = "3000"
+/19 = "3000"
+/20 = "3000"
+/21 = "3000"
+/22 = "3000"
+/23 = "3000"
+/24 = "3000"
+/26 = "3000"
+/27 = "3000"
+/28 = "3000"
+/29 = "3000"
+/30 = "3000"
+/31 = "3000"
+/32 = "3000"
+/33 = "3000"
+/34 = "3000"
+/35 = "3000"
+/36 = "3000"
+/37 = "3000"
+/38 = "3000"
+/39 = "3000"
+/40 = "3000"
+</item>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE INSTRUCTIONS: change instructions here
+**************************************************************************************************************
+**************************************************************************************************************
+<instruct>
+/ inputdevice = keyboard
+/ nextlabel = "pressione a [barra de espaços] para continuar"
+/ lastlabel = "pressione a [barra de espaços] para COMEÇAR"
+/ prevlabel = "pressione [backspace] para retroceder"
+/ screencolor = black
+/ txcolor = white
+</instruct>
+
+
+<page intro>
+<h1>Instruções</h1><hr>
+Irá ver um ponto de fixação no centro do ecrã seguido por um par de imagens; Um à esquerda e outro à direita da cruz de fixação.<br><br> 
+Assim que as imagens desaparecerem do ecrã, uma (<%item.probes.item(1)%>) ou duas estrelas (<%item.probes.item(2)%>)
+irão aparecer na posição de uma das imagens.<br><br>
+A sua tarefa será:<br>
+&bull; primir <b><%parameters.responsekey_left%></b> se viu uma estrela (<%item.probes.item(1)%>)<br> 
+&bull; primir <b><%parameters.responsekey_right%></b> se viu duas estrelas (<%item.probes.item(2)%>).<br><br>
+<center><i>Responda o mais rápido que conseguir sem errar!</i></center><br><br>
+Depois de responder, outro ponto de fixação aparecerá seguido da apresentação de um novo conjunto de imagens. 
+Irá realizar várias tentativas.</p><br>
+<p>Por favor, pressione [espaço] para começar. </p>
+</page>
+
+<text correctFeedback>
+/ items = ("Correto")
+/ fontstyle = ("Arial", 8%, true, false, false, false, 5, 1)
+/ position = (50%, 80%)
+/ size = (80%, 10%)
+/ vjustify = center
+/ valign = center
+/ halign = center
+/ txcolor = green
+</text>
+
+<text incorrectFeedback>
+/ items = ("Incorreto")
+/ fontstyle = ("Arial", 8%, true, false, false, false, 5, 1)
+/ position = (50%, 80%)
+/ size = (80%, 10%)
+/ vjustify = center
+/ valign = center
+/ halign = center
+/ txcolor = red
+</text>
+
+
+<text finish>
+/ items = ("Obrigado!")
+/ fontstyle = ("Arial", 8%, true, false, false, false, 5, 1)
+/ position = (50%, 50%)
+/ size = (80%, 10%)
+/ vjustify = center
+/ valign = center
+/ halign = center
+</text>
+
+<text exit>
+/ items = ("pressione a [barra de espaços] para terminar")
+/ fontstyle = ("Arial", 3%, false, false, false, false, 5, 1)
+/ position = (50%, 95%)
+/ size = (80%, 5%)
+/ vjustify = center
+/ valign = center
+/ halign = center
+/ txbgcolor = gray
+</text>
+
+*******************************
+General Helper Instructions
+******************************
+
+<text getReady>
+/ items = ("<center><h1>Prepare-se!</h1><br>
+~n<%expressions.buttoninstruct1%></center>")
+/ fontstyle = ("Arial", 3.00%, false, false, false, false, 5, 1)
+</text>
+
+****************************************************************************************************
+general instruction expressions: adjust the instruction text depending on device used to run script
+****************************************************************************************************
+<expressions>
+/buttoninstruct1 = if (computer.touch && !computer.haskeyboard) {"put your fingers over the response buttons";} else 
+{"coloque os dedos nas teclas '<%parameters.responsekey_left%>' e '<%parameters.responsekey_right%>'";}
+</expressions>
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EDITABLE LISTS: change editable lists here
+**************************************************************************************************************
+**************************************************************************************************************
+//1 = emotion1
+//Note: if additional emotion Categories should be run, the itemlist needs to be updated
+<list trialSelector>
+/ items = (1)
+/ poolsize = 20
+/ replace = false
+</list>
+
+************************************************************************
+Emotion 1
+************************************************************************
+
+//1 = emotion face is presented on the left (50%)
+//2 = emotion face is presented on the right (50%)
+<list emotion1_targetPositions>
+/ items = (1,2)
+/ poolsize = item.emotion1Faces.itemcount
+/ itemprobabilities = (0.5, 0.5)
+/ replace = false
+/ resetinterval = 1
+</list>
+
+//1 = probe follows emotion image (see parameters.EmotionProbeCongruency)
+//2 = probe follows neutral image
+<list emotion1_ProbeCongruency>
+/ items = (1, 2)
+/ poolsize = item.emotion1Faces.itemcount
+/ itemprobabilities = (parameters.EmotionProbeCongruency, expressions.NeutralProbeCongruency)
+/ replace = false
+/ resetinterval = 1
+</list>
+
+//1 = probe1 (*) will be selected (50%)
+//2 = probe2 (**) will be selected (50%)
+<list emotion1_probeSelection>
+/ items = (1, 2) 
+/ poolsize = item.emotion1Faces.itemcount
+/ itemprobabilities = (0.5, 0.5)
+/ replace = false
+/ resetinterval = 0
+</list>
+
+**************************************************************************************************************
+				!!!REMAINING CODE: Customize after careful consideration only!!!
+**************************************************************************************************************
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	DEFAULTS
+**************************************************************************************************************
+**************************************************************************************************************
+script requires Inquisit 6.3.4.0 or higher
+
+<defaults>
+/canvasaspectratio = (4,3)
+/minimumversion = "6.3.4.0"
+/ fontstyle = ("Arial", 3%, false, false, false, false, 5, 1)
+/txbgcolor = black
+/ txcolor = white
+/ screencolor = black
+</defaults>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	DATA
+**************************************************************************************************************
+**************************************************************************************************************
+
+Note: data file explanations under User Manual Information at the top
+
+To change from one data file per participant to one data file for all participants, set
+/separatefiles = false
+
+***********************
+raw data file
+***********************
+<data>
+/ columns = (build, computer.platform, date, time, subject, group, session, 
+blockcode, blocknum, trialcode, trialnum, 
+expressions.totalTrialNumber, values.trialcount, values.emotionType, values.targetDuration,
+values.congruence, values.target_position,
+values.comp_x, values.target_x, values.probe_x,
+values.itemnumber, values.target_image, values.comp_image, values.probe, response, responsetext, correct, latency)
+</data>
+
+***********************
+summary data file
+***********************
+<summarydata>
+/ columns = (inquisit.build, computer.platform, expressions.task, script.startdate, script.starttime, 
+script.subjectid, script.groupid, script.sessionid, 
+script.elapsedtime, script.completed,
+expressions.propCorrect_Emotion1,
+expressions.meanCorrRT_Emotion1,
+
+expressions.propCorrect_congruent_Emotion1,
+expressions.propCorrect_incongruent_Emotion1,
+expressions.meanCorrRT_congruent_Emotion1,
+expressions.meanCorrRT_incongruent_Emotion1,
+expressions.AB_Emotion1)
+
+</summarydata>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	VALUES: automatically updated
+**************************************************************************************************************
+**************************************************************************************************************
+
+<values>
+/itemnumber = 0
+/probe = ""
+/target_position = ""
+/probe_position = ""
+/congruence = ""
+/target_x = ""
+/target_y = ""
+/comp_x = ""
+/comp_y = ""
+/probe_x = ""
+/probe_y = ""
+/trialcount = 0
+/emotionType = ""
+/target_image = ""
+/comp_image = ""
+/targetDuration = ""
+</values>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EXPRESSIONS
+**************************************************************************************************************
+**************************************************************************************************************
+
+<expressions>
+/NeutralProbeCongruency = 1 - parameters.EmotionProbeCongruency
+
+/ propCorrect_Emotion1 = list.emotion1_ACC.mean
+/ meanCorrRT_Emotion1 = list.emotion1_RT.mean
+
+/ propCorrect_congruent_Emotion1 = list.emotion1_ACC_c.mean
+/ propCorrect_incongruent_Emotion1 = list.emotion1_ACC_ic.mean
+/ meanCorrRT_congruent_Emotion1 = list.emotion1_RT_c.mean
+/ meanCorrRT_incongruent_Emotion1 = list.emotion1_RT_ic.mean
+/ AB_Emotion1 = expressions.meanCorrRT_incongruent_Emotion1 - expressions.meanCorrRT_congruent_Emotion1
+
+</expressions>
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	INSTRUCTIONS
+**************************************************************************************************************
+**************************************************************************************************************
+
+**************************************************************************************************************
+finish trial
+**************************************************************************************************************
+<trial finish>
+/ inputdevice = keyboard
+/ stimulusframes = [1 = finish, exit]
+/ validresponse = (" ")
+/ recorddata = false
+</trial>
+
+
+*************************************
+General Helper Instruction Trials/Blocks
+*************************************
+
+This trial is used when participants are asked to place their fingers on specific response
+buttons. On the touchscreen, this trial presents the (inactive) response buttons to the participants.
+<trial getReady>
+/ stimulusframes = [1 = getReady]
+/ trialduration = parameters.getReadyDuration
+/ validresponse = (parameters.responsekey_left, parameters.responsekey_right)
+/ beginresponsetime = parameters.getReadyDuration
+/ errormessage = false
+/ recorddata = false
+</trial>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	STIMULI
+**************************************************************************************************************
+**************************************************************************************************************
+
+<text fixation>
+/ items = ("+")
+/ position = (50%, 50%)
+/ fontstyle = ("Arial", parameters.fixationcross_height, false, false, false, false, 5, 1)
+/ erase = false
+/ vjustify = center
+</text>
+
+<picture emotion1Target>
+/ items = item.emotion1Faces
+/ select = values.itemnumber
+/ hposition = values.Target_x
+/ vposition = parameters.target_y
+/ size = (parameters.imageheight, parameters.imageheight)
+</picture>
+
+<picture emotion1Comp>
+/ items = item.neutral1Faces
+/ select = values.itemnumber
+/ hposition = values.Comp_x
+/ vposition = parameters.target_y
+/ size = (parameters.imageheight, parameters.imageheight)
+</picture>
+
+<text probe>
+/ items = item.probes
+/ select = values.probe
+/ hposition = values.probe_x
+/ vposition = parameters.target_y - 1%
+/ fontstyle = ("Arial", parameters.probe_height, false, false, false, false, 5, 1)
+</text>
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	LISTS	
+**************************************************************************************************************
+**************************************************************************************************************
+
+
+*************************************************
+Data Lists: used for descriptive statistics
+store correct latencies/accuracy data
+fill up during runtime
+*************************************************
+
+Note: list stores 1 = correct response; 0 = incorrect response for each relevant trial
+any response coded as an error is automatically coded as 0
+<list emotion1_ACC>
+</list>
+
+Note: list stores the latency of correct responses for each relevant trial
+<list emotion1_RT>
+</list>
+
+Note: list stores 1 = correct response; 0 = incorrect response for each relevant trial
+any response coded as an error is automatically coded as 0
+<list emotion1_ACC_c>
+</list>
+
+Note: list stores the latency of correct responses for each relevant trial
+<list emotion1_RT_c>
+</list>
+
+Note: list stores 1 = correct response; 0 = incorrect response for each relevant trial
+any response coded as an error is automatically coded as 0
+<list emotion1_ACC_ic>
+</list>
+
+Note: list stores the latency of correct responses for each relevant trial
+<list emotion1_RT_ic>
+</list>
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	TRIALS 	
+**************************************************************************************************************
+**************************************************************************************************************
+
+<trial trialSelector>
+/ ontrialbegin = [
+	values.emotionType = list.trialSelector.nextvalue;
+	values.trialcount += 1;
+]
+/ trialduration = 0
+/ branch = [
+	if (values.trialcount <= expressions.totalTrialNumber){
+		return trial.Emotion1;		
+	}//code can be edited to run additional emotion trials
+]
+/ recorddata = false
+</trial>
+
+//trial runs 'emotion1' trials (currently the only emotion category run by this script)
+<trial Emotion1>
+/ ontrialbegin = [
+	values.itemnumber = list.emotion1_itemnumbers.nextindex;
+	values.targetDuration = item.emotionPair1Duration.item(values.itemnumber);
+	values.probe = list.emotion1_probeSelection.nextvalue;
+	values.target_position = list.emotion1_targetPositions.nextvalue;
+	values.congruence = list.emotion1_ProbeCongruency.nextvalue;
+	if (values.target_position == 1) {
+		values.target_x = parameters.target_left_x;
+		values.comp_x = parameters.target_right_x;
+	} else {
+		values.target_x = parameters.target_right_x;
+		values.comp_x = parameters.target_left_x;
+	};
+	if (values.congruence == 1) {
+		values.probe_x = values.target_x;
+	} else {
+		values.probe_x = values.comp_x;
+	};
+	trial.Emotion1.insertstimulustime(clearscreen, parameters.fixationduration);
+	trial.Emotion1.insertstimulustime(picture.Emotion1Target, parameters.fixationduration);
+	trial.Emotion1.insertstimulustime(picture.Emotion1Comp, parameters.fixationduration);
+	
+	trial.Emotion1.insertstimulustime(clearscreen, (parameters.fixationduration + values.targetDuration));
+
+	trial.Emotion1.insertstimulustime(text.probe, (parameters.fixationduration + values.targetDuration + parameters.tp_isi));
+	
+]
+/ stimulusframes = [1 = fixation]
+/ beginresponsetime = parameters.fixationduration + values.targetDuration + parameters.tp_isi
+/ responseinterrupt = immediate
+/ validresponse = (parameters.responsekey_left, parameters.responsekey_right)
+/ iscorrectresponse = [
+	return ((values.probe == 1 && trial.Emotion1.responsetext == parameters.responsekey_left) ||
+	(values.probe == 2 && trial.Emotion1.responsetext == parameters.responsekey_right));
+]											
+/ ontrialend = [
+	trial.Emotion1.resetstimulusframes();
+	values.target_image = picture.Emotion1Target.currentitem;
+	values.comp_image = picture.Emotion1Comp.currentitem;
+	
+	//summary data:
+	list.emotion1_ACC.appenditem(trial.Emotion1.correct);
+	if (trial.Emotion1.correct){
+		list.emotion1_RT.appenditem(trial.Emotion1.latency);
+	};
+	if (values.congruence == 1){//probe follows emotion image
+		list.emotion1_ACC_c.appenditem(trial.Emotion1.correct);
+		if (trial.Emotion1.correct){
+			list.emotion1_RT_c.appenditem(trial.Emotion1.latency);
+		};		
+	} else {//probe follows neutral image
+		list.emotion1_ACC_ic.appenditem(trial.Emotion1.correct);
+		if (trial.Emotion1.correct){
+			list.emotion1_RT_ic.appenditem(trial.Emotion1.latency);
+		};		
+	};
+]
+/ timeout = (parameters.fixationDuration + values.targetDuration + parameters.tp_isi + parameters.maxProbeDuration)
+/ branch = [
+	return trial.trialSelector;
+]
+/ correctmessage = true(text.correctFeedback, parameters.feedbackDuration)
+/ errormessage = true(text.incorrectFeedback, parameters.feedbackDuration)
+</trial>
+
+
+**************************************************************************************************************
+**************************************************************************************************************
+	BLOCKS
+**************************************************************************************************************
+**************************************************************************************************************
+
+<block dotProbe>
+/ trials = [1 = getReady; 2 = trialSelector]
+</block>
+
+<block finish>
+/ trials = [
+	1 = finish;
+]
+</block>
+
+**************************************************************************************************************
+**************************************************************************************************************
+	EXPERIMENT 
+**************************************************************************************************************
+**************************************************************************************************************
+
+<expt>
+/ preinstructions = (intro)
+/ blocks = [
+	1 = dotProbe;
+	2 = finish;
+]
+</expt>
+
+**************************************************************************************************************
+												End of File
+**************************************************************************************************************
